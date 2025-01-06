@@ -13,7 +13,7 @@ public class RobotContainer {
     private final XboxController m_driverController = new XboxController(
             OperatorConstants.kDriverControllerPort);
     private final XboxController m_operatorController = new XboxController(
-            OperatorConstants.kDriverControllerPort);
+            OperatorConstants.kOperatorControllerPort);
 
     public RobotContainer() {
         configureBindings();
