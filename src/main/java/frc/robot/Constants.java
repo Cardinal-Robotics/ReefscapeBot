@@ -5,6 +5,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.math.util.Units;
+
+import java.io.File;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -22,9 +27,13 @@ public final class Constants {
     public static final class OperatorConstants {
         public static final int kDriverControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
+        public static final double kDeadband = 0.05;
     }
 
     public static final class DriveConstants {
+        public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
+        public static final double kMaxSpeed = Units.feetToMeters(4.5);
+
         public static final int kFrontLeftDriveMotorPort = 2;
         public static final int kRearLeftDriveMotorPort = 5;
         public static final int kFrontRightDriveMotorPort = 11;
@@ -54,11 +63,6 @@ public final class Constants {
         public static final boolean kRearLeftNotVersH = false;
         public static final boolean kFrontRightNotVersH = true;
         public static final boolean kRearRightNotVersH = false;
-
-        public static final String kFrontLeftName = "FL";
-        public static final String kRearLeftName = "RL";
-        public static final String kFrontRightName = "FR";
-        public static final String kRearRightName = "RR";
     }
 
 }
