@@ -7,6 +7,9 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
+
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -34,7 +37,7 @@ public class RobotContainer {
     // ---------------------------------------------------------------------------------------------------------------------------------------
 
     // Gets how fast it should move.
-    private final SwerveInputStream m_driveAngularVelocity = SwerveInputStream.of(m_swerveDrive.getSwerveDrive(),
+    private final SwerveInputStream m_driveAngularVelocity = SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(m_driverController::getRightX)
@@ -72,6 +75,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        return new PathPlannerAuto("New Auto");
     }
 }
