@@ -16,6 +16,7 @@ import frc.robot.Constants.DriveConstants;
 import swervelib.parser.SwerveParser;
 import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
+import swervelib.SwerveModule;
 
 public class SwerveSubsystem extends SubsystemBase {
     private SwerveDrive m_swerveDrive;
@@ -24,6 +25,12 @@ public class SwerveSubsystem extends SubsystemBase {
         try {
             m_swerveDrive = new SwerveParser(DriveConstants.kSwerveDirectory)
                     .createSwerveDrive(DriveConstants.kMaxSpeed);
+
+            SwerveModule[] modules = m_swerveDrive.getModules();
+            for (int i = 0; i < modules.length; i++) {
+                SwerveModule module = modules[i];
+                SmartDashboard.putNumber(module.configuration.name, module.getRawAbsolutePosition());
+            }
         } catch (Exception e) {
             SmartDashboard.putString("SwerveSubsystem", "Failed to create YAGSL Swerve Drive");
             throw new RuntimeException(e);
@@ -31,6 +38,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {
+        m_swerveDrive.updateOdometry();
         m_swerveDrive.driveFieldOriented(velocity);
     }
 
