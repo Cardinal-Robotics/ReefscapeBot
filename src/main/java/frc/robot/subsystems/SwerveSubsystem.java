@@ -14,9 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
 import swervelib.parser.SwerveParser;
-import swervelib.SwerveDrive;
-import swervelib.SwerveInputStream;
 import swervelib.SwerveModule;
+import swervelib.SwerveDrive;
 
 public class SwerveSubsystem extends SubsystemBase {
     private SwerveDrive m_swerveDrive;
