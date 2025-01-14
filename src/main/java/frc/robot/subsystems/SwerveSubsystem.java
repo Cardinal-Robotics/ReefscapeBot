@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
 import swervelib.parser.SwerveParser;
-import swervelib.SwerveModule;
 import swervelib.SwerveDrive;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -25,11 +24,6 @@ public class SwerveSubsystem extends SubsystemBase {
             m_swerveDrive = new SwerveParser(DriveConstants.kSwerveDirectory)
                     .createSwerveDrive(DriveConstants.kMaxSpeed);
 
-            SwerveModule[] modules = m_swerveDrive.getModules();
-            for (int i = 0; i < modules.length; i++) {
-                SwerveModule module = modules[i];
-                SmartDashboard.putNumber(module.configuration.name, module.getRawAbsolutePosition());
-            }
         } catch (Exception e) {
             SmartDashboard.putString("SwerveSubsystem", "Failed to create YAGSL Swerve Drive");
             throw new RuntimeException(e);
