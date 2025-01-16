@@ -13,11 +13,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.DriveConstants;
-
+import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveModule;
 import swervelib.SwerveDrive;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -32,6 +33,15 @@ public class SwerveSubsystem extends SubsystemBase {
         } catch (Exception e) {
             SmartDashboard.putString("SwerveSubsystem", "Failed to create YAGSL Swerve Drive");
             throw new RuntimeException(e);
+        }
+    }
+
+    public void updatePIDF(PIDFConfig drivePIDF, PIDFConfig anglePIDF) {
+        SwerveModule[] modules = m_swerveDrive.getModules();
+        for (int i = 0; i < modules.length; i++) {
+            SwerveModule module = modules[i];
+            module.setDrivePIDF(drivePIDF);
+            module.setAnglePIDF(anglePIDF);
         }
     }
 
