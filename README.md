@@ -1,6 +1,8 @@
-# ReefscapeBot (2025 Season)
-
-This is the robot code for team 4269. 
+<div align="center">  
+  <img height="300" src="https://info.firstinspires.org/hs-fs/hubfs/2025%20Season/Season%20Assets/FIRST_DIVE-reefscape-PatchLogo.png?width=283&height=343&name=FIRST_DIVE-reefscape-PatchLogo.png"  />
+  <br>
+  <h1>ReefscapeBot (2025 Season)</h1>
+</div>
 
 ## Goals
 - [ ] YAGSL
