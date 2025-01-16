@@ -31,7 +31,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {
-        m_swerveDrive.updateOdometry();
         m_swerveDrive.driveFieldOriented(velocity);
     }
 
