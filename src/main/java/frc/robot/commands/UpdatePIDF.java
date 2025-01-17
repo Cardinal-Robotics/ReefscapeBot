@@ -24,17 +24,17 @@ public class UpdatePIDF extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        SmartDashboard.putNumber("Drive P", m_swerveSubsystem.getSwerveDrive().getModules()[0].getDrivePIDF().p);
-        SmartDashboard.putNumber("Drive I", m_swerveSubsystem.getSwerveDrive().getModules()[0].getDrivePIDF().i);
-        SmartDashboard.putNumber("Drive D", m_swerveSubsystem.getSwerveDrive().getModules()[0].getDrivePIDF().d);
-        SmartDashboard.putNumber("Drive F", m_swerveSubsystem.getSwerveDrive().getModules()[0].getDrivePIDF().f);
-        SmartDashboard.putNumber("Drive iz", m_swerveSubsystem.getSwerveDrive().getModules()[0].getDrivePIDF().iz);
+        SmartDashboard.putNumber("Drive P", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getDrivePIDF().p);
+        SmartDashboard.putNumber("Drive I", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getDrivePIDF().i);
+        SmartDashboard.putNumber("Drive D", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getDrivePIDF().d);
+        SmartDashboard.putNumber("Drive F", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getDrivePIDF().f);
+        SmartDashboard.putNumber("Drive iz", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getDrivePIDF().iz);
 
-        SmartDashboard.putNumber("Angular P", m_swerveSubsystem.getSwerveDrive().getModules()[0].getAnglePIDF().p);
-        SmartDashboard.putNumber("Angular I", m_swerveSubsystem.getSwerveDrive().getModules()[0].getAnglePIDF().i);
-        SmartDashboard.putNumber("Angular D", m_swerveSubsystem.getSwerveDrive().getModules()[0].getAnglePIDF().d);
-        SmartDashboard.putNumber("Angular F", m_swerveSubsystem.getSwerveDrive().getModules()[0].getAnglePIDF().f);
-        SmartDashboard.putNumber("Angular iz", m_swerveSubsystem.getSwerveDrive().getModules()[0].getAnglePIDF().iz);
+        SmartDashboard.putNumber("Angular P", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getAnglePIDF().p);
+        SmartDashboard.putNumber("Angular I", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getAnglePIDF().i);
+        SmartDashboard.putNumber("Angular D", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getAnglePIDF().d);
+        SmartDashboard.putNumber("Angular F", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getAnglePIDF().f);
+        SmartDashboard.putNumber("Angular iz", m_swerveSubsystem.getLibSwerveDrive().getModules()[0].getAnglePIDF().iz);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

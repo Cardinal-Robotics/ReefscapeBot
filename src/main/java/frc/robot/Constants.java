@@ -34,6 +34,16 @@ public final class Constants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
         public static final double kMaxSpeed = 4.5; // m/s
 
+        // PID values for translation (moving).
+        public static final double kPTrans = 0.0022445;
+        public static final double kITrans = 0;
+        public static final double kDTrans = 0.35005;
+
+        // PID values for rotating.
+        public static final double kPAngular = 0.01;
+        public static final double kIAngular = 0;
+        public static final double kDAngular = 0;
+
         public static final int kFrontLeftDriveMotorPort = 2;
         public static final int kRearLeftDriveMotorPort = 5;
         public static final int kFrontRightDriveMotorPort = 11;

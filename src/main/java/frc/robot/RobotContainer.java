@@ -35,7 +35,7 @@ public class RobotContainer {
     // ---------------------------------------------------------------------------------------------------------------------------------------
 
     // Gets how fast it should move.
-    private final SwerveInputStream m_driveAngularVelocity = SwerveInputStream.of(m_swerveDrive.getSwerveDrive(),
+    private final SwerveInputStream m_driveAngularVelocity = SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(m_driverController::getRightX)

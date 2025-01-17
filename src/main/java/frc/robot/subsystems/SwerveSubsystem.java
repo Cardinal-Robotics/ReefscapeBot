@@ -6,7 +6,13 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -34,6 +40,8 @@ public class SwerveSubsystem extends SubsystemBase {
             SmartDashboard.putString("SwerveSubsystem", "Failed to create YAGSL Swerve Drive");
             throw new RuntimeException(e);
         }
+
+        setupPathPlanner();
     }
 
     public void updatePIDF(PIDFConfig drivePIDF, PIDFConfig anglePIDF) {
@@ -43,6 +51,10 @@ public class SwerveSubsystem extends SubsystemBase {
             module.setDrivePIDF(drivePIDF);
             module.setAnglePIDF(anglePIDF);
         }
+    }
+
+    public void lockInPlace() {
+        m_swerveDrive.lockPose();
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {
@@ -81,7 +93,49 @@ public class SwerveSubsystem extends SubsystemBase {
                 3.0, 5.0, 3.0);
     }
 
-    public SwerveDrive getSwerveDrive() {
+    /**
+     * @return Returns the YAGSL Swerve Drive instance
+     */
+    public SwerveDrive getLibSwerveDrive() {
         return this.m_swerveDrive;
+    }
+
+    /**
+     * Setup AutoBuilder for PathPlanner.
+     */
+    public void setupPathPlanner() {
+        // Load the RobotConfig from the GUI settings. You should probably
+        // store this in your Constants file
+        RobotConfig config;
+        try {
+            config = RobotConfig.fromGUISettings();
+
+            AutoBuilder.configure(
+                    m_swerveDrive::getPose,
+                    m_swerveDrive::resetOdometry,
+                    m_swerveDrive::getRobotVelocity,
+                    (speedsRobotRelative, moduleFeedForwards) -> {
+                        m_swerveDrive.drive(
+                                speedsRobotRelative,
+                                m_swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
+                                moduleFeedForwards.linearForces());
+                    },
+                    new PPHolonomicDriveController(
+                            new PIDConstants(DriveConstants.kPTrans, DriveConstants.kITrans, DriveConstants.kDTrans), // Translation
+                                                                                                                      // PID
+                            new PIDConstants(DriveConstants.kPAngular, DriveConstants.kIAngular,
+                                    DriveConstants.kDAngular)), // Rotation PID
+                    config,
+                    () -> {
+                        var alliance = DriverStation.getAlliance();
+                        if (alliance.isPresent()) {
+                            return alliance.get() == DriverStation.Alliance.Red;
+                        }
+                        return false;
+                    },
+                    this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
