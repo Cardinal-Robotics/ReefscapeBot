@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.UpdatePIDF;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj.XboxController;
@@ -44,6 +45,7 @@ public class RobotContainer {
             .allianceRelativeControl(true); // Field orientation flips to be on the your team's side.
 
     // Gets which angle to turn to.
+
     private final SwerveInputStream m_driveDirectAngle = m_driveAngularVelocity.copy()
             .withControllerHeadingAxis(
                     m_driverController::getRightX,
@@ -59,12 +61,14 @@ public class RobotContainer {
     private final Command m_driveFieldOrientedDirectAngle = m_swerveDrive.driveFieldOriented(m_driveDirectAngle);
     private final Command m_driveFieldOrientedAngularVelocity = m_swerveDrive
             .driveFieldOriented(m_driveAngularVelocity);
+
+    private final UpdatePIDF m_updatePIDF = new UpdatePIDF(m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
     public RobotContainer() {
         configureBindings();
-        m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
+        m_swerveDrive.setDefaultCommand(m_updatePIDF.andThen(m_driveFieldOrientedAngularVelocity));
     }
 
     private void configureBindings() {
