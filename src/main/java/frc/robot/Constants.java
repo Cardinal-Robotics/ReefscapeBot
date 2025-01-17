@@ -32,7 +32,7 @@ public final class Constants {
 
     public static final class DriveConstants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-        public static final double kMaxSpeed = 4.5; // m/s
+        public static final double kMaxSpeed = 3.699417868457614; // m/s
 
         // PID values for translation (moving).
         public static final double kPTrans = 0.0022445;

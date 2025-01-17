@@ -30,6 +30,8 @@ import swervelib.SwerveDrive;
 public class SwerveSubsystem extends SubsystemBase {
     private SwerveDrive m_swerveDrive;
 
+    private ChassisSpeeds maxVelocity = new ChassisSpeeds(0, 0, 0);
+
     public SwerveSubsystem() {
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // REMOVE OR LOW FOR COMP MAKES RUN SLOW
         try {
@@ -64,6 +66,11 @@ public class SwerveSubsystem extends SubsystemBase {
     public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
         return run(() -> {
             this.m_swerveDrive.driveFieldOriented(velocity.get());
+            if (maxVelocity.vxMetersPerSecond < this.getLibSwerveDrive()
+                    .getFieldVelocity().vxMetersPerSecond) {
+                maxVelocity = this.getLibSwerveDrive().getFieldVelocity();
+                SmartDashboard.putNumber("max x velocity", maxVelocity.vxMetersPerSecond);
+            }
         });
     }
 
@@ -76,7 +83,7 @@ public class SwerveSubsystem extends SubsystemBase {
         return SwerveDriveTest.generateSysIdCommand(
                 SwerveDriveTest.setDriveSysIdRoutine(
                         new Config(),
-                        this, m_swerveDrive, 12),
+                        this, m_swerveDrive, 12, false),
                 3.0, 5.0, 3.0);
     }
 

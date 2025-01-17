@@ -5,19 +5,21 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.GoBerserk;
 import frc.robot.commands.UpdatePIDF;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class RobotContainer {
+
     //
     // Controllers
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final XboxController m_driverController = new XboxController(
+    private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
-    private final XboxController m_operatorController = new XboxController(
+    private final CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -63,15 +65,21 @@ public class RobotContainer {
             .driveFieldOriented(m_driveAngularVelocity);
 
     private final UpdatePIDF m_updatePIDF = new UpdatePIDF(m_swerveDrive);
+    private final GoBerserk m_goBerserk = new GoBerserk(m_swerveDrive);
+
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
     public RobotContainer() {
         configureBindings();
-        m_swerveDrive.setDefaultCommand(m_updatePIDF.andThen(m_driveFieldOrientedAngularVelocity));
+        m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
     }
 
     private void configureBindings() {
+        m_driverController.a().whileTrue(m_swerveDrive.sysIdDriveMotorCommand());
+        m_driverController.b().whileTrue(m_swerveDrive.sysIdAngleMotorCommand());
+
+        m_driverController.x().whileTrue(m_goBerserk);
 
     }
 
