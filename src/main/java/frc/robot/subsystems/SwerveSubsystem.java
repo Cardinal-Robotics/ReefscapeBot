@@ -13,9 +13,12 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.DriveConstants;
@@ -28,6 +31,8 @@ import swervelib.SwerveModule;
 import swervelib.SwerveDrive;
 
 public class SwerveSubsystem extends SubsystemBase {
+    StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
+            .getStructTopic("YAGSL Pose", Pose2d.struct).publish();
     private SwerveDrive m_swerveDrive;
 
     private ChassisSpeeds maxVelocity = new ChassisSpeeds(0, 0, 0);
@@ -39,9 +44,12 @@ public class SwerveSubsystem extends SubsystemBase {
                     .createSwerveDrive(DriveConstants.kMaxSpeed);
 
         } catch (Exception e) {
-            SmartDashboard.putString("SwerveSubsystem", "Failed to create YAGSL Swerve Drive");
             throw new RuntimeException(e);
         }
+
+        m_swerveDrive.field.setRobotPose(DriveConstants.kInitialRobotPose);
+        m_swerveDrive.resetOdometry(DriveConstants.kInitialRobotPose);
+        m_publisher.set(m_swerveDrive.getPose());
 
         setupPathPlanner();
     }
@@ -66,11 +74,13 @@ public class SwerveSubsystem extends SubsystemBase {
     public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
         return run(() -> {
             this.m_swerveDrive.driveFieldOriented(velocity.get());
-            if (maxVelocity.vxMetersPerSecond < this.getLibSwerveDrive()
-                    .getFieldVelocity().vxMetersPerSecond) {
-                maxVelocity = this.getLibSwerveDrive().getFieldVelocity();
-                SmartDashboard.putNumber("max x velocity", maxVelocity.vxMetersPerSecond);
-            }
+            this.m_publisher.set(m_swerveDrive.getPose());
+        });
+    }
+
+    public Command resetGyro() {
+        return runOnce(() -> {
+            this.m_swerveDrive.setGyro(Rotation3d.kZero);
         });
     }
 

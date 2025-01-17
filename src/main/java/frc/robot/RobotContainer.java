@@ -5,15 +5,16 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.GoBerserk;
 import frc.robot.commands.UpdatePIDF;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class RobotContainer {
-
     //
     // Controllers
     // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -63,9 +64,9 @@ public class RobotContainer {
     private final Command m_driveFieldOrientedDirectAngle = m_swerveDrive.driveFieldOriented(m_driveDirectAngle);
     private final Command m_driveFieldOrientedAngularVelocity = m_swerveDrive
             .driveFieldOriented(m_driveAngularVelocity);
+    private final Command m_resetGyro = m_swerveDrive.resetGyro();
 
-    private final UpdatePIDF m_updatePIDF = new UpdatePIDF(m_swerveDrive);
-    private final GoBerserk m_goBerserk = new GoBerserk(m_swerveDrive);
+    // private final UpdatePIDF m_updatePIDF = new UpdatePIDF(m_swerveDrive);
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -76,14 +77,10 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        m_driverController.a().whileTrue(m_swerveDrive.sysIdDriveMotorCommand());
-        m_driverController.b().whileTrue(m_swerveDrive.sysIdAngleMotorCommand());
-
-        m_driverController.x().whileTrue(m_goBerserk);
-
+        m_driverController.y().onTrue(m_resetGyro);
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        return new PathPlannerAuto("AlexGreat");
     }
 }

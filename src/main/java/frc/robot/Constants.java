@@ -6,7 +6,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 import java.io.File;
 
@@ -33,6 +34,8 @@ public final class Constants {
     public static final class DriveConstants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
         public static final double kMaxSpeed = 3.699417868457614; // m/s
+
+        public static final Pose2d kInitialRobotPose = new Pose2d(2.17, 7, Rotation2d.kZero);
 
         // PID values for translation (moving).
         public static final double kPTrans = 0.0022445;
