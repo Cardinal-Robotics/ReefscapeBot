@@ -5,7 +5,9 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.UpdatePIDF;
+import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -29,6 +31,7 @@ public class RobotContainer {
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+    private final LimelightSubsystem m_limelightsubsystem = new LimelightSubsystem(m_swerveDrive);
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -65,6 +68,7 @@ public class RobotContainer {
     private final Command m_driveFieldOrientedAngularVelocity = m_swerveDrive
             .driveFieldOriented(m_driveAngularVelocity);
     private final Command m_resetGyro = m_swerveDrive.resetGyro();
+    private final LimelightCommand m_limelight = new LimelightCommand(m_limelightsubsystem);
 
     // private final UpdatePIDF m_updatePIDF = new UpdatePIDF(m_swerveDrive);
 
@@ -78,6 +82,7 @@ public class RobotContainer {
 
     private void configureBindings() {
         m_driverController.y().onTrue(m_resetGyro);
+        m_driverController.a().whileTrue(m_limelight);
     }
 
     public Command getAutonomousCommand() {

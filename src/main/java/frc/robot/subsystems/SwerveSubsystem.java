@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -65,6 +66,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void lockInPlace() {
         m_swerveDrive.lockPose();
+    }
+
+    public void driveRelative(double x, double y, double rotation) {
+        ChassisSpeeds velocity = new ChassisSpeeds(x, y, Units.degreesToRadians(rotation));
+        m_swerveDrive.drive(velocity);
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {
