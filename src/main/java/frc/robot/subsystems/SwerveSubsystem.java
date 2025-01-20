@@ -13,6 +13,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -47,11 +48,29 @@ public class SwerveSubsystem extends SubsystemBase {
             throw new RuntimeException(e);
         }
 
-        m_swerveDrive.field.setRobotPose(DriveConstants.kInitialRobotPose);
-        m_swerveDrive.resetOdometry(DriveConstants.kInitialRobotPose);
+        m_swerveDrive.resetOdometry(getInitialPose());
+        m_swerveDrive.field.setRobotPose(getInitialPose());
         m_publisher.set(m_swerveDrive.getPose());
 
         setupPathPlanner();
+    }
+
+    private Pose2d getInitialPose() {
+        // For robot simulation you will need to use the real DriverStation since the
+        // alliance is obtained from DriverStation.
+        var alliance = DriverStation.getAlliance();
+
+        if (!alliance.isPresent())
+            return DriveConstants.kInitialBlueRobotPose;
+        if (alliance.get() == DriverStation.Alliance.Red)
+            return DriveConstants.kInitialRedRobotPose;
+
+        return DriveConstants.kInitialBlueRobotPose;
+    }
+
+    @Override
+    public void periodic() {
+        this.m_publisher.set(m_swerveDrive.getPose());
     }
 
     public void updatePIDF(PIDFConfig drivePIDF, PIDFConfig anglePIDF) {
@@ -74,7 +93,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
         return run(() -> {
             this.m_swerveDrive.driveFieldOriented(velocity.get());
-            this.m_publisher.set(m_swerveDrive.getPose());
         });
     }
 
@@ -151,6 +169,8 @@ public class SwerveSubsystem extends SubsystemBase {
                         return false;
                     },
                     this);
+
+            AutoBuilder.resetOdom(getInitialPose()).schedule();
         } catch (Exception e) {
             e.printStackTrace();
         }

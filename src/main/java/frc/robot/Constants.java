@@ -35,7 +35,8 @@ public final class Constants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
         public static final double kMaxSpeed = 3.699417868457614; // m/s
 
-        public static final Pose2d kInitialRobotPose = new Pose2d(2.17, 7, Rotation2d.kZero);
+        public static final Pose2d kInitialBlueRobotPose = new Pose2d(2.17, 7, Rotation2d.kZero);
+        public static final Pose2d kInitialRedRobotPose = new Pose2d(15.378, 1.052, Rotation2d.k180deg);
 
         // PID values for translation (moving).
         public static final double kPTrans = 0.0022445;
