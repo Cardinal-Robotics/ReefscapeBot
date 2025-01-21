@@ -19,7 +19,9 @@ public class AlignAprilTag extends Command {
         m_swerveSubsystem = swerveSubsystem;
 
         addRequirements(m_limeLightSubsystem);
-        addRequirements();
+        // Don't require the swerve subsystem, it causes YAGSL to freak out. At least in
+        // the simulation.
+        // addRequirements(m_swerveSubsystem);
     }
 
     @Override
