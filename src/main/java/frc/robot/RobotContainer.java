@@ -4,19 +4,27 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.LimelightCommand;
-import frc.robot.commands.UpdatePIDF;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.UpdatePIDF;
 import swervelib.SwerveInputStream;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 public class RobotContainer {
+    // Misc.
+    // ---------------------------------------------------------------------------------------------------------------------------------------
+    private final SendableChooser<Command> m_autoChooser;
+    // ---------------------------------------------------------------------------------------------------------------------------------------
+    //
+
     //
     // Controllers
     // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -39,8 +47,6 @@ public class RobotContainer {
     //
     // YAGSL Swerve input streams
     // ---------------------------------------------------------------------------------------------------------------------------------------
-
-    // Gets how fast it should move.
     private final SwerveInputStream m_driveAngularVelocity = SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
@@ -49,8 +55,6 @@ public class RobotContainer {
                                                    // way slight micro-movements doesn't suddenly move the robot.
             .scaleTranslation(0.8) // If the joystick goes to 100%, this scales it down to 80%.
             .allianceRelativeControl(true); // Field orientation flips to be on the your team's side.
-
-    // Gets which angle to turn to.
 
     private final SwerveInputStream m_driveDirectAngle = m_driveAngularVelocity.copy()
             .withControllerHeadingAxis(
@@ -78,6 +82,9 @@ public class RobotContainer {
     public RobotContainer() {
         configureBindings();
         m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
+
+        m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
+        SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
 
     private void configureBindings() {
@@ -86,6 +93,9 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("AlexGreat");
+        return m_autoChooser.getSelected();
     }
+
 }
+
+    
