@@ -73,15 +73,6 @@ public class SwerveSubsystem extends SubsystemBase {
         this.m_publisher.set(m_swerveDrive.getPose());
     }
 
-    public void updatePIDF(PIDFConfig drivePIDF, PIDFConfig anglePIDF) {
-        SwerveModule[] modules = m_swerveDrive.getModules();
-        for (int i = 0; i < modules.length; i++) {
-            SwerveModule module = modules[i];
-            module.setDrivePIDF(drivePIDF);
-            module.setAnglePIDF(anglePIDF);
-        }
-    }
-
     public void lockInPlace() {
         m_swerveDrive.lockPose();
     }

@@ -79,4 +79,23 @@ public final class Constants {
         public static final boolean kRearRightNotVersH = false;
     }
 
+    public static final class ElevatorConstants {
+        public static final int kLeaderMotorId = 0;
+        public static final int kFollowerMotorId = 0;
+
+        public static final double kMaxAcceleration = 0;
+        public static final double kMaxVelocity = 0;
+
+        public static final double kEncoderDistancePerPulse = 0;
+
+        // PID values for elevator controller
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+
+        // Values for elevator feed-forward
+        public static final double kS = 0;
+        public static final double kG = 0;
+        public static final double kV = 0;
+    }
 }

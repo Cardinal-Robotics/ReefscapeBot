@@ -20,6 +20,7 @@ public class RobotContainer {
     // Misc.
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final SendableChooser<Command> m_autoChooser;
+    private static final SendableChooser<Boolean> m_displayDebugData = new SendableChooser<Boolean>();
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -75,8 +76,16 @@ public class RobotContainer {
         configureBindings();
         m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
 
+        m_displayDebugData.addOption("Display", true);
+        m_displayDebugData.addOption("Hide", false);
+        SmartDashboard.putData("Display debug data?", m_displayDebugData);
+
         m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
+    }
+
+    public static boolean shouldDisplayDebugData() {
+        return m_displayDebugData.getSelected();
     }
 
     private void configureBindings() {
