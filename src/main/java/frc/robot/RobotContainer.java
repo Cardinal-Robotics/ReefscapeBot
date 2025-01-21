@@ -5,23 +5,26 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.LimelightCommand;
-import frc.robot.subsystems.LimelightSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.commands.UpdatePIDF;
-import swervelib.SwerveInputStream;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.SwerveSubsystem;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import swervelib.SwerveInputStream;
 
 public class RobotContainer {
     // Misc.
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final SendableChooser<Command> m_autoChooser;
+    private static final SendableChooser<Boolean> m_displayDebugData = new SendableChooser<Boolean>();
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -39,8 +42,6 @@ public class RobotContainer {
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-    private final LimelightSubsystem m_limelightsubsystem = new LimelightSubsystem(m_swerveDrive);
-
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -71,11 +72,7 @@ public class RobotContainer {
     private final Command m_driveFieldOrientedDirectAngle = m_swerveDrive.driveFieldOriented(m_driveDirectAngle);
     private final Command m_driveFieldOrientedAngularVelocity = m_swerveDrive
             .driveFieldOriented(m_driveAngularVelocity);
-    private final Command m_resetGyro = m_swerveDrive.resetGyro();
-    private final LimelightCommand m_limelight = new LimelightCommand(m_limelightsubsystem);
-
-    // private final UpdatePIDF m_updatePIDF = new UpdatePIDF(m_swerveDrive);
-
+    private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -83,13 +80,24 @@ public class RobotContainer {
         configureBindings();
         m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
 
+        m_displayDebugData.addOption("Display", true);
+        m_displayDebugData.addOption("Hide", false);
+        SmartDashboard.putData("Display debug data?", m_displayDebugData);
+
         m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
 
+    public static boolean shouldDisplayDebugData() {
+        return m_displayDebugData.getSelected();
+    }
+
     private void configureBindings() {
         m_driverController.y().onTrue(m_resetGyro);
-        m_driverController.a().whileTrue(m_limelight);
+        m_driverController.a()
+                .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() == Alliance.Red
+                        ? Constants.DriveConstants.kInitialRedRobotPose
+                        : Constants.DriveConstants.kInitialBlueRobotPose));
     }
 
     public Command getAutonomousCommand() {
@@ -97,5 +105,3 @@ public class RobotContainer {
     }
 
 }
-
-    
