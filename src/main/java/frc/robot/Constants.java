@@ -114,4 +114,14 @@ public final class Constants {
         // or just => (Pi * D) / ppr
         public static final double kElevatorEncoderDistPerPulse = ((Math.PI) * (2 * kElevatorDrumRadius)) / 4096;
     }
+
+    public static final class AlgaeMechanismConstants {
+        // Ports/ID(s)
+        public static final int kLeaderMotorPort = 20;
+        public static final int kFollowerMotorPort = 21;
+
+        // Motor speeds (-100% to 100%) => (-1 to 1)
+        public static final double kIntakeSpeed = 0.5;
+        public static final double kReleaseSpeed = -0.5;
+    }
 }

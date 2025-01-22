@@ -12,10 +12,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
+import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.LimelightSubsystem;
+import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.commands.AlignAprilTag;
+import frc.robot.commands.ReleaseAlgae;
+import frc.robot.commands.IntakeAlgae;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -42,8 +45,9 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
+    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem();
+    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -79,12 +83,18 @@ public class RobotContainer {
     private final Command m_driveFieldOrientedAngularVelocity = m_swerveDrive
             .driveFieldOriented(m_driveAngularVelocity);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
+
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_limelightSubsystem, m_swerveDrive);
+    private final ReleaseAlgae m_releaseAlgae = new ReleaseAlgae(m_algaeSubsystem);
+    private final IntakeAlgae m_intakeAlgae = new IntakeAlgae(m_algaeSubsystem);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
     public RobotContainer() {
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         configureBindings();
+
         m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
 
         m_displayDebugData.addOption("Display", true);
@@ -109,9 +119,8 @@ public class RobotContainer {
                         : Constants.DriveConstants.kInitialBlueRobotPose));
 
         // Operator controls
-        // (using driver controller right now for testing purposes)
-        // m_driverController.rightBumper().onTrue(null);
-        // m_driverController.leftBumper().onTrue(null);
+        m_operatorController.rightTrigger().whileTrue(m_intakeAlgae);
+        m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
     }
 
     public Command getAutonomousCommand() {

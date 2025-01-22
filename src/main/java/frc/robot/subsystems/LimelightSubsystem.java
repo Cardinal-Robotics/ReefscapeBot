@@ -9,12 +9,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTable;
 
 public class LimelightSubsystem extends SubsystemBase {
-    private final SwerveSubsystem m_swerveSubsystem;
     private final NetworkTable m_table;
 
-    public LimelightSubsystem(SwerveSubsystem subsystem) {
+    public LimelightSubsystem() {
         m_table = NetworkTableInstance.getDefault().getTable("limelight"); // gets 8 values from limelight
-        m_swerveSubsystem = subsystem;
     }
 
     public boolean hasTargets() {
