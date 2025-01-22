@@ -53,7 +53,11 @@ public class RobotContainer {
     private final SwerveInputStream m_driveAngularVelocity = SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
-            .withControllerRotationAxis(m_driverController::getRightX)
+            .withControllerRotationAxis(() -> (m_driverController.getRightX() * (Robot.isSimulation() ? -1 : 1))) // The
+                                                                                                                  // simulation
+                                                                                                                  // has
+                                                                                                                  // inverted
+                                                                                                                  // rotation.
             .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the deadband for it to register. This
                                                    // way slight micro-movements doesn't suddenly move the robot.
             .scaleTranslation(0.8) // If the joystick goes to 100%, this scales it down to 80%.

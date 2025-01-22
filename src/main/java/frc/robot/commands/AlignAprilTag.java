@@ -26,6 +26,9 @@ public class AlignAprilTag extends Command {
 
     @Override
     public void execute() {
+        if (!m_limeLightSubsystem.hasTargets())
+            return;
+
         double x = m_limeLightSubsystem.getTX();
         double y = m_limeLightSubsystem.getTY();
 
@@ -39,12 +42,15 @@ public class AlignAprilTag extends Command {
             m_swerveSubsystem.driveRelative(0, -0.8, 0);
         }
 
-        if (x < 2 && x > -2) { // once x aligned, y
-            if (y < 11) { // forward
-                m_swerveSubsystem.driveRelative(-0.8, 0, 0);
-            } else if (y > 15) { // back
-                m_swerveSubsystem.driveRelative(0.8, 0, 0);
-            }
+        // If x and y aren't aligned yet, don't align the closeness yet.
+        if (!(x < 2 && x > -2))
+            return;
+
+        if (y < 11) { // back away from the AprilTag
+            m_swerveSubsystem.driveRelative(-0.8, 0, 0);
+        } else if (y > 15) { // move to the AprilTag
+            m_swerveSubsystem.driveRelative(0.8, 0, 0);
         }
+
     }
 }

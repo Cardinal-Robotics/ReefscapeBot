@@ -4,25 +4,29 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.networktables.NetworkTable;
 
 public class LimelightSubsystem extends SubsystemBase {
-    SwerveSubsystem m_swerveSubsystem;
-    NetworkTable m_table;
+    private final SwerveSubsystem m_swerveSubsystem;
+    private final NetworkTable m_table;
 
     public LimelightSubsystem(SwerveSubsystem subsystem) {
         m_table = NetworkTableInstance.getDefault().getTable("limelight"); // gets 8 values from limelight
         m_swerveSubsystem = subsystem;
     }
 
+    public boolean hasTargets() {
+        return m_table.getEntry("tv").getInteger(0) == 1;
+    }
+
     public double getTX() {
-        return m_table.getEntry("tx").getDouble(0);
+        return m_table.getEntry("tx").getDouble(Double.NaN);
     }
 
     public double getTY() {
-        return m_table.getEntry("ty").getDouble(0);
+        return m_table.getEntry("ty").getDouble(Double.NaN);
     }
 
     @Override
