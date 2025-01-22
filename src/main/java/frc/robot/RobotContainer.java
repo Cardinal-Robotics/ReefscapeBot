@@ -96,12 +96,18 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.a().whileTrue(m_alignAprilTag);
         m_driverController.b()
                 .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() == Alliance.Red
                         ? Constants.DriveConstants.kInitialRedRobotPose
                         : Constants.DriveConstants.kInitialBlueRobotPose));
+
+        // Operator controls
+        // (using driver controller right now for testing purposes)
+        // m_driverController.rightBumper().onTrue(null);
+        // m_driverController.leftBumper().onTrue(null);
     }
 
     public Command getAutonomousCommand() {

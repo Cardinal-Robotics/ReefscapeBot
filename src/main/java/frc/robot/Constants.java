@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.math.util.Units;
 
 import java.io.File;
 
@@ -80,22 +81,37 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
-        public static final int kLeaderMotorId = 0;
-        public static final int kFollowerMotorId = 0;
+        // Ports/ID(s)
+        public static final int kLeaderMotorPort = 0;
+        public static final int kFollowerMotorPort = 0;
+        public static final int kEncoderAChannel = 0;
+        public static final int kEncoderBChannel = 1;
 
+        // PID values for elevator controller
+        public static final double kElevatorKp = 5;
+        public static final double kElevatorKi = 0;
+        public static final double kElevatorKd = 0;
+
+        // Values for elevator feed-forward
+        public static final double kElevatorKs = 0;
+        public static final double kElevatorKg = 0.762;
+        public static final double kElevatorKv = 0.762;
+        public static final double kElevatorKa = 0;
+
+        // idk
         public static final double kMaxAcceleration = 0;
         public static final double kMaxVelocity = 0;
 
-        public static final double kEncoderDistancePerPulse = 0;
+        public static final double kElevatorGearing = 10.0;
+        public static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
 
-        // PID values for elevator controller
-        public static final double kP = 0;
-        public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double kCarriageMass = 4.0;
 
-        // Values for elevator feed-forward
-        public static final double kS = 0;
-        public static final double kG = 0;
-        public static final double kV = 0;
+        public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(74);
+        public static final double kMinElevatorHeightMeters = 0;
+
+        // distance per pulse = (distance per revolution) / (pulses per revolution)
+        // or just => (Pi * D) / ppr
+        public static final double kElevatorEncoderDistPerPulse = ((Math.PI) * (2 * kElevatorDrumRadius)) / 4096;
     }
 }
