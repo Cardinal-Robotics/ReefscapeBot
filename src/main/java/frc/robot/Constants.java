@@ -117,11 +117,32 @@ public final class Constants {
 
     public static final class AlgaeMechanismConstants {
         // Ports/ID(s)
+        public static final int kFollowerMotorPort = 21; // These ID(s) are made up so that the simulator won't
+                                                         // complain. Make sure to configure these
         public static final int kLeaderMotorPort = 20;
-        public static final int kFollowerMotorPort = 21;
+        public static final int kTiltMotorPort = 22;
+
+        // PID & feed forward for tilt motor
+        public static final double kTiltFeedForward = 0;
+        public static final double kTiltKp = 0;
+        public static final double kTiltKi = 0;
+        public static final double kTiltKd = 0;
 
         // Motor speeds (-100% to 100%) => (-1 to 1)
         public static final double kIntakeSpeed = 0.5;
         public static final double kReleaseSpeed = -0.5;
+
+        // Time constants (how much time should the motors spend trying to
+        // intake/release the algae).
+        public static final double kIntakeTime = 1.0;
+        public static final double kReleaseTime = 1.0;
+
+        // Setpoints for tilt motor
+        public static final double kTargetPointIntake = 0; // The tilt motor's set point before grabbing the algae out
+                                                           // of the reef.
+        public static final double kTargetPointDrive = 0; // The tilt motor's set point when driving around, preferably
+                                                          // level.
+        public static final double kTargetPointRelease = 0; // The tilt motor's set point when releasing the algae into
+                                                            // the processor.
     }
 }

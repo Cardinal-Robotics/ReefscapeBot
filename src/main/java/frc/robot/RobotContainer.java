@@ -9,16 +9,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
+import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.commands.AlignAprilTag;
-import frc.robot.commands.ReleaseAlgae;
-import frc.robot.commands.IntakeAlgae;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -85,8 +86,25 @@ public class RobotContainer {
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_limelightSubsystem, m_swerveDrive);
-    private final ReleaseAlgae m_releaseAlgae = new ReleaseAlgae(m_algaeSubsystem);
-    private final IntakeAlgae m_intakeAlgae = new IntakeAlgae(m_algaeSubsystem);
+    private final StartEndCommand m_toggleAlgaeIntake = new StartEndCommand(
+            () -> Commands.run(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointIntake),
+                    m_algaeSubsystem)
+                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+                    .andThen(() -> m_algaeSubsystem.spinMotors(AlgaeMechanismConstants.kIntakeSpeed))
+                    .andThen(new WaitCommand(AlgaeMechanismConstants.kIntakeTime))
+                    .andThen(() -> m_algaeSubsystem.stopMotors())
+                    .andThen(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointDrive))
+                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+                    .schedule(),
+            () -> Commands.run(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointRelease),
+                    m_algaeSubsystem)
+                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+                    .andThen(() -> m_algaeSubsystem.spinMotors(AlgaeMechanismConstants.kReleaseSpeed))
+                    .andThen(new WaitCommand(AlgaeMechanismConstants.kReleaseTime))
+                    .andThen(() -> m_algaeSubsystem.stopMotors())
+                    .andThen(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointDrive))
+                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+                    .schedule());
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -119,12 +137,11 @@ public class RobotContainer {
                         : Constants.DriveConstants.kInitialBlueRobotPose));
 
         // Operator controls
-        m_operatorController.rightTrigger().whileTrue(m_intakeAlgae);
-        m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
+        m_operatorController.b().toggleOnTrue(m_toggleAlgaeIntake);
+        // m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
     }
 
     public Command getAutonomousCommand() {
         return m_autoChooser.getSelected();
     }
-
 }
