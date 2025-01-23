@@ -47,7 +47,7 @@ public class RobotContainer {
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem();
-    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -86,25 +86,33 @@ public class RobotContainer {
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_limelightSubsystem, m_swerveDrive);
-    private final StartEndCommand m_toggleAlgaeIntake = new StartEndCommand(
-            () -> Commands.run(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointIntake),
-                    m_algaeSubsystem)
-                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
-                    .andThen(() -> m_algaeSubsystem.spinMotors(AlgaeMechanismConstants.kIntakeSpeed))
-                    .andThen(new WaitCommand(AlgaeMechanismConstants.kIntakeTime))
-                    .andThen(() -> m_algaeSubsystem.stopMotors())
-                    .andThen(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointDrive))
-                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
-                    .schedule(),
-            () -> Commands.run(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointRelease),
-                    m_algaeSubsystem)
-                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
-                    .andThen(() -> m_algaeSubsystem.spinMotors(AlgaeMechanismConstants.kReleaseSpeed))
-                    .andThen(new WaitCommand(AlgaeMechanismConstants.kReleaseTime))
-                    .andThen(() -> m_algaeSubsystem.stopMotors())
-                    .andThen(() -> m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointDrive))
-                    .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
-                    .schedule());
+    /*
+     * private final StartEndCommand m_toggleAlgaeIntake = new StartEndCommand(
+     * () -> Commands.run(() ->
+     * m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointIntake),
+     * m_algaeSubsystem)
+     * .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+     * .andThen(() ->
+     * m_algaeSubsystem.spinMotors(AlgaeMechanismConstants.kIntakeSpeed))
+     * .andThen(new WaitCommand(AlgaeMechanismConstants.kIntakeTime))
+     * .andThen(() -> m_algaeSubsystem.stopMotors())
+     * .andThen(() ->
+     * m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointDrive))
+     * .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+     * .schedule(),
+     * () -> Commands.run(() ->
+     * m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointRelease),
+     * m_algaeSubsystem)
+     * .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+     * .andThen(() ->
+     * m_algaeSubsystem.spinMotors(AlgaeMechanismConstants.kReleaseSpeed))
+     * .andThen(new WaitCommand(AlgaeMechanismConstants.kReleaseTime))
+     * .andThen(() -> m_algaeSubsystem.stopMotors())
+     * .andThen(() ->
+     * m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointDrive))
+     * .until(() -> m_algaeSubsystem.isTiltMotorAtGoal())
+     * .schedule());
+     */
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -137,7 +145,7 @@ public class RobotContainer {
                         : Constants.DriveConstants.kInitialBlueRobotPose));
 
         // Operator controls
-        m_operatorController.b().toggleOnTrue(m_toggleAlgaeIntake);
+        // m_operatorController.b().toggleOnTrue(m_toggleAlgaeIntake);
         // m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
     }
 
