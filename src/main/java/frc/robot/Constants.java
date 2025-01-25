@@ -34,7 +34,7 @@ public final class Constants {
 
     public static final class DriveConstants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-        public static final double kMaxSpeed = 3.699417868457614; // m/s
+        public static final double kMaxSpeed = 1.5;// 3.699417868457614; // m/s
 
         public static final Pose2d kInitialBlueRobotPose = new Pose2d(2.17, 7, Rotation2d.kZero);
         public static final Pose2d kInitialRedRobotPose = new Pose2d(15.378, 1.052, Rotation2d.k180deg);
@@ -47,7 +47,7 @@ public final class Constants {
         // PID values for rotating.
         public static final double kPAngular = 0.01;
         public static final double kIAngular = 0;
-        public static final double kDAngular = 0;
+        public static final double kDAngular = 0.003225;
 
         public static final int kFrontLeftDriveMotorPort = 2;
         public static final int kRearLeftDriveMotorPort = 5;
