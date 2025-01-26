@@ -26,6 +26,10 @@ import java.io.File;
  */
 
 public final class Constants {
+    public static final class LogConstants {
+        public static final boolean kDisplayDebugData = true;
+    }
+
     public static final class OperatorConstants {
         public static final int kDriverControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
@@ -117,20 +121,19 @@ public final class Constants {
 
     public static final class AlgaeMechanismConstants {
         // Ports/ID(s)
-        public static final int kFollowerMotorPort = 21; // These ID(s) are made up so that the simulator won't
-                                                         // complain. Make sure to configure these
-        public static final int kLeaderMotorPort = 20;
+        public static final int kIntakeMotorPort = 20; // These ID(s) are made up so that the simulator won't complain.
+                                                       // Make sure to configure these
         public static final int kTiltMotorPort = 22;
 
         // PID & feed forward for tilt motor
-        public static final double kTiltFeedForward = 0;
-        public static final double kTiltKp = 0;
+        public static final double kTiltFeedForward = 0; // Note to future self: you should probably use REV Hardware
+        public static final double kTiltKp = 0; /////////// Client's PID tuning tool for this one.
         public static final double kTiltKi = 0;
         public static final double kTiltKd = 0;
 
         // Motor speeds (-100% to 100%) => (-1 to 1)
-        public static final double kIntakeSpeed = 0.5;
-        public static final double kReleaseSpeed = -0.5;
+        public static final double kIntakeSpeed = 0.85;
+        public static final double kReleaseSpeed = -0.85;
 
         // Time constants (how much time should the motors spend trying to
         // intake/release the algae).
