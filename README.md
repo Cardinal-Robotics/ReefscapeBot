@@ -10,10 +10,17 @@
 - [ ] Tuned values for YAGSL and PathPlanner
 - [ ] Elevator subsystem
 - [ ] Climber subsystem
+- [ ] Coral subsystem
+- [X] Algae subsystem
 
 ## Development Journey
 
 ### Week 3 & 4 (1/20 - 2/1)
+* YAGSL now works on unnamed frame bot (UFB). Note to self: make sure to change this when we actually decide on a name for the bot.
+  * Demo (for like 2 seconds) then Aaron singing:
+  <br>
+  <video src="./media/video-20250125 Small YAGSL test followed by a cover of Africa by Toto.mp4">
+* LED strips are now working (on a separate bot)! It can show all sorts of colors, it can (in theory) show the elevator progress, do segmented rainbow, etc.
 
 ### Week 1 & 2 (1/4 - 1/18) - Starting with Remi (Crescendo Bot)
 * Begin following a proper command-base project structure.
