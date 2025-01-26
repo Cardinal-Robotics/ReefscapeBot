@@ -1,7 +1,7 @@
 <div align="center">  
-  <img height="300" src="https://info.firstinspires.org/hs-fs/hubfs/2025%20Season/Season%20Assets/FIRST_DIVE-reefscape-PatchLogo.png?width=283&height=343&name=FIRST_DIVE-reefscape-PatchLogo.png"  />
+  <img src="https://www.firstinspires.org/sites/default/files/2024-banner/frc_reefscape.gif" width="300" alt="2025 Reefscape Logo"/><br/>
   <br>
-  <h1>ReefscapeBot (2025 Season)</h1>
+  <h1>Reefscape (2025 Season)</h1>
 </div>
 
 ## Bot
