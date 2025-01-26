@@ -4,6 +4,9 @@
   <h1>ReefscapeBot (2025 Season)</h1>
 </div>
 
+## Bot
+Please put a finished picture of the bot here when we finish it.
+
 ## Goals
 - [X] YAGSL
 - [X] PathPlanner
