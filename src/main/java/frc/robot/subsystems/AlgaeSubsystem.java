@@ -31,11 +31,11 @@ public class AlgaeSubsystem extends SubsystemBase {
 
         SparkMaxConfig tiltConfig = new SparkMaxConfig();
         tiltConfig.idleMode(IdleMode.kCoast);
-        tiltConfig.closedLoop.pid(
+        tiltConfig.closedLoop.pidf(
                 AlgaeMechanismConstants.kTiltKp,
                 AlgaeMechanismConstants.kTiltKi,
-                AlgaeMechanismConstants.kTiltKd);
-        tiltConfig.closedLoop.velocityFF(AlgaeMechanismConstants.kTiltFeedForward);
+                AlgaeMechanismConstants.kTiltKd,
+                AlgaeMechanismConstants.kTiltFeedForward);
 
         m_intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -44,12 +44,12 @@ public class AlgaeSubsystem extends SubsystemBase {
     /**
      * @param speed The speed to set. Value should be between -1.0 and 1.0.
      */
-    public void spinMotors(double speed) {
+    public void spinIntakeMotor(double speed) {
         m_intakeMotor.set(speed);
     }
 
-    public void stopMotors() {
-        spinMotors(0);
+    public void stopIntakeMotor() {
+        spinIntakeMotor(0);
     }
 
     public void setTiltTarget(double setpoint) {
@@ -57,9 +57,13 @@ public class AlgaeSubsystem extends SubsystemBase {
         m_tiltMotor.getClosedLoopController().setReference(setpoint, ControlType.kPosition);
     }
 
-    public boolean isTiltMotorAtGoal() {
+    public boolean isTiltMotorAtGoal(double target) {
         double currentPosition = m_tiltMotor.getEncoder().getPosition();
-        double error = Math.abs(m_setpoint - currentPosition);
+        double error = Math.abs(target - currentPosition);
         return error <= 0.2; // Returns true if within the tolerance range
+    }
+
+    public boolean isTiltMotorAtGoal() {
+        return isTiltMotorAtGoal(m_setpoint);
     }
 }

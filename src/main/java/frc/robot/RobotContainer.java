@@ -97,7 +97,6 @@ public class RobotContainer {
         configureBindings();
 
         m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
-        m_algaeSubsystem.setDefaultCommand(m_toggleableAlgaeIntake);
 
         m_displayDebugData.addOption("Display", true);
         m_displayDebugData.addOption("Hide", false);
@@ -121,7 +120,7 @@ public class RobotContainer {
                         : Constants.DriveConstants.kInitialBlueRobotPose));
 
         // Operator controls
-        m_operatorController.b().whileTrue(m_toggleableAlgaeIntake);
+        m_operatorController.b().onTrue(m_toggleableAlgaeIntake);
         // m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
     }
 
