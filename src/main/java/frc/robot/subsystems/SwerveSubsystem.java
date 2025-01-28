@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose2d;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants.DriveConstants;
 
 import java.util.function.Supplier;
@@ -75,6 +75,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void resetGyro() {
         this.m_swerveDrive.setGyro(Rotation3d.kZero);
+    }
+
+    public Rotation2d getRotation() {
+        return this.m_swerveDrive.getPose().getRotation();
     }
 
     public void lockInPlace() {

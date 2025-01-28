@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import edu.wpi.first.networktables.NetworkTable;
 
 public class LimelightSubsystem extends SubsystemBase {
@@ -25,6 +26,29 @@ public class LimelightSubsystem extends SubsystemBase {
 
     public double getTY() {
         return m_table.getEntry("ty").getDouble(Double.NaN);
+    }
+
+    public double getYaw() { // gets the yaw
+        return m_table.getEntry("botpose").getDoubleArray(new double[6])[5] - 90;
+    }
+
+    public double getRedX() {
+        return m_table.getEntry("botpose_wpired").getDoubleArray(new double[6])[0];
+    }
+
+    public double getRedY() {
+        return m_table.getEntry("botpose_wpired").getDoubleArray(new double[6])[1];
+    }
+
+    public double alignYaw() {
+        double omega = 0; // angular velocity
+        if (getYaw() < -92) {
+            omega = .5;
+        } else if (getYaw() > 88) {
+            omega = -.5;
+        }
+
+        return omega; // returns omega
     }
 
     @Override

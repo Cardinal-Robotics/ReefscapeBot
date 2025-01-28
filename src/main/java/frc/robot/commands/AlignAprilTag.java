@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LimelightSubsystem;
@@ -29,28 +30,36 @@ public class AlignAprilTag extends Command {
         if (!m_limeLightSubsystem.hasTargets())
             return;
 
-        double x = m_limeLightSubsystem.getTX();
-        double y = m_limeLightSubsystem.getTY();
+        double x = m_limeLightSubsystem.getRedX();
+        double y = m_limeLightSubsystem.getRedY();
+        double angle = m_limeLightSubsystem.getYaw();
+        double rotation = m_limeLightSubsystem.alignYaw();
 
         SmartDashboard.putNumber("Tag x-offset", x); // logs values to make sure we get them
         SmartDashboard.putNumber("Tag y-offset", y);
 
         // this aligns first with x then goes with y once x aligned
-        if (x > 2) { // moves robot right
-            m_swerveSubsystem.driveRelative(0, 0.8, 0);
-        } else if (x < -2) { // left
-            m_swerveSubsystem.driveRelative(0, -0.8, 0);
+        if (y > 3.4) { // moves robot right //|| angle > -88 || angle < -92
+            m_swerveSubsystem
+                    .driveFieldOriented(new ChassisSpeeds(-.8, 0,
+                            rotation)); // Math.toRadians(180 -
+                                        // m_swerveSubsystem.getRotation().getDegrees()))
+        } else if (y < 3.2) { // left
+            m_swerveSubsystem
+                    .driveFieldOriented(new ChassisSpeeds(.8, 0,
+                            rotation));
         }
 
         // If x and y aren't aligned yet, don't align the closeness yet.
-        if (!(x < 2 && x > -2))
+        if (!(x < 2.8 && x > 3.3))
             return;
-
-        if (y < 11) { // back away from the AprilTag
-            m_swerveSubsystem.driveRelative(-0.8, 0, 0);
-        } else if (y > 15) { // move to the AprilTag
-            m_swerveSubsystem.driveRelative(0.8, 0, 0);
-        }
+        /*
+         * if (y < 11) { // back away from the AprilTag
+         * m_swerveSubsystem.driveRelative(0.8, 0, 0);
+         * } else if (y > 15) { // move to the AprilTag
+         * m_swerveSubsystem.driveRelative(-0.8, 0, 0);
+         * }
+         */
 
     }
 }
