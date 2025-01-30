@@ -4,7 +4,11 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LimelightSubsystem;
@@ -14,6 +18,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class AlignAprilTag extends Command {
     private final LimelightSubsystem m_limeLightSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
+    private Pose2d limeLightPose;
 
     public AlignAprilTag(LimelightSubsystem limeLightSubsystem, SwerveSubsystem swerveSubsystem) {
         m_limeLightSubsystem = limeLightSubsystem;
@@ -34,6 +39,9 @@ public class AlignAprilTag extends Command {
         double y = m_limeLightSubsystem.getRedY();
         double angle = m_limeLightSubsystem.getYaw();
         double rotation = m_limeLightSubsystem.alignYaw();
+        limeLightPose = new Pose2d(x, y, new Rotation2d(Math.toRadians(angle)));
+
+        m_swerveSubsystem.m_swerveDrive.addVisionMeasurement(limeLightPose, Timer.getFPGATimestamp());
 
         SmartDashboard.putNumber("Tag x-offset", x); // logs values to make sure we get them
         SmartDashboard.putNumber("Tag y-offset", y);
