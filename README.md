@@ -15,6 +15,7 @@ Please put a finished picture of the bot here when we finish it.
 - [ ] Climber subsystem
 - [ ] Coral subsystem
 - [X] Algae subsystem
+- [ ] LimeLight auto-align to Reef
 
 ## Development Journey
 
