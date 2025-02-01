@@ -4,6 +4,10 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LimelightSubsystem;
@@ -29,28 +33,36 @@ public class AlignAprilTag extends Command {
         if (!m_limeLightSubsystem.hasTargets())
             return;
 
+        System.out.println("E");
+
         double x = m_limeLightSubsystem.getTX();
         double y = m_limeLightSubsystem.getTY();
 
         SmartDashboard.putNumber("Tag x-offset", x); // logs values to make sure we get them
         SmartDashboard.putNumber("Tag y-offset", y);
 
+        m_swerveSubsystem.driveCustomPoseOriented(new Pose2d(new Translation2d(13.890498, 4.0259), Rotation2d.kZero),
+                -x,
+                -y, 0);
+
         // this aligns first with x then goes with y once x aligned
-        if (x > 2) { // moves robot right
-            m_swerveSubsystem.driveRelative(0, 0.8, 0);
-        } else if (x < -2) { // left
-            m_swerveSubsystem.driveRelative(0, -0.8, 0);
-        }
-
-        // If x and y aren't aligned yet, don't align the closeness yet.
-        if (!(x < 2 && x > -2))
-            return;
-
-        if (y < 11) { // back away from the AprilTag
-            m_swerveSubsystem.driveRelative(-0.8, 0, 0);
-        } else if (y > 15) { // move to the AprilTag
-            m_swerveSubsystem.driveRelative(0.8, 0, 0);
-        }
+        /*
+         * if (y > 2) { // moves robot right
+         * m_swerveSubsystem.driveRelative(0, 0.8, 0);
+         * } else if (y < -2) { // left
+         * m_swerveSubsystem.driveRelative(0, -0.8, 0);
+         * }
+         * 
+         * // If x and y aren't aligned yet, don't align the closeness yet.
+         * if (!(y < 2 && y > -2))
+         * return;
+         * 
+         * if (x < 0.5) { // back away from the AprilTag
+         * m_swerveSubsystem.driveRelative(-0.8, 0, 0);
+         * } else if (x > 0.6) { // move to the AprilTag
+         * m_swerveSubsystem.driveRelative(0.8, 0, 0);
+         * }
+         */
 
     }
 }

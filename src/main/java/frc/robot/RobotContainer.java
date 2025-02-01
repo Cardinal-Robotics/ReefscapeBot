@@ -18,9 +18,9 @@ import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.ToggleableAlgaeIntake;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.commands.AlignAprilTag;
+import frc.robot.commands.ToggleableAlgaeIntake;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -47,9 +47,10 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem();
     private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveDrive);
+
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
