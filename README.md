@@ -26,7 +26,8 @@ Please put a finished picture of the bot here when we finish it.
 https://github.com/user-attachments/assets/33cbf16d-e4bf-4471-a0ff-4f62e915d27c
 
 * LED strips are now working (on a separate bot)! It can show all sorts of colors, it can (in theory) show the elevator progress, do segmented rainbow, etc.
-
+* The robot can (barely) align to the AprilTag. There's major pose ambiguity problems that need to be worked out first but it's almost there!
+ 
 ### Week 1 & 2 (1/4 - 1/18) - Starting with Remi (Crescendo Bot)
 * Begin following a proper command-base project structure.
 * YAGSL and PathPlanner have been implemented into Remi!
