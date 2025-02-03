@@ -30,20 +30,15 @@ public class AlignAprilTag extends Command {
 
     @Override
     public void execute() {
-        if (!m_limeLightSubsystem.hasTargets())
+        Pose2d pose = m_limeLightSubsystem.getTagPoseRelativeToRobot();
+
+        if (pose.getX() == 0 && pose.getY() == 0 && pose.getRotation().getDegrees() == 0)
             return;
 
-        System.out.println("E");
-
-        double x = m_limeLightSubsystem.getTX();
-        double y = m_limeLightSubsystem.getTY();
-
-        SmartDashboard.putNumber("Tag x-offset", x); // logs values to make sure we get them
-        SmartDashboard.putNumber("Tag y-offset", y);
-
-        m_swerveSubsystem.driveCustomPoseOriented(new Pose2d(new Translation2d(13.890498, 4.0259), Rotation2d.kZero),
-                -x,
-                -y, 0);
+        m_swerveSubsystem.driveCustomPoseOriented(
+                new Pose2d(Translation2d.kZero, Rotation2d.fromDegrees(-60)),
+                -pose.getY(),
+                -pose.getX(), -pose.getRotation().getDegrees());
 
         // this aligns first with x then goes with y once x aligned
         /*

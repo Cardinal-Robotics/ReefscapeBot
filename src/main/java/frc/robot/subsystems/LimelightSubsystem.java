@@ -9,8 +9,10 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -40,10 +42,6 @@ public class LimelightSubsystem extends SubsystemBase {
 
     public LimelightSubsystem(SwerveSubsystem swerveSubsystem) {
         m_table = NetworkTableInstance.getDefault().getTable("limelight"); // gets 8 values from limelight
-        System.out.println(m_table.getPath());
-        m_table.getEntry("tx").setDouble(0);
-        m_table.getEntry("ty").setDouble(0);
-        m_table.getEntry("tv").setInteger(0);
 
         m_swerveDrive = swerveSubsystem;
 
@@ -81,12 +79,15 @@ public class LimelightSubsystem extends SubsystemBase {
         return m_table.getEntry("tv").getInteger(0) == 1;
     }
 
-    public double getTX() {
-        return m_table.getEntry("tx").getDouble(Double.NaN);
-    }
+    public Pose2d getTagPoseRelativeToRobot() {
+        double[] poseData = m_table.getEntry("botpose_targetspace").getDoubleArray(new double[6]);
 
-    public double getTY() {
-        return m_table.getEntry("ty").getDouble(Double.NaN);
+        Pose2d pose = new Pose2d(new Translation2d(poseData[0], poseData[1]),
+                new Rotation2d(Units.degreesToRadians(poseData[4])));
+
+        m_publisher.set(new Pose3d(pose));
+
+        return pose;
     }
 
     @Override
@@ -97,28 +98,18 @@ public class LimelightSubsystem extends SubsystemBase {
         m_table = NetworkTableInstance.getDefault().getTable("limelight");
         m_visionSimulation.update(m_swerveDrive.getLibSwerveDrive().getPose());
 
-        double tX = 0;
-        double tY = 0;
-        long tV = 0;
-
         VisionTargetSim[] targets = m_visionSimulation.getVisionTargets().toArray(new VisionTargetSim[0]);
         for (VisionTargetSim target : targets) {
-            if (target.fiducialID != 7)
+            if (target.fiducialID != 6)
                 continue;
 
             Pose3d relativePose = target.getPose().relativeTo(new Pose3d(m_swerveDrive.getPose()));
 
-            tX = relativePose.getX();
-            tY = relativePose.getY();
-            tV = 1;
+            // m_table.getEntry("botpose_targetspace").setDoubleArray(relativePose);
 
             m_publisher.set(relativePose);
             break;
         }
-
-        m_table.getEntry("tx").setDouble(tX);
-        m_table.getEntry("ty").setDouble(tY);
-        m_table.getEntry("tv").setInteger(tV);
     }
 
 }

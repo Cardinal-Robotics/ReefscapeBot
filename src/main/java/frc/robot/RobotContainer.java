@@ -15,10 +15,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.AlgaeMechanismConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.commands.AlignAprilTag;
 import frc.robot.commands.ToggleableAlgaeIntake;
 
@@ -47,7 +49,9 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    // private final ElevatorSubsystem m_elevatorSubsystem = new
+    // ElevatorSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
     private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveDrive);
 
@@ -87,7 +91,8 @@ public class RobotContainer {
             .driveFieldOriented(m_driveAngularVelocity);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new ToggleableAlgaeIntake(m_algaeSubsystem);
+    // private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new
+    // ToggleableAlgaeIntake(m_algaeSubsystem);
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_limelightSubsystem, m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -120,8 +125,36 @@ public class RobotContainer {
                         ? Constants.DriveConstants.kInitialRedRobotPose
                         : Constants.DriveConstants.kInitialBlueRobotPose));
 
+        /*
+         * m_operatorController.x()
+         * .onTrue(Commands.runOnce(
+         * () -> m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.
+         * kElevatorPositionScoreAlgae),
+         * m_elevatorSubsystem));
+         * m_operatorController.povDown()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL1),
+         * m_elevatorSubsystem));
+         * m_operatorController.povUp()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL2),
+         * m_elevatorSubsystem));
+         * m_operatorController.povLeft()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL3),
+         * m_elevatorSubsystem));
+         * m_operatorController.povRight()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL4),
+         * m_elevatorSubsystem));
+         */
+
         // Operator controls
-        m_operatorController.b().onTrue(m_toggleableAlgaeIntake);
+        // m_operatorController.b().onTrue(m_toggleableAlgaeIntake);
         // m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
     }
 
