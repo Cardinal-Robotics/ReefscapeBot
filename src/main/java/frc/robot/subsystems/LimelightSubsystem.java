@@ -4,22 +4,22 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.util.Units;
 
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
@@ -88,6 +88,29 @@ public class LimelightSubsystem extends SubsystemBase {
         m_publisher.set(new Pose3d(pose));
 
         return pose;
+    }
+
+    public double getYaw() { // gets the yaw
+        return m_table.getEntry("botpose").getDoubleArray(new double[6])[5] - 90;
+    }
+
+    public double getRedX() {
+        return m_table.getEntry("botpose_wpired").getDoubleArray(new double[6])[0];
+    }
+
+    public double getRedY() {
+        return m_table.getEntry("botpose_wpired").getDoubleArray(new double[6])[1];
+    }
+
+    public double alignYaw() {
+        double omega = 0; // angular velocity
+        if (getYaw() < -92) {
+            omega = .5;
+        } else if (getYaw() > 88) {
+            omega = -.5;
+        }
+
+        return omega; // returns omega
     }
 
     @Override

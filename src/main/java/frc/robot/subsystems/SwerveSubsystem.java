@@ -17,19 +17,25 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.Nat;
 
 import frc.robot.Constants.DriveConstants;
 
@@ -38,7 +44,9 @@ import java.util.function.Supplier;
 public class SwerveSubsystem extends SubsystemBase {
     StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
             .getStructTopic("YAGSL Pose", Pose2d.struct).publish();
-    private SwerveDrive m_swerveDrive;
+    public SwerveDrive m_swerveDrive;
+
+    LimelightSubsystem m_limeLightSubsystem;
 
     public SwerveSubsystem() {
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // REMOVE OR LOW FOR COMP MAKES RUN SLOW
@@ -82,6 +90,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void resetGyro() {
         this.m_swerveDrive.setGyro(Rotation3d.kZero);
+    }
+
+    public Rotation2d getRotation() {
+        return this.m_swerveDrive.getPose().getRotation();
     }
 
     public void lockInPlace() {
@@ -211,4 +223,5 @@ public class SwerveSubsystem extends SubsystemBase {
             e.printStackTrace();
         }
     }
+
 }

@@ -17,6 +17,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class AlignAprilTag extends Command {
     private final LimelightSubsystem m_limeLightSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
+    private Pose2d limeLightPose;
 
     public AlignAprilTag(LimelightSubsystem limeLightSubsystem, SwerveSubsystem swerveSubsystem) {
         m_limeLightSubsystem = limeLightSubsystem;
