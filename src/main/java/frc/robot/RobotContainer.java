@@ -51,7 +51,6 @@ public class RobotContainer {
     // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
     // private final ElevatorSubsystem m_elevatorSubsystem = new
     // ElevatorSubsystem();
-    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
     private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveDrive);
 
