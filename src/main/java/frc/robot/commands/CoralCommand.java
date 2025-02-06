@@ -14,6 +14,7 @@ import frc.robot.subsystems.CoralSubsystem;
 public class CoralCommand extends Command {
     /** Creates a new CoralCommand. */
     CoralSubsystem m_coralSubsystem;
+    double targetAngle = 0;
 
     public CoralCommand(CoralSubsystem CoralSubsystem) {
         addRequirements(CoralSubsystem);
@@ -29,6 +30,9 @@ public class CoralCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        targetAngle = m_coralSubsystem.setTarget();
+        m_coralSubsystem.alignCoral(targetAngle);
+
         if (RobotContainer.m_operatorController.x().getAsBoolean()) {
             m_coralSubsystem.takeIn();
         } else if (RobotContainer.m_operatorController.b().getAsBoolean()) {

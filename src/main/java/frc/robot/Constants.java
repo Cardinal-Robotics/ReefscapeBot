@@ -38,7 +38,7 @@ public final class Constants {
 
     public static final class DriveConstants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-        public static final double kMaxSpeed = 1.5;// 3.699417868457614; // m/s
+        public static final double kMaxSpeed = 1.5;// 3.699417868457614; // m/s //3.4619388492 new value
 
         public static final Pose2d kInitialBlueRobotPose = new Pose2d(2.17, 7, Rotation2d.kZero);
         public static final Pose2d kInitialRedRobotPose = new Pose2d(15.378, 1.052, Rotation2d.k180deg);
@@ -146,6 +146,25 @@ public final class Constants {
         public static final double kTargetPointDrive = 0; // The tilt motor's set point when driving around, preferably
                                                           // level.
         public static final double kTargetPointRelease = 0; // The tilt motor's set point when releasing the algae into
-                                                            // the processor.
+                                                            // the barge
+    }
+
+    public static final class CoralMechanismConstants {
+        public static final double kCoralKp = 0;
+        public static final double kCoralKi = 0;
+        public static final double kCoralKd = 0;
+
+        public static final int kCoralIntakeID = 1;
+        public static final int kCoralPivotID = 3;
+
+        public static final int kCoralEncoderChannelA = 2;
+        public static final int kCoralEncoderChannelB = 4;
+
+        public static final double kL1Position = 0;
+        public static final double k2_3Position = 0;
+        public static final double kL4Position = 0;
+        public static final double kCoralStore = 0;
+
+        public static final double kIntakePosition = 0;
     }
 }
