@@ -119,10 +119,10 @@ public class RobotContainer {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.a().whileTrue(m_alignAprilTag);
-        m_driverController.b()
+/*         m_driverController.b()
                 .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() == Alliance.Red
                         ? Constants.DriveConstants.kInitialRedRobotPose
-                        : Constants.DriveConstants.kInitialBlueRobotPose));
+                        : Constants.DriveConstants.kInitialBlueRobotPose)); */
 
         /*
          * m_operatorController.x()
