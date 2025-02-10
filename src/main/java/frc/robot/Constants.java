@@ -150,21 +150,20 @@ public final class Constants {
     }
 
     public static final class CoralMechanismConstants {
-        public static final double kCoralKp = 0;
+        public static final double kCoralKp = .0175;
         public static final double kCoralKi = 0;
-        public static final double kCoralKd = 0;
+        public static final double kCoralKd = 0.00145;
 
         public static final int kCoralIntakeID = 1;
         public static final int kCoralPivotID = 3;
 
-        public static final int kCoralEncoderChannelA = 2;
-        public static final int kCoralEncoderChannelB = 4;
+        public static final int kCoralEncoderChannelA = 9;
 
-        public static final double kL1Position = 0;
-        public static final double k2_3Position = 0;
-        public static final double kL4Position = 0;
-        public static final double kCoralStore = 0;
+        public static final double kL1Position = 50; // down
+        public static final double k2_3Position = 0; // left
+        public static final double kL4Position = -50; // up
+        public static final double kCoralStore = 25;
 
-        public static final double kIntakePosition = 0;
+        public static final double kIntakePosition = -25; // right
     }
 }
