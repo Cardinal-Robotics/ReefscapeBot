@@ -28,8 +28,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .positionConversionFactor(ElevatorConstants.kPositionConversionFactor)
                 .velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor);
 
-        masterConfig.closedLoop.pidf(ElevatorConstants.kElevatorP, ElevatorConstants.kElevatorI,
-                ElevatorConstants.kElevatorD, ElevatorConstants.kElevatorF);
+        masterConfig.closedLoop.pid(ElevatorConstants.kElevatorP, ElevatorConstants.kElevatorI,
+                ElevatorConstants.kElevatorD);
 
         SparkMaxConfig slaveConfig = new SparkMaxConfig();
         slaveConfig
