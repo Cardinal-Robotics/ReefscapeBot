@@ -24,7 +24,6 @@ public class Robot extends TimedRobot {
     private final RobotContainer m_robotContainer;
     UsbCamera camera1;
     UsbCamera camera2;
-    VideoSink server;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -38,7 +37,9 @@ public class Robot extends TimedRobot {
         m_robotContainer = new RobotContainer();
         camera1 = CameraServer.startAutomaticCapture(0);
         camera2 = CameraServer.startAutomaticCapture(1);
-        server = CameraServer.getServer();
+
+        camera1.setFPS(30);
+        camera2.setFPS(30);
     }
 
     /**
@@ -61,8 +62,6 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-
-        server.setSource(camera2);
 
     }
 
