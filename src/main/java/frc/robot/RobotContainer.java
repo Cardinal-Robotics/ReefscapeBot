@@ -18,8 +18,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.commands.AlignAprilTag;
 import frc.robot.commands.CoralCommand;
+import frc.robot.commands.LEDCommand;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -49,7 +51,8 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final CoralSubsystem m_coralsubsystem = new CoralSubsystem();
+    public final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
+    // private final CoralSubsystem m_coralsubsystem = new CoralSubsystem();
     // private final LimelightSubsystem m_limelightSubsystem = new
     // LimelightSubsystem();
     // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
@@ -93,7 +96,9 @@ public class RobotContainer {
     //
     // Commands
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final CoralCommand m_coralCommand = new CoralCommand(m_coralsubsystem);
+    private final LEDCommand m_LEDCommand = new LEDCommand(m_LEDSubsystem);
+    // private final CoralCommand m_coralCommand = new
+    // CoralCommand(m_coralsubsystem);
     /*
      * private final Command m_driveFieldOrientedDirectAngle =
      * m_swerveDrive.driveFieldOriented(m_driveDirectAngle);
@@ -125,7 +130,8 @@ public class RobotContainer {
          * m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
          * SmartDashboard.putData("Auto Chooser", m_autoChooser);
          */
-        m_coralsubsystem.setDefaultCommand(m_coralCommand);
+        // m_coralsubsystem.setDefaultCommand(m_coralCommand);
+        m_LEDSubsystem.setDefaultCommand(m_LEDCommand);
     }
 
     /*
