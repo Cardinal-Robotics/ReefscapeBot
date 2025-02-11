@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.ElevatorConstants;
@@ -52,8 +53,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_master.getClosedLoopController().setReference(setPoint, ControlType.kPosition);
     }
 
+    public double getPosition() {
+        return m_master.getAbsoluteEncoder().getPosition();
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        SmartDashboard.putNumber("ElevatorSubsystem::getPosition()", getPosition());
     }
 }
