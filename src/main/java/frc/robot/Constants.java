@@ -38,7 +38,7 @@ public final class Constants {
 
     public static final class DriveConstants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-        public static final double kMaxSpeed = 1.5;// 3.699417868457614; // m/s
+        public static final double kMaxSpeed = 3.699417868457614; // m/s
 
         public static final Pose2d kInitialBlueRobotPose = new Pose2d(2.17, 7, Rotation2d.kZero);
         public static final Pose2d kInitialRedRobotPose = new Pose2d(15.378, 1.052, Rotation2d.k180deg);
@@ -86,28 +86,18 @@ public final class Constants {
 
     public static final class ElevatorConstants {
         // Ports/ID(s)
-        public static final int kLeaderMotorPort = 0;
-        public static final int kFollowerMotorPort = 0;
-        public static final int kEncoderAChannel = 0;
-        public static final int kEncoderBChannel = 1;
+        public static final int kMasterMotorId = 57;
+        public static final int kSlaveMotorId = 68;
+        public static final int kMasterEncoderId = 58;
+        public static final int kSlaveEncoderId = 69;
 
         // PID values for elevator controller
-        public static final double kElevatorKp = 5;
-        public static final double kElevatorKi = 0;
-        public static final double kElevatorKd = 0;
+        public static final double kElevatorP = 5;
+        public static final double kElevatorI = 0;
+        public static final double kElevatorD = 0;
 
-        // Values for elevator feed-forward
-        public static final double kElevatorKs = 0;
-        public static final double kElevatorKg = 0.762;
-        public static final double kElevatorKv = 0.762;
-        public static final double kElevatorKa = 0;
-
-        // idk
         public static final double kMaxAcceleration = 0;
         public static final double kMaxVelocity = 0;
-
-        public static final double kElevatorGearing = 10.0;
-        public static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
 
         public static final double kCarriageMass = 4.0;
 
@@ -116,7 +106,27 @@ public final class Constants {
 
         // distance per pulse = (distance per revolution) / (pulses per revolution)
         // or just => (Pi * D) / ppr
-        public static final double kElevatorEncoderDistPerPulse = ((Math.PI) * (2 * kElevatorDrumRadius)) / 4096;
+        // public static final double kElevatorEncoderDistPerPulse = ((Math.PI) * (2 *
+        // kElevatorDrumRadius) * ) / 4096; // CPR = 4096
+
+        public static final double kElevatorDrumRadius = 0;
+        public static final int kElevatorEncoderCPR = 4096; // counts per revolution
+        public static final int kElevatorGearRatio = 20; // 20:1
+
+        // public static final double kPositionConversionFactor = ((((2 * Math.PI) *
+        // kElevatorDrumRadius)
+        // * kElevatorGearRatio) / kElevatorEncoderCPR);
+        public static final double kElevatorPulleyDiameter = 0.02032;
+        public static final double kPositionConversionFactor = (Math.PI * kElevatorPulleyDiameter) / kElevatorGearRatio;
+        public static final double kVelocityConversionFactor = (Math.PI * kElevatorPulleyDiameter)
+                / (kElevatorGearRatio * 60);
+
+        // Lukus Vucus has approved these constants
+        public static final double kElevatorPositionL1 = 0.0;
+        public static final double kElevatorPositionL2 = 0.0;
+        public static final double kElevatorPositionL3 = 0.0;
+        public static final double kElevatorPositionL4 = 0.0;
+        public static final double kElevatorPositionScoreAlgae = 0.0;
     }
 
     public static final class AlgaeMechanismConstants {

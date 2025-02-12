@@ -20,13 +20,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
+
 import frc.robot.Constants.DriveConstants;
 
 import java.util.function.Supplier;
@@ -35,8 +36,6 @@ public class SwerveSubsystem extends SubsystemBase {
     StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
             .getStructTopic("YAGSL Pose", Pose2d.struct).publish();
     private SwerveDrive m_swerveDrive;
-
-    private ChassisSpeeds maxVelocity = new ChassisSpeeds(0, 0, 0);
 
     public SwerveSubsystem() {
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // REMOVE OR LOW FOR COMP MAKES RUN SLOW
@@ -48,6 +47,7 @@ public class SwerveSubsystem extends SubsystemBase {
             throw new RuntimeException(e);
         }
 
+        m_swerveDrive.setHeadingCorrection(true);
         m_swerveDrive.resetOdometry(getInitialPose());
         m_swerveDrive.field.setRobotPose(getInitialPose());
         m_publisher.set(m_swerveDrive.getPose());
@@ -73,6 +73,10 @@ public class SwerveSubsystem extends SubsystemBase {
         return DriveConstants.kInitialBlueRobotPose;
     }
 
+    public Pose2d getPose() {
+        return this.m_swerveDrive.getPose();
+    }
+
     public void resetGyro() {
         this.m_swerveDrive.setGyro(Rotation3d.kZero);
     }
@@ -88,6 +92,21 @@ public class SwerveSubsystem extends SubsystemBase {
     public void driveRelative(double x, double y, double rotation) {
         ChassisSpeeds velocity = new ChassisSpeeds(x, y, Units.degreesToRadians(rotation));
         m_swerveDrive.drive(velocity);
+    }
+
+    public void driveCustomPoseOriented(Pose2d originPose, double x, double y, double rotation) {
+        Pose2d relativeTransform = originPose.relativeTo(getPose());
+        // Translation2d relativeTranslation = relativeTransform.getTranslation();
+        Rotation2d relativeRotation = relativeTransform.getRotation();
+
+        ChassisSpeeds targetRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                x, // Forward velocity (target-relative)
+                y, // Sideways velocity (target-relative)
+                Units.degreesToRadians(rotation), // Rotational velocity
+                relativeRotation // The target-relative rotation
+        );
+
+        m_swerveDrive.drive(targetRelativeSpeeds);
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {

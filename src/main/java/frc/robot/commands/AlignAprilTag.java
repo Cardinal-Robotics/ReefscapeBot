@@ -4,13 +4,14 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignAprilTag extends Command {
     private final LimelightSubsystem m_limeLightSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
@@ -27,37 +28,32 @@ public class AlignAprilTag extends Command {
 
     @Override
     public void execute() {
-        if (!m_limeLightSubsystem.hasTargets())
+        Pose2d pose = m_limeLightSubsystem.getTagPoseRelativeToRobot();
+
+        if (pose.getX() == 0 && pose.getY() == 0 && pose.getRotation().getDegrees() == 0)
             return;
 
-        double x = m_limeLightSubsystem.getRedX();
-        double y = m_limeLightSubsystem.getRedY();
-        double angle = m_limeLightSubsystem.getYaw();
-        double rotation = m_limeLightSubsystem.alignYaw();
-
-        SmartDashboard.putNumber("Tag x-offset", x); // logs values to make sure we get them
-        SmartDashboard.putNumber("Tag y-offset", y);
+        m_swerveSubsystem.driveCustomPoseOriented(
+                new Pose2d(Translation2d.kZero, Rotation2d.fromDegrees(-60)),
+                -pose.getY(),
+                -pose.getX(), -pose.getRotation().getDegrees());
 
         // this aligns first with x then goes with y once x aligned
-        if (y > 3.4) { // moves robot right //|| angle > -88 || angle < -92
-            m_swerveSubsystem
-                    .driveFieldOriented(new ChassisSpeeds(-.8, 0,
-                            rotation)); // Math.toRadians(180 -
-                                        // m_swerveSubsystem.getRotation().getDegrees()))
-        } else if (y < 3.2) { // left
-            m_swerveSubsystem
-                    .driveFieldOriented(new ChassisSpeeds(.8, 0,
-                            rotation));
-        }
-
-        // If x and y aren't aligned yet, don't align the closeness yet.
-        if (!(x < 2.8 && x > 3.3))
-            return;
         /*
-         * if (y < 11) { // back away from the AprilTag
-         * m_swerveSubsystem.driveRelative(0.8, 0, 0);
-         * } else if (y > 15) { // move to the AprilTag
+         * if (y > 2) { // moves robot right
+         * m_swerveSubsystem.driveRelative(0, 0.8, 0);
+         * } else if (y < -2) { // left
+         * m_swerveSubsystem.driveRelative(0, -0.8, 0);
+         * }
+         * 
+         * // If x and y aren't aligned yet, don't align the closeness yet.
+         * if (!(y < 2 && y > -2))
+         * return;
+         * 
+         * if (x < 0.5) { // back away from the AprilTag
          * m_swerveSubsystem.driveRelative(-0.8, 0, 0);
+         * } else if (x > 0.6) { // move to the AprilTag
+         * m_swerveSubsystem.driveRelative(0.8, 0, 0);
          * }
          */
 

@@ -12,8 +12,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
+import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.commands.ToggleableAlgaeIntake;
 import frc.robot.subsystems.LimelightSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
@@ -44,9 +47,13 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem();
+    //
     // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    // private final ElevatorSubsystem m_elevatorSubsystem = new
+    // ElevatorSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveDrive);
+
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -112,10 +119,38 @@ public class RobotContainer {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.a().whileTrue(m_alignAprilTag);
-        m_driverController.b()
+/*         m_driverController.b()
                 .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() == Alliance.Red
                         ? Constants.DriveConstants.kInitialRedRobotPose
-                        : Constants.DriveConstants.kInitialBlueRobotPose));
+                        : Constants.DriveConstants.kInitialBlueRobotPose)); */
+
+        /*
+         * m_operatorController.x()
+         * .onTrue(Commands.runOnce(
+         * () -> m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.
+         * kElevatorPositionScoreAlgae),
+         * m_elevatorSubsystem));
+         * m_operatorController.povDown()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL1),
+         * m_elevatorSubsystem));
+         * m_operatorController.povUp()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL2),
+         * m_elevatorSubsystem));
+         * m_operatorController.povLeft()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL3),
+         * m_elevatorSubsystem));
+         * m_operatorController.povRight()
+         * .onTrue(Commands.runOnce(
+         * () ->
+         * m_elevatorSubsystem.setElevatorGoal(ElevatorConstants.kElevatorPositionL4),
+         * m_elevatorSubsystem));
+         */
 
         // Operator controls
         // m_operatorController.b().onTrue(m_toggleableAlgaeIntake);
