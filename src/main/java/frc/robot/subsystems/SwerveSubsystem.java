@@ -20,17 +20,22 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 
 import frc.robot.Constants.DriveConstants;
 
 import java.util.function.Supplier;
+
+import org.photonvision.EstimatedRobotPose;
 
 public class SwerveSubsystem extends SubsystemBase {
     StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
@@ -92,6 +97,11 @@ public class SwerveSubsystem extends SubsystemBase {
     public void driveRelative(double x, double y, double rotation) {
         ChassisSpeeds velocity = new ChassisSpeeds(x, y, Units.degreesToRadians(rotation));
         m_swerveDrive.drive(velocity);
+    }
+
+    public void addVisionMeasurement(EstimatedRobotPose estimatedRobotPose, Matrix<N3, N1> standardDeviations) {
+        m_swerveDrive.addVisionMeasurement(estimatedRobotPose.estimatedPose.toPose2d(),
+                estimatedRobotPose.timestampSeconds, standardDeviations);
     }
 
     public void driveCustomPoseOriented(Pose2d originPose, double x, double y, double rotation) {

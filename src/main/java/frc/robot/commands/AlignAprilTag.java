@@ -7,34 +7,39 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+
+import java.util.Optional;
+
 import edu.wpi.first.math.geometry.Pose2d;
 
-import frc.robot.subsystems.LimelightSubsystem;
+import frc.robot.subsystems.VisionSubsystem.Cameras;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class AlignAprilTag extends Command {
-    private final LimelightSubsystem m_limeLightSubsystem;
+    private final VisionSubsystem m_visionSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
 
-    public AlignAprilTag(LimelightSubsystem limeLightSubsystem, SwerveSubsystem swerveSubsystem) {
-        m_limeLightSubsystem = limeLightSubsystem;
+    public AlignAprilTag(VisionSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem) {
+        m_visionSubsystem = visionSubsystem;
         m_swerveSubsystem = swerveSubsystem;
 
-        addRequirements(m_limeLightSubsystem);
-        // Don't require the swerve subsystem, it causes YAGSL to freak out. At least in
-        // the simulation.
-        // addRequirements(m_swerveSubsystem);
+        addRequirements(m_visionSubsystem);
     }
 
     @Override
     public void execute() {
-        Pose2d pose = m_limeLightSubsystem.getTagPoseRelativeToRobot();
-
-        if (pose.getX() == 0 && pose.getY() == 0 && pose.getRotation().getDegrees() == 0)
+        Optional<Pose2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(6, Cameras.LEFT_CAM);
+        if (potentialPose.isEmpty())
             return;
 
+        Pose2d pose = potentialPose.get();
+
         m_swerveSubsystem.driveCustomPoseOriented(
-                new Pose2d(Translation2d.kZero, Rotation2d.fromDegrees(-60)),
+                new Pose2d(Translation2d.kZero,
+                        Rotation2d.fromDegrees(
+                                m_visionSubsystem.getAprilTagPose(6, Transform2d.kZero).getRotation().getRadians())),
                 -pose.getY(),
                 -pose.getX(), -pose.getRotation().getDegrees());
 

@@ -14,12 +14,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.commands.ToggleableAlgaeIntake;
-import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
+import frc.robot.subsystems.DriverCameras;
 import frc.robot.commands.AlignAprilTag;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -52,7 +53,8 @@ public class RobotContainer {
     // private final ElevatorSubsystem m_elevatorSubsystem = new
     // ElevatorSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveDrive);
+    private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
+    private final DriverCameras m_driverCameras = new DriverCameras();
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -92,7 +94,7 @@ public class RobotContainer {
 
     // private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new
     // ToggleableAlgaeIntake(m_algaeSubsystem);
-    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_limelightSubsystem, m_swerveDrive);
+    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -119,10 +121,13 @@ public class RobotContainer {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.a().whileTrue(m_alignAprilTag);
-/*         m_driverController.b()
-                .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() == Alliance.Red
-                        ? Constants.DriveConstants.kInitialRedRobotPose
-                        : Constants.DriveConstants.kInitialBlueRobotPose)); */
+        /*
+         * m_driverController.b()
+         * .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() ==
+         * Alliance.Red
+         * ? Constants.DriveConstants.kInitialRedRobotPose
+         * : Constants.DriveConstants.kInitialBlueRobotPose));
+         */
 
         /*
          * m_operatorController.x()
