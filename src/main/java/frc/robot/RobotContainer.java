@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.commands.ToggleableAlgaeIntake;
+import frc.robot.commands.AlignAprilTag.TagPositions;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -121,6 +122,21 @@ public class RobotContainer {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.a().whileTrue(m_alignAprilTag);
+
+        m_driverController.povUp().debounce(0.5)
+                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP)));
+        m_driverController.povUpRight()
+                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP_RIGHT)));
+        m_driverController.povUpLeft()
+                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP_LEFT)));
+
+        m_driverController.povDown().debounce(0.5)
+                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM)));
+        m_driverController.povDownRight()
+                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM_RIGHT)));
+        m_driverController.povDownLeft()
+                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM_LEFT)));
+
         /*
          * m_driverController.b()
          * .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() ==

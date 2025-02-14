@@ -17,7 +17,9 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -138,6 +140,7 @@ public class VisionSubsystem extends SubsystemBase {
              */
             visionSim.update(m_swerveDrive.getSimulationDriveTrainPose().get());
         }
+
         for (Cameras camera : Cameras.values()) {
             Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
             if (poseEst.isEmpty())
@@ -211,21 +214,22 @@ public class VisionSubsystem extends SubsystemBase {
         return Optional.empty();
     }
 
+    private final StructPublisher<Transform3d> m_publisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Photon Pose", Transform3d.struct).publish();
+
     public Optional<Pose2d> getRobotPoseRelativeToAprilTag(int id, Cameras camera) {
         Optional<PhotonTrackedTarget> target = getTargetFromId(id, camera);
         if (target.isEmpty())
             return Optional.empty();
 
-        // This logic is wrong...
-        Transform3d cameraToTag = target.get().getBestCameraToTarget();
+        Transform3d tagToCamera = target.get().getBestCameraToTarget().inverse();
 
-        Transform3d cameraToRobot = camera.robotToCamTransform.inverse();
-
-        Transform3d robotToTag = cameraToRobot.plus(cameraToTag);
-        Transform3d tagToRobot = robotToTag.inverse();
+        Transform3d tagToRobot = tagToCamera.plus(camera.robotToCamTransform.inverse());
+        m_publisher.set(tagToRobot);
 
         return Optional
-                .of(new Pose2d(tagToRobot.getTranslation().toTranslation2d(), tagToRobot.getRotation().toRotation2d()));
+                .of(new Pose2d(tagToRobot.getTranslation().toTranslation2d(),
+                        tagToRobot.getRotation().toRotation2d()));
     }
 
     /**
@@ -240,7 +244,7 @@ public class VisionSubsystem extends SubsystemBase {
     public enum Cameras {
         /** Left camera */
         LEFT_CAM("leftCamera",
-                new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(30)),
+                new Rotation3d(0, Math.toRadians(0), Math.toRadians(-30)),
                 new Translation3d(Units.inchesToMeters(12.056),
                         Units.inchesToMeters(10.981),
                         Units.inchesToMeters(8.44)),
@@ -248,7 +252,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         /** Right Camera */
         RIGHT_CAM("rightCamera",
-                new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-30)),
+                new Rotation3d(0, Math.toRadians(0), Math.toRadians(30)),
                 new Translation3d(Units.inchesToMeters(12.056),
                         Units.inchesToMeters(-10.981),
                         Units.inchesToMeters(8.44)),
