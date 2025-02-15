@@ -20,32 +20,27 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
+
 import frc.robot.Constants.DriveConstants;
 
 import java.util.function.Supplier;
 
+import org.photonvision.EstimatedRobotPose;
+
 public class SwerveSubsystem extends SubsystemBase {
     StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
             .getStructTopic("YAGSL Pose", Pose2d.struct).publish();
-    public SwerveDrive m_swerveDrive;
-
-    LimelightSubsystem m_limeLightSubsystem;
-
-    private ChassisSpeeds maxVelocity = new ChassisSpeeds(0, 0, 0);
+    private SwerveDrive m_swerveDrive;
 
     public SwerveSubsystem() {
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // REMOVE OR LOW FOR COMP MAKES RUN SLOW
@@ -57,6 +52,7 @@ public class SwerveSubsystem extends SubsystemBase {
             throw new RuntimeException(e);
         }
 
+        m_swerveDrive.setHeadingCorrection(true);
         m_swerveDrive.resetOdometry(getInitialPose());
         m_swerveDrive.field.setRobotPose(getInitialPose());
         m_publisher.set(m_swerveDrive.getPose());
@@ -82,6 +78,10 @@ public class SwerveSubsystem extends SubsystemBase {
         return DriveConstants.kInitialBlueRobotPose;
     }
 
+    public Pose2d getPose() {
+        return this.m_swerveDrive.getPose();
+    }
+
     public void resetGyro() {
         this.m_swerveDrive.setGyro(Rotation3d.kZero);
     }
@@ -97,6 +97,11 @@ public class SwerveSubsystem extends SubsystemBase {
     public void driveRelative(double x, double y, double rotation) {
         ChassisSpeeds velocity = new ChassisSpeeds(x, y, Units.degreesToRadians(rotation));
         m_swerveDrive.drive(velocity);
+    }
+
+    public void addVisionMeasurement(EstimatedRobotPose estimatedRobotPose, Matrix<N3, N1> standardDeviations) {
+        m_swerveDrive.addVisionMeasurement(estimatedRobotPose.estimatedPose.toPose2d(),
+                estimatedRobotPose.timestampSeconds, standardDeviations);
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {
@@ -202,5 +207,4 @@ public class SwerveSubsystem extends SubsystemBase {
             e.printStackTrace();
         }
     }
-
 }
