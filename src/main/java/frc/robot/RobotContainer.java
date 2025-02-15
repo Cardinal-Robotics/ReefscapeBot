@@ -20,8 +20,12 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
+import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DriverCameras;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.commands.AlignAprilTag;
+import frc.robot.commands.CoralCommand;
+import frc.robot.commands.LEDCommand;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -39,7 +43,7 @@ public class RobotContainer {
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
-    private final CommandXboxController m_operatorController = new CommandXboxController(
+    public static CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -47,10 +51,10 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    //
+    //private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
+    //private final CoralSubsystem m_coralsubsystem = new CoralSubsystem();
     // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
-    // private final ElevatorSubsystem m_elevatorSubsystem = new
-    // ElevatorSubsystem();
+    // private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
     private final DriverCameras m_driverCameras = new DriverCameras();
@@ -75,7 +79,6 @@ public class RobotContainer {
                                                    // the robot.
             .scaleTranslation(0.8) // If the joystick goes to 100%, this scales it down to 80%.
             .allianceRelativeControl(true); // Field orientation flips to be on the your team's side.
-
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -93,6 +96,7 @@ public class RobotContainer {
     //
 
     public RobotContainer() {
+
         DriverStation.silenceJoystickConnectionWarning(true);
 
         configureBindings();
@@ -101,6 +105,9 @@ public class RobotContainer {
 
         m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
+
+        // m_coralsubsystem.setDefaultCommand(m_coralCommand);
+        // m_ledSubsystem.setDefaultCommand(m_LEDCommand);
     }
 
     private void configureBindings() {
@@ -164,6 +171,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return m_autoChooser.getSelected();
+        return null;// m_autoChooser.getSelected();
     }
 }
