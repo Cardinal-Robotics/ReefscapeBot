@@ -15,15 +15,18 @@
 - [X] YAGSL
 - [X] PathPlanner
 - [ ] Tuned values for YAGSL and PathPlanner
-- [ ] Elevator subsystem
+- [X] Elevator subsystem
 - [ ] Climber subsystem
-- [ ] Coral subsystem
+- [X] Coral subsystem
 - [X] Algae subsystem
-- [ ] Automatically align to the REEF w/ vision
+- [X] Automatically align to the REEF w/ vision
 
 ## Development Journey
 
 ### Week 5 & 6 (2/3 - 2/15)
+* Outlined code for elecator and coral mechanisms.
+* Made code for LEDs.
+* Alignment to AprilTag with PhotonVision (in sim)!
 
 ### Week 3 & 4 (1/20 - 2/1)
 * YAGSL now works on unnamed frame bot (UFB). Note to self: make sure to change this when we actually decide on a name for the bot.
