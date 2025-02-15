@@ -152,7 +152,6 @@ public class VisionSubsystem extends SubsystemBase {
                     camera.curStdDevs);
 
         }
-
     }
 
     /**
@@ -192,6 +191,16 @@ public class VisionSubsystem extends SubsystemBase {
         return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
     }
 
+    private class TargetAndCamera {
+        PhotonTrackedTarget target;
+        Cameras camera;
+
+        TargetAndCamera(PhotonTrackedTarget tar, Cameras cam) {
+            target = tar;
+            camera = cam;
+        }
+    }
+
     /**
      * Get tracked target from a camera of AprilTagID
      *
@@ -199,14 +208,20 @@ public class VisionSubsystem extends SubsystemBase {
      * @param camera Camera to check.
      * @return Tracked target.
      */
-    public Optional<PhotonTrackedTarget> getTargetFromId(int id, Cameras camera) {
-        for (PhotonPipelineResult result : camera.resultsList) {
-            if (!result.hasTargets())
-                continue;
+    public Optional<TargetAndCamera> getTargetFromId(int id) {
+        for (Cameras camera : Cameras.values()) {
+            for (PhotonPipelineResult result : camera.resultsList) {
+                if (!result.hasTargets())
+                    continue;
 
-            for (PhotonTrackedTarget target : result.getTargets()) {
-                if (target.getFiducialId() == id) {
-                    return Optional.of(target);
+                for (PhotonTrackedTarget target : result.getTargets()) {
+                    if (target.getFiducialId() == id) {
+                        return Optional.of(new TargetAndCamera(target, camera)); // Returns the camera because some
+                                                                                 // other functions like
+                                                                                 // getRobotPoseRelativeToAprilTag()
+                                                                                 // needs to adjust for the camera's
+                                                                                 // offset to get the robot pose.
+                    }
                 }
             }
         }
@@ -217,12 +232,15 @@ public class VisionSubsystem extends SubsystemBase {
     private final StructPublisher<Transform3d> m_publisher = NetworkTableInstance.getDefault()
             .getStructTopic("Photon Pose", Transform3d.struct).publish();
 
-    public Optional<Pose2d> getRobotPoseRelativeToAprilTag(int id, Cameras camera) {
-        Optional<PhotonTrackedTarget> target = getTargetFromId(id, camera);
-        if (target.isEmpty())
+    public Optional<Pose2d> getRobotPoseRelativeToAprilTag(int id) {
+        Optional<TargetAndCamera> data = getTargetFromId(id);
+        if (data.isEmpty())
             return Optional.empty();
 
-        Transform3d tagToCamera = target.get().getBestCameraToTarget().inverse();
+        PhotonTrackedTarget target = data.get().target;
+        Cameras camera = data.get().camera;
+
+        Transform3d tagToCamera = target.getBestCameraToTarget().inverse();
 
         Transform3d tagToRobot = tagToCamera.plus(camera.robotToCamTransform.inverse());
         m_publisher.set(tagToRobot);

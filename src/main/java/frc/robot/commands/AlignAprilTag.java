@@ -4,34 +4,40 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-
-import java.util.Optional;
-
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import frc.robot.subsystems.VisionSubsystem.Cameras;
+import edu.wpi.first.wpilibj.Timer;
+
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+
+import java.util.Optional;
 
 public class AlignAprilTag extends Command {
     private final VisionSubsystem m_visionSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
 
+    private TagPositions m_tagPosition;
+    private boolean m_finished = false;
+    private double m_lastUpdated;
+    private int m_targetId;
+
     public AlignAprilTag(VisionSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem) {
         m_visionSubsystem = visionSubsystem;
         m_swerveSubsystem = swerveSubsystem;
 
+        setTagPosition(TagPositions.TOP);
+
         addRequirements(m_visionSubsystem);
+        addRequirements(m_swerveSubsystem);
     }
 
     public enum TagPositions {
@@ -44,70 +50,91 @@ public class AlignAprilTag extends Command {
         BOTTOM,
     }
 
-    private TagPositions m_tagPosition = TagPositions.TOP;
+    @Override
+    public void initialize() {
+        m_lastUpdated = Timer.getFPGATimestamp();
+        setTagPosition(m_tagPosition);
+        m_finished = false;
+    }
 
     public void setTagPosition(TagPositions tagPosition) {
         m_tagPosition = tagPosition;
+
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+
+        switch (m_tagPosition) {
+            case TOP:
+                m_targetId = (alliance == Alliance.Red ? 10 : 21);
+                break;
+            case TOP_RIGHT:
+                m_targetId = (alliance == Alliance.Red ? 9 : 22);
+                break;
+            case TOP_LEFT:
+                m_targetId = (alliance == Alliance.Red ? 11 : 20);
+                break;
+            case BOTTOM:
+                m_targetId = (alliance == Alliance.Red ? 7 : 18);
+                break;
+            case BOTTOM_RIGHT:
+                m_targetId = (alliance == Alliance.Red ? 8 : 17);
+                break;
+            case BOTTOM_LEFT:
+                m_targetId = (alliance == Alliance.Red ? 6 : 19);
+                break;
+        }
+
+        SmartDashboard.putNumber("ID of AprilTag Aligning", m_targetId);
     }
+
+    private final StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Target aligning position", Pose2d.struct).publish();
 
     @Override
     public void execute() {
-        int ID = 10;
-        switch (m_tagPosition) {
-            case TOP:
-                ID = 10;
-                break;
-            case TOP_RIGHT:
-                ID = 9;
-                break;
-            case TOP_LEFT:
-                ID = 11;
-                break;
-            case BOTTOM:
-                ID = 7;
-                break;
-            case BOTTOM_RIGHT:
-                ID = 8;
-                break;
-            case BOTTOM_LEFT:
-                ID = 6;
-                break;
+        Optional<Pose2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
 
+        // If it has been more than half a second without seeing a target, stop moving.
+        // This fixes issues when the AprilTag is physically out of view but the robot
+        // is still set to keep moving forward. I'm praying the delay isn't that bad on
+        // the real bot.
+        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 0.5) {
+            m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
+            return;
         }
-
-        Optional<Pose2d> potentialPose = Optional
-                .of(m_swerveSubsystem.getPose().relativeTo(VisionSubsystem.getAprilTagPose(ID, Transform2d.kZero)));
 
         if (potentialPose.isEmpty())
             return;
 
-        Pose2d pose = potentialPose.get();
+        // Positive X goes past an AprilTag, negative X goes away from an AprilTag.
+        // Positive Y is left of an AprilTag. Negative Y is right of an AprilTag.
+        Transform2d poseOffset = new Transform2d(-0.5, 0.5, Rotation2d.kZero);
 
-        m_swerveSubsystem.driveCustomPoseOriented(
-                new Pose2d(Translation2d.kZero,
-                        Rotation2d.fromDegrees(
-                                m_visionSubsystem.getAprilTagPose(ID, Transform2d.kZero).getRotation().getDegrees())),
-                -pose.getX(),
-                -pose.getY(), pose.getRotation().getDegrees());
+        Pose2d pose = potentialPose.get()
+                .plus(poseOffset.inverse());
 
-        // this aligns first with x then goes with y once x aligned
-        /*
-         * if (y > 2) { // moves robot right
-         * m_swerveSubsystem.driveRelative(0, 0.8, 0);
-         * } else if (y < -2) { // left
-         * m_swerveSubsystem.driveRelative(0, -0.8, 0);
-         * }
-         * 
-         * // If x and y aren't aligned yet, don't align the closeness yet.
-         * if (!(y < 2 && y > -2))
-         * return;
-         * 
-         * if (x < 0.5) { // back away from the AprilTag
-         * m_swerveSubsystem.driveRelative(-0.8, 0, 0);
-         * } else if (x > 0.6) { // move to the AprilTag
-         * m_swerveSubsystem.driveRelative(0.8, 0, 0);
-         * }
-         */
+        m_publisher.set(VisionSubsystem.getAprilTagPose(m_targetId, Transform2d.kZero).plus(poseOffset.inverse()));
 
+        // Calculates the propper speed to correctly face the AprilTag (assuming
+        // odometry is perfect, because VisionSubsytem::getAprilTagPose doesn't get the
+        // actual AprilTag data but it gets where the AprilTag *should* be on the
+        // field).
+        double omegaRadiansPerSecond = m_swerveSubsystem.getLibSwerveDrive().swerveController.headingCalculate(
+                m_swerveSubsystem.getPose().getRotation().getRadians(),
+                VisionSubsystem.getAprilTagPose(m_targetId, Transform2d.kZero).getRotation()
+                        .rotateBy(Rotation2d.k180deg).getRadians());
+
+        ChassisSpeeds targetRelativeSpeeds = new ChassisSpeeds(
+                pose.getX(), // Forward velocity
+                pose.getY(), // Sideways velocity
+                omegaRadiansPerSecond // Rotational velocity
+        );
+
+        m_swerveSubsystem.getLibSwerveDrive().drive(targetRelativeSpeeds);
+        m_lastUpdated = Timer.getFPGATimestamp();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return m_finished;
     }
 }

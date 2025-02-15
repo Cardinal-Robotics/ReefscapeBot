@@ -104,21 +104,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 estimatedRobotPose.timestampSeconds, standardDeviations);
     }
 
-    public void driveCustomPoseOriented(Pose2d originPose, double x, double y, double rotation) {
-        Pose2d relativeTransform = originPose.relativeTo(getPose());
-        // Translation2d relativeTranslation = relativeTransform.getTranslation();
-        Rotation2d relativeRotation = relativeTransform.getRotation();
-
-        ChassisSpeeds targetRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                x, // Forward velocity (target-relative)
-                y, // Sideways velocity (target-relative)
-                Units.degreesToRadians(rotation), // Rotational velocity
-                relativeRotation // The target-relative rotation
-        );
-
-        m_swerveDrive.drive(targetRelativeSpeeds);
-    }
-
     public void driveFieldOriented(ChassisSpeeds velocity) {
         m_swerveDrive.driveFieldOriented(velocity);
     }
