@@ -30,11 +30,8 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     // Misc.
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    /*
-     * private final SendableChooser<Command> m_autoChooser;
-     * private static final SendableChooser<Boolean> m_displayDebugData = new
-     * SendableChooser<Boolean>();
-     */
+    private final SendableChooser<Command> m_autoChooser;
+    private static final SendableChooser<Boolean> m_displayDebugData = new SendableChooser<Boolean>();
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -53,43 +50,34 @@ public class RobotContainer {
     // ---------------------------------------------------------------------------------------------------------------------------------------
     public final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
     // private final CoralSubsystem m_coralsubsystem = new CoralSubsystem();
-    // private final LimelightSubsystem m_limelightSubsystem = new
-    // LimelightSubsystem();
     // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
-    // private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+    private final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem();
+    private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
     //
     // YAGSL Swerve input streams
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    /*
-     * private final SwerveInputStream m_driveAngularVelocity =
-     * SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
-     * () -> m_driverController.getLeftY() * -1,
-     * () -> m_driverController.getLeftX() * -1)
-     * .withControllerRotationAxis(() -> (m_driverController.getRightX() * -1)) //
-     * The
-     * // simulation
-     * // has
-     * // inverted
-     * // rotation
-     * .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the
-     * deadband for it to register. This
-     * // way slight micro-movements doesn't suddenly move the robot.
-     * .scaleTranslation(0.8) // If the joystick goes to 100%, this scales it down
-     * to 80%.
-     * .allianceRelativeControl(true); // Field orientation flips to be on the your
-     * team's side.
-     * 
-     * private final SwerveInputStream m_driveDirectAngle =
-     * m_driveAngularVelocity.copy()
-     * .withControllerHeadingAxis(
-     * m_driverController::getRightX,
-     * m_driverController::getRightY)
-     * .headingWhile(true);
-     */
 
+    private final SwerveInputStream m_driveAngularVelocity = SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
+            () -> m_driverController.getLeftY() * -1,
+            () -> m_driverController.getLeftX() * -1)
+            .withControllerRotationAxis(() -> (m_driverController.getRightX() * -1)) // The
+            // simulation
+            // has
+            // inverted
+            // rotation
+            .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the deadband for it to register. This
+            // way slight micro-movements doesn't suddenly move the robot.
+            .scaleTranslation(0.8) // If the joystick goes to 100%, this scales it down to 80%.
+            .allianceRelativeControl(true); // Field orientation flips to be on the your team's side.
+
+    private final SwerveInputStream m_driveDirectAngle = m_driveAngularVelocity.copy()
+            .withControllerHeadingAxis(
+                    m_driverController::getRightX,
+                    m_driverController::getRightY)
+            .headingWhile(true);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -99,63 +87,49 @@ public class RobotContainer {
     private final LEDCommand m_LEDCommand = new LEDCommand(m_LEDSubsystem);
     // private final CoralCommand m_coralCommand = new
     // CoralCommand(m_coralsubsystem);
-    /*
-     * private final Command m_driveFieldOrientedDirectAngle =
-     * m_swerveDrive.driveFieldOriented(m_driveDirectAngle);
-     * private final Command m_driveFieldOrientedAngularVelocity = m_swerveDrive
-     * .driveFieldOriented(m_driveAngularVelocity);
-     * private final Command m_resetGyro = Commands.runOnce(() ->
-     * m_swerveDrive.resetGyro(), m_swerveDrive);
-     * 
-     * // private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new
-     * // ToggleableAlgaeIntake(m_algaeSubsystem);
-     * private final AlignAprilTag m_alignAprilTag = new
-     * AlignAprilTag(m_limelightSubsystem, m_swerveDrive);
-     */
+
+    private final Command m_driveFieldOrientedDirectAngle = m_swerveDrive.driveFieldOriented(m_driveDirectAngle);
+    private final Command m_driveFieldOrientedAngularVelocity = m_swerveDrive
+            .driveFieldOriented(m_driveAngularVelocity);
+    private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
+
+    // private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new
+    // ToggleableAlgaeIntake(m_algaeSubsystem);
+    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_limelightSubsystem, m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
     public RobotContainer() {
-        /*
-         * DriverStation.silenceJoystickConnectionWarning(true);
-         * 
-         * configureBindings();
-         * 
-         * m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
-         * 
-         * m_displayDebugData.addOption("Display", true);
-         * m_displayDebugData.addOption("Hide", false);
-         * SmartDashboard.putData("Display debug data?", m_displayDebugData);
-         * 
-         * m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
-         * SmartDashboard.putData("Auto Chooser", m_autoChooser);
-         */
+
+        DriverStation.silenceJoystickConnectionWarning(true);
+
+        configureBindings();
+
+        m_swerveDrive.setDefaultCommand(m_driveFieldOrientedAngularVelocity);
+
+        m_displayDebugData.addOption("Display", true);
+        m_displayDebugData.addOption("Hide", false);
+        SmartDashboard.putData("Display debug data?", m_displayDebugData);
+
+        m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
+        SmartDashboard.putData("Auto Chooser", m_autoChooser);
+
         // m_coralsubsystem.setDefaultCommand(m_coralCommand);
         m_LEDSubsystem.setDefaultCommand(m_LEDCommand);
     }
 
-    /*
-     * public static boolean shouldDisplayDebugData() {
-     * return m_displayDebugData.getSelected();
-     * }
-     */
-
     private void configureBindings() {
+        // Driver controls
+        m_driverController.y().onTrue(m_resetGyro);
+        m_driverController.a().whileTrue(m_alignAprilTag);
+        m_driverController.b()
+                .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() == Alliance.Red
+                        ? Constants.DriveConstants.kInitialRedRobotPose
+                        : Constants.DriveConstants.kInitialBlueRobotPose));
 
-        /*
-         * // Driver controls
-         * m_driverController.y().onTrue(m_resetGyro);
-         * m_driverController.a().whileTrue(m_alignAprilTag);
-         * m_driverController.b()
-         * .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() ==
-         * Alliance.Red
-         * ? Constants.DriveConstants.kInitialRedRobotPose
-         * : Constants.DriveConstants.kInitialBlueRobotPose));
-         * 
-         * // Operator controls
-         * // m_operatorController.b().onTrue(m_toggleableAlgaeIntake);
-         * // m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
-         */
+        // Operator controls
+        // m_operatorController.b().onTrue(m_toggleableAlgaeIntake);
+        // m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
     }
 
     public Command getAutonomousCommand() {
