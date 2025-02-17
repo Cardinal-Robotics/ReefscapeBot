@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
@@ -194,15 +195,10 @@ public class SwerveSubsystem extends SubsystemBase {
                                     DriveConstants.kDAngular)), // Rotation PID
                     config,
                     () -> {
-                        var alliance = DriverStation.getAlliance();
-                        if (alliance.isPresent()) {
-                            return alliance.get() == DriverStation.Alliance.Red;
-                        }
-                        return false;
+                        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+                        return alliance == DriverStation.Alliance.Red;
                     },
                     this);
-
-            AutoBuilder.resetOdom(getInitialPose()).schedule();
         } catch (Exception e) {
             e.printStackTrace();
         }

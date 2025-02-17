@@ -24,7 +24,6 @@ import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DriverCameras;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.commands.AlignAprilTag;
-import frc.robot.commands.CoralCommand;
 import frc.robot.commands.LEDCommand;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -51,10 +50,11 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    //private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
-    //private final CoralSubsystem m_coralsubsystem = new CoralSubsystem();
+    // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
+    private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
     // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
-    // private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+    // private final ElevatorSubsystem m_elevatorSubsystem = new
+    // ElevatorSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
     private final DriverCameras m_driverCameras = new DriverCameras();
@@ -128,6 +128,13 @@ public class RobotContainer {
                 .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM_RIGHT)));
         m_driverController.povDownLeft()
                 .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM_LEFT)));
+
+        /*
+         * m_operatorController.rightBumper().onTrue(Commands.runOnce(() ->
+         * m_coralSubsystem.spinIntakeMotor(0.2)));
+         * m_operatorController.leftBumper().onTrue(Commands.runOnce(() ->
+         * m_coralSubsystem.spinIntakeMotor(0.0)));
+         */
 
         /*
          * m_driverController.b()
