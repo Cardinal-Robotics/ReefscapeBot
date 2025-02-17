@@ -38,7 +38,7 @@ public class LEDSubsystem extends SubsystemBase {
     public LEDSubsystem() {
         // PWM port 9
         // Must be a PWM header, not MXP or DIO
-        m_led = new AddressableLED(8);
+        m_led = new AddressableLED(9);
 
         // all hues at maximum saturation and half brightness
 
@@ -125,46 +125,22 @@ public class LEDSubsystem extends SubsystemBase {
         return valor;
     }
 
-
-           
-
-    if (r < 255) {     
-
-    
-    
-
-    i    r--;
-        }
-        return r;
-    }
-
-    public void set(int r, int g, int b) {
-        for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-            m_ledBuffer.setRGB(i, r, g, b);
-        }
-
-        m_led.setData(m_ledBuffer);
-    }
-
     public void setChoppedRainbow() {
         Map<Number, Color> maskSteps = Map.of(0, Color.kWhite, 0.5, Color.kBlack);
         LEDPattern base = LEDPattern.rainbow(255, 255);
-     
+        LEDPattern mask = LEDPattern.steps(maskSteps).scrollAtRelativeSpeed(Percent.per(Second).of(100));
 
-           
+        LEDPattern pattern = base.mask(mask);
 
-    LEDPattern pattern = base.mask(mask);
+        // Apply the LED pattern to the data buffer
+        pattern.applyTo(m_ledBuffer);
 
+        // Write the data to the LED strip
+        m_led.setData(m_ledBuffer);
+    }
 
-        // Wri
-    e th
-
-    
-
-    rride
-
-    // This method will be called once per sche
-    
-
-    
-    
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+    }
+}

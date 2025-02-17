@@ -13,9 +13,6 @@ public class LEDCommand extends Command {
     /** Creates a new LEDCommand. */
     LEDSubsystem m_LEDSubsystem;
     private float valor = 0;
-    private int r = 0;
-    private int g = 0;
-    private int b = 0;
 
     public LEDCommand(LEDSubsystem LEDSubsystem) {
         // Use addRequirements() here to declare subsystem dependencies.
@@ -38,20 +35,6 @@ public class LEDCommand extends Command {
             valor = m_LEDSubsystem.decreaseValor(valor);
         }
 
-        if (RobotContainer.m_operatorController.rightBumper().getAsBoolean()) {
-            valor = m_LEDSubsystem.increase(r);
-        } else if (RobotContainer.m_operatorController.leftBumper().getAsBoolean()) {
-            valor = m_LEDSubsystem.decrease(r);
-        } else if (RobotContainer.m_operatorController.povUp().getAsBoolean()) {
-            valor = m_LEDSubsystem.increase(g);
-        } else if (RobotContainer.m_operatorController.povDown().getAsBoolean()) {
-            valor = m_LEDSubsystem.increase(g);
-        } else if (RobotContainer.m_operatorController.povLeft().getAsBoolean()) {
-            valor = m_LEDSubsystem.increase(b);
-        } else if (RobotContainer.m_operatorController.povRight().getAsBoolean()) {
-            valor = m_LEDSubsystem.decrease(b);
-        }
-
         if (RobotContainer.m_operatorController.b().getAsBoolean()) {
             m_LEDSubsystem.setBlue();
         } else if (RobotContainer.m_operatorController.x().getAsBoolean()) {
@@ -60,8 +43,6 @@ public class LEDCommand extends Command {
             m_LEDSubsystem.elevatorPattern(valor);
         } else if (RobotContainer.m_operatorController.rightStick().getAsBoolean()) {
             m_LEDSubsystem.setChoppedRainbow();
-        } else if (RobotContainer.m_operatorController.leftStick().getAsBoolean()) {
-            m_LEDSubsystem.set(r, g, b);
         } else {
             m_LEDSubsystem.setRed();
         }
