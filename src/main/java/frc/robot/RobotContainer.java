@@ -173,6 +173,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;// m_autoChooser.getSelected();
+        return m_autoChooser.getSelected();
     }
 }
