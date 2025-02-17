@@ -59,11 +59,13 @@ public class CoralSubsystem extends SubsystemBase {
         double currentAngle = getAngle();
         double feedforward = 0.06 * Math.cos(Math.toRadians(currentAngle));
 
-        m_pivotMotor.getClosedLoopController().setReference(
-                m_setpoint,
-                ControlType.kPosition,
-                ClosedLoopSlot.kSlot0,
-                feedforward);
+        /*
+         * m_pivotMotor.getClosedLoopController().setReference(
+         * m_setpoint,
+         * ControlType.kPosition,
+         * ClosedLoopSlot.kSlot0,
+         * feedforward);
+         */
     }
 
 }

@@ -5,11 +5,16 @@
 package frc.robot.commands;
 
 import frc.robot.Constants.AlgaeMechanismConstants;
+import frc.robot.Constants.ElevatorConstants.ElevatorPositions;
+import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
+import frc.robot.Constants.ElevatorConstants.InteractionState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.AlgaeSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
 public class ToggleableAlgaeIntake extends Command {
+    private final ElevatorSubsystem m_elevatorSubsystem;
     private final AlgaeSubsystem m_algaeSubsystem;
     private final Timer m_timer = new Timer();
     private boolean m_hasAlgae = false;
@@ -25,10 +30,12 @@ public class ToggleableAlgaeIntake extends Command {
         IDLE
     }
 
-    public ToggleableAlgaeIntake(AlgaeSubsystem algaeSubsystem) {
+    public ToggleableAlgaeIntake(ElevatorSubsystem elevatorSubsystem, AlgaeSubsystem algaeSubsystem) {
         m_currentState = m_hasAlgae ? AlgaeState.TILT_TO_RELEASE : AlgaeState.TILT_TO_INTAKE;
 
+        m_elevatorSubsystem = elevatorSubsystem;
         m_algaeSubsystem = algaeSubsystem;
+
         addRequirements(m_algaeSubsystem);
     }
 
@@ -36,6 +43,7 @@ public class ToggleableAlgaeIntake extends Command {
     public void initialize() {
         // Set the starting state based on whether algae is currently held
         m_currentState = m_hasAlgae ? AlgaeState.TILT_TO_RELEASE : AlgaeState.TILT_TO_INTAKE;
+        m_elevatorSubsystem.setInteractionState(InteractionState.Algae);
 
         m_timer.reset();
         m_timer.stop();
@@ -76,10 +84,10 @@ public class ToggleableAlgaeIntake extends Command {
             case TILT_TO_RELEASE: // Makes sure that the algae mechanism is faced downwards at the processor so
                                   // the ball can make it through.
                 m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointRelease);
-                // TODO: Call elevator to processor setpoint early (in this block of code) so
-                // that it both tilts and does Elevator PID so as to not waste any time.
+                m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.AlgaeScore);
 
-                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetPointRelease)) {
+                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetPointRelease) && Math.abs(
+                        m_elevatorSubsystem.getPosition() - ElevatorPositions.kElevatorPositionAlgaeScore) < 0.25) {
                     m_currentState = AlgaeState.ELEVATOR_AT_PROCESSOR;
                     m_timer.reset();
                     m_timer.start();

@@ -84,6 +84,22 @@ public final class Constants {
         public static final boolean kRearRightNotVersH = false;
     }
 
+    public static final class ClimberConstants {
+        // Ports/ID(s)
+        public static final int kFollowerMotorId = 0;
+        public static final int kLeaderMotorId = 0;
+        public static final int kEncoderId = 0;
+
+        // PID values for climber
+        public static final double kClimberP = 0;
+        public static final double kClimberI = 0;
+        public static final double kClimberD = 0;
+
+        // Positions
+        public static final double kCrushingFrame = 0;
+        public static final double kCrushingCage = 0;
+    }
+
     public static final class ElevatorConstants {
         // Ports/ID(s)
         public static final int kMasterMotorId = 57;
@@ -95,6 +111,35 @@ public final class Constants {
         public static final double kElevatorP = 5;
         public static final double kElevatorI = 0;
         public static final double kElevatorD = 0;
+
+        public enum ElevatorTarget {
+            CoralIntake,
+            AlgaeScore,
+            L1,
+            L2,
+            L3,
+            L4
+        }
+
+        public enum InteractionState {
+            Coral,
+            Algae
+        }
+
+        public class ElevatorPositions {
+            public static final double kElevatorPositionCoralIntake = 0.0;
+            public static final double kElevatorPositionAlgaeScore = 0.0;
+
+            public static final double kElevatorPositionAlgaeL1 = 0.0;
+            public static final double kElevatorPositionAlgaeL2 = 0.0;
+            public static final double kElevatorPositionAlgaeL3 = 0.0;
+            public static final double kElevatorPositionAlgaeL4 = 0.0;
+
+            public static final double kElevatorPositionCoralL1 = 0.0;
+            public static final double kElevatorPositionCoralL2 = 0.0;
+            public static final double kElevatorPositionCoralL3 = 0.0;
+            public static final double kElevatorPositionCoralL4 = 0.0;
+        }
 
         public static final double kMaxAcceleration = 0;
         public static final double kMaxVelocity = 0;
@@ -120,13 +165,6 @@ public final class Constants {
         public static final double kPositionConversionFactor = (Math.PI * kElevatorPulleyDiameter) / kElevatorGearRatio;
         public static final double kVelocityConversionFactor = (Math.PI * kElevatorPulleyDiameter)
                 / (kElevatorGearRatio * 60);
-
-        // Lukus Vucus has approved these constants
-        public static final double kElevatorPositionL1 = 0.0;
-        public static final double kElevatorPositionL2 = 0.0;
-        public static final double kElevatorPositionL3 = 0.0;
-        public static final double kElevatorPositionL4 = 0.0;
-        public static final double kElevatorPositionScoreAlgae = 0.0;
     }
 
     public static final class AlgaeMechanismConstants {
