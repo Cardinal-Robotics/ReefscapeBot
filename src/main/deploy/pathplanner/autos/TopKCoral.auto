@@ -15,6 +15,49 @@
           "data": {
             "waitTime": 0.5
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AprilTagAlignBottomLeft"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorCoralL4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralTiltL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralRelease"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralStopRelease"
+          }
         }
       ]
     }

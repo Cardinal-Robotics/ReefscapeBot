@@ -144,27 +144,27 @@ public class RobotContainer {
                 Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4), m_elevatorSubsystem));
 
         // Coral mechanism
-        NamedCommands.registerCommand("CoralTiltIntake",
-                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kIntakePosition),
-                        m_coralSubsystem));
-        NamedCommands.registerCommand("CoralTiltIdle",
-                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kCoralStore),
-                        m_coralSubsystem));
-        NamedCommands.registerCommand("CoralTiltL1",
-                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL1Position),
-                        m_coralSubsystem));
-        NamedCommands.registerCommand("CoralTiltL2-L3",
-                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL2_3Position),
-                        m_coralSubsystem));
-        NamedCommands.registerCommand("CoralTiltL4",
-                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL4Position),
-                        m_coralSubsystem));
-        NamedCommands.registerCommand("CoralRelease",
-                Commands.runOnce(() -> m_coralSubsystem.spinIntakeMotor(0.2),
-                        m_coralSubsystem));
-        NamedCommands.registerCommand("CoralStopRelease",
-                Commands.runOnce(() -> m_coralSubsystem.spinIntakeMotor(0),
-                        m_coralSubsystem));
+        NamedCommands.registerCommand("CoralTiltIntake", Commands
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kIntakePosition), m_coralSubsystem)
+                .until(() -> m_coralSubsystem.atTarget()));
+        NamedCommands.registerCommand("CoralTiltIdle", Commands
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kCoralStore), m_coralSubsystem)
+                .until(() -> m_coralSubsystem.atTarget()));
+        NamedCommands.registerCommand("CoralTiltL1", Commands
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL1Position), m_coralSubsystem)
+                .until(() -> m_coralSubsystem.atTarget()));
+        NamedCommands.registerCommand("CoralTiltL2-L3", Commands
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL2_3Position), m_coralSubsystem)
+                .until(() -> m_coralSubsystem.atTarget()));
+        NamedCommands.registerCommand("CoralTiltL4", Commands
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL4Position), m_coralSubsystem)
+                .until(() -> m_coralSubsystem.atTarget()));
+        NamedCommands.registerCommand("CoralRelease", Commands
+                .runOnce(() -> m_coralSubsystem.spinIntakeMotor(0.2), m_coralSubsystem)
+                .until(() -> m_coralSubsystem.atTarget()));
+        NamedCommands.registerCommand("CoralStopRelease", Commands
+                .runOnce(() -> m_coralSubsystem.spinIntakeMotor(0), m_coralSubsystem)
+                .until(() -> m_coralSubsystem.atTarget()));
     }
 
     private void configureBindings() {

@@ -38,10 +38,10 @@ public final class Constants {
 
     public static final class DriveConstants {
         public static final File kSwerveDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-        public static final double kMaxSpeed = 1.5;// 3.699417868457614; // m/s //3.4619388492 new value
+        public static final double kMaxSpeed = 3.699417868457614; // m/s //3.4619388492 new value
 
-        public static final Pose2d kInitialBlueRobotPose = new Pose2d(2.17, 7, Rotation2d.kZero);
-        public static final Pose2d kInitialRedRobotPose = new Pose2d(15.378, 1.052, Rotation2d.k180deg);
+        public static final Pose2d kInitialBlueRobotPose = new Pose2d(7.469, 7.457, Rotation2d.k180deg);
+        public static final Pose2d kInitialRedRobotPose = new Pose2d(10.079, 0.595, Rotation2d.kZero);
 
         // PID values for translation (moving).
         public static final double kPTrans = 0.0022445;
@@ -130,7 +130,7 @@ public final class Constants {
             public static final double kElevatorPositionCoralIntake = 0.0;
             public static final double kElevatorPositionAlgaeScore = 0.0;
 
-            public static final double kElevatorPositionAlgaeL1 = 0.0;
+            public static final double kElevatorPositionAlgaeL1 = 50.0;
             public static final double kElevatorPositionAlgaeL2 = 0.0;
             public static final double kElevatorPositionAlgaeL3 = 0.0;
             public static final double kElevatorPositionAlgaeL4 = 0.0;
@@ -205,7 +205,7 @@ public final class Constants {
         public static final int kCoralIntakeID = 1;
         public static final int kCoralPivotID = 3;
 
-        public static final int kCoralEncoderChannelA = 9;
+        public static final double kAllowedSetpointError = 3;
 
         public static final double kL1Position = 50; // down
         public static final double kL2_3Position = 0; // left

@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 
 import frc.robot.Constants.CoralMechanismConstants;
 import frc.robot.RobotContainer;
@@ -48,6 +49,10 @@ public class CoralSubsystem extends SubsystemBase {
         m_intakeMotor.set(speed);
     }
 
+    public boolean atTarget() {
+        return Math.abs(m_setpoint - getAngle()) > CoralMechanismConstants.kAllowedSetpointError;
+    }
+
     public void setTarget(double target) {
         m_setpoint = target;
     }
@@ -64,8 +69,9 @@ public class CoralSubsystem extends SubsystemBase {
          * m_setpoint,
          * ControlType.kPosition,
          * ClosedLoopSlot.kSlot0,
-         * feedforward);
+         * feedforward, ArbFFUnits.kPercentOut);
          */
+
     }
 
 }

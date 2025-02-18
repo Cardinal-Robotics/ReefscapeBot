@@ -102,6 +102,7 @@ public class AlignAprilTag extends Command {
         // the real bot.
         if ((Timer.getFPGATimestamp() - m_lastUpdated) > 0.5) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
+            m_finished = true;
             return;
         }
 
@@ -117,14 +118,28 @@ public class AlignAprilTag extends Command {
 
         m_publisher.set(VisionSubsystem.getAprilTagPose(m_targetId, Transform2d.kZero).plus(poseOffset.inverse()));
 
+        if (pose.getX() < 0.1 && pose.getY() < 0.1) {
+            m_finished = true;
+            return;
+        }
+
         // Calculates the propper speed to correctly face the AprilTag (assuming
         // odometry is perfect, because VisionSubsytem::getAprilTagPose doesn't get the
         // actual AprilTag data but it gets where the AprilTag *should* be on the
         // field).
+        Rotation2d targetRotation = VisionSubsystem.getAprilTagPose(m_targetId, Transform2d.kZero).getRotation()
+                .rotateBy(Rotation2d.k180deg) // Gets the opposite direction of the tag so that the robot faces the tag.
+                .rotateBy(DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red ? Rotation2d.k180deg
+                        : Rotation2d.kZero); // Flipping alliance stuff
+
         double omegaRadiansPerSecond = m_swerveSubsystem.getLibSwerveDrive().swerveController.headingCalculate(
-                m_swerveSubsystem.getPose().getRotation().getRadians(),
-                VisionSubsystem.getAprilTagPose(m_targetId, Transform2d.kZero).getRotation()
-                        .rotateBy(Rotation2d.k180deg).getRadians());
+                m_swerveSubsystem.getPose().getRotation()
+                        .rotateBy(DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red ? Rotation2d.k180deg
+                                : Rotation2d.kZero)
+                        .getRadians(), // More alliance flipping.
+                targetRotation.getRadians());
+
+        m_swerveSubsystem.getLibSwerveDrive().swerveController.lastAngleScalar = targetRotation.getRadians();
 
         ChassisSpeeds targetRelativeSpeeds = new ChassisSpeeds(
                 pose.getX(), // Forward velocity
