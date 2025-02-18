@@ -15,20 +15,23 @@ import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
 import frc.robot.commands.AlignAprilTag.TagPositions;
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.CoralMechanismConstants;
 import frc.robot.commands.ToggleableAlgaeIntake;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DriverCameras;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.commands.AlignAprilTag;
 import frc.robot.commands.LEDCommand;
 
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import swervelib.SwerveInputStream;
@@ -101,15 +104,67 @@ public class RobotContainer {
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
 
+        registerNamedCommands();
         configureBindings();
 
         m_swerveDrive.setDefaultCommand(m_driveFieldOriented);
 
-        m_autoChooser = AutoBuilder.buildAutoChooser("AlexGreat");
+        m_autoChooser = AutoBuilder.buildAutoChooser("Leave");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
 
         // m_coralsubsystem.setDefaultCommand(m_coralCommand);
         // m_ledSubsystem.setDefaultCommand(m_LEDCommand);
+    }
+
+    private void registerNamedCommands() {
+        // AprilTag Alignment
+        NamedCommands.registerCommand("AprilTagAlignTop",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.TOP));
+        NamedCommands.registerCommand("AprilTagAlignTopRight",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.TOP_RIGHT));
+        NamedCommands.registerCommand("AprilTagAlignTopLeft",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.TOP_LEFT));
+        NamedCommands.registerCommand("AprilTagAlignBottom",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.BOTTOM));
+        NamedCommands.registerCommand("AprilTagAlignBottomLeft",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.BOTTOM_LEFT));
+        NamedCommands.registerCommand("AprilTagAlignBottomRight",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.BOTTOM_RIGHT));
+
+        // Elevator positions
+        NamedCommands.registerCommand("ElevatorCoralIntake", Commands
+                .runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake), m_elevatorSubsystem));
+        NamedCommands.registerCommand("ElevatorCoralL1",
+                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1), m_elevatorSubsystem));
+        NamedCommands.registerCommand("ElevatorCoralL2",
+                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2), m_elevatorSubsystem));
+        NamedCommands.registerCommand("ElevatorCoralL3",
+                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3), m_elevatorSubsystem));
+        NamedCommands.registerCommand("ElevatorCoralL4",
+                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4), m_elevatorSubsystem));
+
+        // Coral mechanism
+        NamedCommands.registerCommand("CoralTiltIntake",
+                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kIntakePosition),
+                        m_coralSubsystem));
+        NamedCommands.registerCommand("CoralTiltIdle",
+                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kCoralStore),
+                        m_coralSubsystem));
+        NamedCommands.registerCommand("CoralTiltL1",
+                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL1Position),
+                        m_coralSubsystem));
+        NamedCommands.registerCommand("CoralTiltL2-L3",
+                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL2_3Position),
+                        m_coralSubsystem));
+        NamedCommands.registerCommand("CoralTiltL4",
+                Commands.runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL4Position),
+                        m_coralSubsystem));
+        NamedCommands.registerCommand("CoralRelease",
+                Commands.runOnce(() -> m_coralSubsystem.spinIntakeMotor(0.2),
+                        m_coralSubsystem));
+        NamedCommands.registerCommand("CoralStopRelease",
+                Commands.runOnce(() -> m_coralSubsystem.spinIntakeMotor(0),
+                        m_coralSubsystem));
     }
 
     private void configureBindings() {

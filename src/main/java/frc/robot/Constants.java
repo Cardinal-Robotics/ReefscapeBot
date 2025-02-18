@@ -208,7 +208,7 @@ public final class Constants {
         public static final int kCoralEncoderChannelA = 9;
 
         public static final double kL1Position = 50; // down
-        public static final double k2_3Position = 0; // left
+        public static final double kL2_3Position = 0; // left
         public static final double kL4Position = -50; // up
         public static final double kCoralStore = 25;
 

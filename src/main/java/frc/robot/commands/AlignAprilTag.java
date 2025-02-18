@@ -25,7 +25,7 @@ public class AlignAprilTag extends Command {
     private final VisionSubsystem m_visionSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
 
-    private TagPositions m_tagPosition;
+    private TagPositions m_tagPosition = TagPositions.TOP;
     private boolean m_finished = false;
     private double m_lastUpdated;
     private int m_targetId;
@@ -34,10 +34,13 @@ public class AlignAprilTag extends Command {
         m_visionSubsystem = visionSubsystem;
         m_swerveSubsystem = swerveSubsystem;
 
-        setTagPosition(TagPositions.TOP);
-
         addRequirements(m_visionSubsystem);
         addRequirements(m_swerveSubsystem);
+    }
+
+    public AlignAprilTag(VisionSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem, TagPositions tagPosition) {
+        this(visionSubsystem, swerveSubsystem);
+        setTagPosition(tagPosition);
     }
 
     public enum TagPositions {
