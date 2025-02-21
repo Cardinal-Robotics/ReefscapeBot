@@ -218,6 +218,7 @@ public class RobotContainer {
                 .onTrue(Commands.runOnce(
                         () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4),
                         m_elevatorSubsystem));
+
         m_driverController.leftStick()
                 .onTrue(Commands.runOnce(() -> m_climberSubsystem.setGoal(ClimberConstants.kCrushingFrame),
                         m_climberSubsystem));

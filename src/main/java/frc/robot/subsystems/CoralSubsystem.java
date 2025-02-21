@@ -4,28 +4,24 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.CoralMechanismConstants;
-import frc.robot.RobotContainer;
 
 public class CoralSubsystem extends SubsystemBase {
     private final SparkMax m_pivotMotor = new SparkMax(CoralMechanismConstants.kCoralPivotID, MotorType.kBrushless);
     private final WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(CoralMechanismConstants.kCoralIntakeID);
+    private final RelativeEncoder m_pivotEncoder = m_pivotMotor.getEncoder();
 
     private double m_setpoint = 0;
 
@@ -42,7 +38,7 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public double getAngle() {
-        return m_pivotMotor.getAbsoluteEncoder().getPosition();
+        return m_pivotEncoder.getPosition();
     }
 
     public void spinIntakeMotor(double speed) {
@@ -59,7 +55,7 @@ public class CoralSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Coral mechanism rotation", getAngle());// - 277
+        SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
 
         double currentAngle = getAngle();
         double feedforward = 0.06 * Math.cos(Math.toRadians(currentAngle));

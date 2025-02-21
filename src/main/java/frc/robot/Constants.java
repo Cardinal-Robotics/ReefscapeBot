@@ -112,6 +112,11 @@ public final class Constants {
         public static final double kElevatorI = 0;
         public static final double kElevatorD = 0;
 
+        // Feedforward values (if needed)
+        public static final double kElevatorKs = 0;
+        public static final double kElevatorKg = 0;
+        public static final double kElevatorKv = 0;
+
         public enum ElevatorTarget {
             CoralIntake,
             AlgaeScore,

@@ -4,54 +4,74 @@
 
 package frc.robot.subsystems;
 
+import frc.robot.Constants.ElevatorConstants.ElevatorPositions;
+import frc.robot.Constants.ElevatorConstants.InteractionState;
+import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
+import frc.robot.Constants.ElevatorConstants;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.ElevatorConstants.ElevatorPositions;
-import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
-import frc.robot.Constants.ElevatorConstants.InteractionState;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private InteractionState m_interactionState = InteractionState.Algae;
-    private SparkMax m_master = new SparkMax(ElevatorConstants.kMasterMotorId, MotorType.kBrushless);
-    private SparkMax m_slave = new SparkMax(ElevatorConstants.kSlaveMotorId, MotorType.kBrushless); // DO NOT CHANGE TO
-                                                                                                    // FOLLOWER
+    private final SparkMax m_master = new SparkMax(ElevatorConstants.kMasterMotorId, MotorType.kBrushless);
+    // DO NOT CHANGE TO FOLLOWER
+    private final SparkMax m_slave = new SparkMax(ElevatorConstants.kSlaveMotorId, MotorType.kBrushless);
+    private final RelativeEncoder m_encoder = m_master.getEncoder();
 
-    // Simulation code
-    private final SparkMaxSim m_masterSim = new SparkMaxSim(m_master, DCMotor.getNeo550(2));
-    private final Mechanism2d m_mechanism = new Mechanism2d(20, 50);
-    private final MechanismRoot2d m_mechanismRoot = m_mechanism.getRoot("Elevator Root", 10, 0);
-    private final MechanismLigament2d m_elevatorMechanism = m_mechanismRoot
-            .append(new MechanismLigament2d("Elevator", 50, 90));
+    private InteractionState m_interactionState = InteractionState.Coral;
+
+    // Feedforward stuff (if needed)
+    /*
+     * private final TrapezoidProfile m_profile = new TrapezoidProfile(new
+     * TrapezoidProfile.Constraints(1.75, 0.75));
+     * private final ElevatorFeedforward m_elevatorFeedforward = new
+     * ElevatorFeedforward(
+     * ElevatorConstants.kElevatorKs,
+     * ElevatorConstants.kElevatorKg,
+     * ElevatorConstants.kElevatorKv);
+     * 
+     * private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+     * private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+     */
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
+        /*
+         * m_setpoint = m_profile.calculate(0.02, m_setpoint, m_goal);
+         * m_master.getClosedLoopController().setReference(
+         * m_setpoint.position,
+         * ControlType.kPosition,
+         * ClosedLoopSlot.kSlot0,
+         * m_elevatorFeedforward.calculate(m_setpoint.velocity));
+         */
+    }
 
     public ElevatorSubsystem() {
-        if (Robot.isSimulation())
-            SmartDashboard.putData("Elevator Simulation", m_mechanism);
-
         SparkMaxConfig masterConfig = new SparkMaxConfig();
         masterConfig.idleMode(IdleMode.kBrake);
 
-        masterConfig.absoluteEncoder
+        masterConfig.encoder
                 .positionConversionFactor(ElevatorConstants.kPositionConversionFactor)
                 .velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor);
 
-        masterConfig.closedLoop.pid(ElevatorConstants.kElevatorP, ElevatorConstants.kElevatorI,
-                ElevatorConstants.kElevatorD);
+        masterConfig.closedLoop
+                .pid(ElevatorConstants.kElevatorP,
+                        ElevatorConstants.kElevatorI,
+                        ElevatorConstants.kElevatorD)
+                .outputRange(-1, 1);
 
         SparkMaxConfig slaveConfig = new SparkMaxConfig();
         slaveConfig
@@ -68,14 +88,25 @@ public class ElevatorSubsystem extends SubsystemBase {
                                                                                                           // later
     }
 
-    public void setInteractionState(InteractionState state) {
-        m_interactionState = state;
+    // Getters & setters
+    public double getPosition() {
+        return m_encoder.getPosition();
     }
 
     public InteractionState getInteractionState() {
         return m_interactionState;
     }
 
+    public void setInteractionState(InteractionState state) {
+        m_interactionState = state;
+    }
+
+    public void setElevatorGoal(ElevatorTarget goal, InteractionState state) {
+        setInteractionState(state);
+        setElevatorGoal(goal);
+    }
+
+    // --- Handles elevator target
     public void setElevatorGoal(ElevatorTarget goal) {
         double target = ElevatorPositions.kElevatorPositionAlgaeScore; // idle position
         switch (goal) {
@@ -104,27 +135,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 break;
         }
 
-        m_masterSim.setPosition(target);
+        // m_goal = new TrapezoidProfile.State(target, 0);
         m_master.getClosedLoopController().setReference(target, ControlType.kPosition);
-    }
-
-    public void setElevatorGoal(ElevatorTarget goal, InteractionState state) {
-        setInteractionState(state);
-        setElevatorGoal(goal);
-    }
-
-    public double getPosition() {
-        return m_master.getAbsoluteEncoder().getPosition();
-    }
-
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
-        SmartDashboard.putNumber("ElevatorSubsystem::getPosition()", getPosition());
-    }
-
-    @Override
-    public void simulationPeriodic() {
-        m_elevatorMechanism.setLength(m_masterSim.getPosition());
     }
 }
