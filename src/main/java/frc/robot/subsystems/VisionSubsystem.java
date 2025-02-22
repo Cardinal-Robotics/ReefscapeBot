@@ -11,20 +11,15 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Milliseconds;
-import static edu.wpi.first.units.Units.Seconds;
-
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -38,11 +33,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.math.Matrix;
 
+import static edu.wpi.first.units.Units.Microseconds;
+import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
+
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.SwerveDrive;
 
 import java.util.function.Supplier;
-import java.lang.StackWalker.Option;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.List;

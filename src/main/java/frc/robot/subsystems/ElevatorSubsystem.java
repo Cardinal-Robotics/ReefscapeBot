@@ -23,6 +23,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Pose3d;
+
+import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private final SparkMax m_master = new SparkMax(ElevatorConstants.kMasterMotorId, MotorType.kBrushless);
@@ -49,6 +55,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
+
+        Logger.recordOutput("ZeroedComponentPoses",
+                new Pose3d[] { new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d() });
         /*
          * m_setpoint = m_profile.calculate(0.02, m_setpoint, m_goal);
          * m_master.getClosedLoopController().setReference(

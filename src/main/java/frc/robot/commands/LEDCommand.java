@@ -6,15 +6,15 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.LightSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class LEDCommand extends Command {
     /** Creates a new LEDCommand. */
-    LEDSubsystem m_LEDSubsystem;
+    LightSubsystem m_LEDSubsystem;
     private float valor = 0;
 
-    public LEDCommand(LEDSubsystem LEDSubsystem) {
+    public LEDCommand(LightSubsystem LEDSubsystem) {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(LEDSubsystem);
         m_LEDSubsystem = LEDSubsystem;

@@ -20,6 +20,7 @@
 - [X] Coral subsystem
 - [X] Algae subsystem
 - [X] Automatically align to the REEF w/ vision
+- [ ] Remove AdvantageKit when entering comps, I haven't tested enough to see if our Rio can handle it
 
 ## Development Journey
 

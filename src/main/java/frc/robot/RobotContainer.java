@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
 import frc.robot.commands.AlignAprilTag.TagPositions;
 import frc.robot.Constants.AlgaeMechanismConstants;
-import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.CoralMechanismConstants;
 import frc.robot.commands.ToggleableAlgaeIntake;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -22,16 +21,17 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
+import frc.robot.subsystems.LightSubsystem;
 import frc.robot.subsystems.DriverCameras;
-import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.commands.AlignAprilTag;
 import frc.robot.commands.LEDCommand;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import swervelib.SwerveInputStream;
@@ -56,14 +56,15 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
-    private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
-    // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
-    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
-    private final DriverCameras m_driverCameras = new DriverCameras();
+    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
+    private final DriverCameras m_driverCameras = new DriverCameras();
+    // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //

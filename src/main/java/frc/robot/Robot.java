@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
  * The methods in this class are called automatically corresponding to each
@@ -15,7 +18,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * package after creating
  * this project, you must also update the Main.java file in the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
     private final RobotContainer m_robotContainer;
     private Command m_autonomousCommand;
 
@@ -25,6 +28,13 @@ public class Robot extends TimedRobot {
      * initialization code.
      */
     public Robot() {
+        Logger.recordMetadata("Reefscape", "CatfishWaves"); // Set a metadata value
+
+        if (isSimulation()) {
+            Logger.addDataReceiver(new NT4Publisher());
+            Logger.start();
+        }
+
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our
         // autonomous chooser on the dashboard.
