@@ -14,6 +14,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.CoralMechanismConstants;
@@ -39,6 +40,10 @@ public class CoralSubsystem extends SubsystemBase {
 
     public double getAngle() {
         return m_pivotEncoder.getPosition();
+    }
+
+    public Command setMotors(double speed) {
+        return runOnce(() -> spinIntakeMotor(speed));
     }
 
     public void spinIntakeMotor(double speed) {

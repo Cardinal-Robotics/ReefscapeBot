@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.AlgaeMechanismConstants;
@@ -46,6 +47,10 @@ public class AlgaeSubsystem extends SubsystemBase {
      */
     public void spinIntakeMotor(double speed) {
         m_intakeMotor.set(speed);
+    }
+
+    public Command setMotors(double speed) {
+        return runOnce(() -> spinIntakeMotor(speed));
     }
 
     public void stopIntakeMotor() {

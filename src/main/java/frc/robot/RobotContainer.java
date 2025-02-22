@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
+import frc.robot.Constants.ElevatorConstants.InteractionState;
 import frc.robot.commands.AlignAprilTag.TagPositions;
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.CoralMechanismConstants;
@@ -96,8 +97,8 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    // private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new
-    // ToggleableAlgaeIntake(m_algaeSubsystem);
+    private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new ToggleableAlgaeIntake(m_elevatorSubsystem,
+            m_algaeSubsystem);
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -172,14 +173,27 @@ public class RobotContainer {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.a().whileTrue(m_alignAprilTag);
+        /*
+         * m_driverController.x()
+         * .toggleOnTrue(Commands.runOnce(() ->
+         * m_swerveDrive.setDefaultCommand(m_driveFieldOriented)));
+         */
 
+        // Climber controls
+        m_driverController.leftStick()
+                .onTrue(Commands.runOnce(() -> m_climberSubsystem.setGoal(ClimberConstants.kCrushingFrame),
+                        m_climberSubsystem));
+        m_driverController.rightStick()
+                .onTrue(Commands.runOnce(() -> m_climberSubsystem.setGoal(ClimberConstants.kCrushingCage),
+                        m_climberSubsystem));
+
+        // Target AprilTag positions
         m_driverController.povUp().debounce(0.25)
                 .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP)));
         m_driverController.povUpRight()
                 .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP_RIGHT)));
         m_driverController.povUpLeft()
                 .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP_LEFT)));
-
         m_driverController.povDown().debounce(0.25)
                 .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM)));
         m_driverController.povDownRight()
@@ -197,12 +211,33 @@ public class RobotContainer {
 
         // Operator controls
 
-        // m_operatorController.b().onTrue(m_toggleableAlgaeIntake);
-        // m_operatorController.leftTrigger().whileTrue(m_releaseAlgae);
+        // State Controls
+        m_operatorController.rightStick()
+                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.setInteractionState(InteractionState.Algae)));
+        m_operatorController.leftStick()
+                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.setInteractionState(InteractionState.Coral)));
 
-        m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_coralSubsystem.spinIntakeMotor(-0.2)));
-        m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_coralSubsystem.spinIntakeMotor(0.0)));
+        // Coral Controls
+        m_operatorController.rightBumper()
+                .onTrue(m_coralSubsystem.setMotors(0.2))
+                .onFalse(m_coralSubsystem.setMotors(0));
+        m_operatorController.leftBumper()
+                .onTrue(m_coralSubsystem.setMotors(-0.2))
+                .onFalse(m_coralSubsystem.setMotors(0));
 
+        // Algae Controls
+        m_operatorController.rightTrigger()
+                .onTrue(m_toggleableAlgaeIntake);
+
+        // Elevator Positions
+        m_operatorController.button(6)
+                .onTrue(Commands.runOnce(
+                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake),
+                        m_elevatorSubsystem));
+        m_operatorController.button(7)
+                .onTrue(Commands.runOnce(
+                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.AlgaeScore),
+                        m_elevatorSubsystem));
         m_operatorController.a()
                 .onTrue(Commands.runOnce(
                         () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1),
@@ -219,13 +254,6 @@ public class RobotContainer {
                 .onTrue(Commands.runOnce(
                         () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4),
                         m_elevatorSubsystem));
-
-        m_driverController.leftStick()
-                .onTrue(Commands.runOnce(() -> m_climberSubsystem.setGoal(ClimberConstants.kCrushingFrame),
-                        m_climberSubsystem));
-        m_driverController.rightStick()
-                .onTrue(Commands.runOnce(() -> m_climberSubsystem.setGoal(ClimberConstants.kCrushingCage),
-                        m_climberSubsystem));
 
     }
 
