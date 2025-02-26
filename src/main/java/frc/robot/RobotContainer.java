@@ -27,6 +27,7 @@ import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.LightSubsystem;
+import frc.robot.subsystems.SimulatedGame;
 import frc.robot.subsystems.DriverCameras;
 import frc.robot.commands.AlignAprilTag;
 import frc.robot.commands.LEDCommand;
@@ -66,6 +67,7 @@ public class RobotContainer {
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
     private final DriverCameras m_driverCameras = new DriverCameras();
     // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
+    private final SimulatedGame m_gameSim = new SimulatedGame();
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //

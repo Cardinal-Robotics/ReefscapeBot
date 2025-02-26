@@ -5,6 +5,7 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 
@@ -129,5 +130,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         CommandScheduler.getInstance().run();
+        SimulatedArena.getInstance().simulationPeriodic();
     }
 }

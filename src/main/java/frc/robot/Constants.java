@@ -132,18 +132,18 @@ public final class Constants {
         }
 
         public class ElevatorPositions {
-            public static final double kElevatorPositionCoralIntake = 0.0;
-            public static final double kElevatorPositionAlgaeScore = 0.0;
+            public static final double kElevatorPositionCoralIntake = 0.18;
+            public static final double kElevatorPositionAlgaeScore = 0.19;
 
-            public static final double kElevatorPositionAlgaeL1 = 50.0;
+            public static final double kElevatorPositionAlgaeL1 = 0.0;
             public static final double kElevatorPositionAlgaeL2 = 0.0;
             public static final double kElevatorPositionAlgaeL3 = 0.0;
             public static final double kElevatorPositionAlgaeL4 = 0.0;
 
-            public static final double kElevatorPositionCoralL1 = 0.0;
-            public static final double kElevatorPositionCoralL2 = 0.0;
-            public static final double kElevatorPositionCoralL3 = 0.0;
-            public static final double kElevatorPositionCoralL4 = 0.0;
+            public static final double kElevatorPositionCoralL1 = 0.18;
+            public static final double kElevatorPositionCoralL2 = 0.18;
+            public static final double kElevatorPositionCoralL3 = 0.31;
+            public static final double kElevatorPositionCoralL4 = 0.88;
         }
 
         public static final double kMaxAcceleration = 0;

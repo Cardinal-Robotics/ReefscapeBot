@@ -7,6 +7,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.PhotonPoseEstimator;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
