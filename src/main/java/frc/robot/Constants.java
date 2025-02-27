@@ -86,8 +86,8 @@ public final class Constants {
 
     public static final class ClimberConstants {
         // Ports/ID(s)
-        public static final int kFollowerMotorId = 0;
-        public static final int kLeaderMotorId = 0;
+        public static final int kFollowerMotorId = 22;
+        public static final int kLeaderMotorId = 21;
         public static final int kEncoderId = 0;
 
         // PID values for climber
@@ -102,10 +102,8 @@ public final class Constants {
 
     public static final class ElevatorConstants {
         // Ports/ID(s)
-        public static final int kMasterMotorId = 57;
-        public static final int kSlaveMotorId = 68;
-        public static final int kMasterEncoderId = 58;
-        public static final int kSlaveEncoderId = 69;
+        public static final int kMasterMotorId = 15;
+        public static final int kSlaveMotorId = 16;
 
         // PID values for elevator controller
         public static final double kElevatorP = 5;
@@ -174,9 +172,8 @@ public final class Constants {
 
     public static final class AlgaeMechanismConstants {
         // Ports/ID(s)
-        public static final int kIntakeMotorPort = 20; // These ID(s) are made up so that the simulator won't complain.
-                                                       // Make sure to configure these
-        public static final int kTiltMotorPort = 22;
+        public static final int kIntakeMotorPort = 17;
+        public static final int kTiltMotorPort = 19;
 
         // PID & feed forward for tilt motor
         public static final double kTiltFeedForward = 0; // Note to future self: you should probably use REV Hardware
@@ -207,8 +204,8 @@ public final class Constants {
         public static final double kCoralKi = 0;
         public static final double kCoralKd = 0.00145;
 
-        public static final int kCoralIntakeID = 1;
-        public static final int kCoralPivotID = 3;
+        public static final int kCoralIntakeID = 18;
+        public static final int kCoralPivotID = 20;
 
         public static final double kAllowedSetpointError = 3;
 
