@@ -85,12 +85,7 @@ public class AlignAprilTag extends Command {
                 m_targetId = (alliance == Alliance.Red ? 6 : 19);
                 break;
         }
-
-        SmartDashboard.putNumber("ID of AprilTag Aligning", m_targetId);
     }
-
-    private final StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
-            .getStructTopic("Target aligning position", Pose2d.struct).publish();
 
     @Override
     public void execute() {
@@ -115,8 +110,6 @@ public class AlignAprilTag extends Command {
 
         Pose2d pose = potentialPose.get()
                 .plus(poseOffset.inverse());
-
-        m_publisher.set(VisionSubsystem.getAprilTagPose(m_targetId, Transform2d.kZero).plus(poseOffset.inverse()));
 
         if (pose.getX() < 0.1 && pose.getY() < 0.1) {
             m_finished = true;

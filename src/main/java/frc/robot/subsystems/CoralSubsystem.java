@@ -8,9 +8,12 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,12 +33,14 @@ public class CoralSubsystem extends SubsystemBase {
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
         pivotConfig.idleMode(IdleMode.kBrake);
-        pivotConfig.absoluteEncoder.positionConversionFactor(360); // Converts rotations into degrees.
+        pivotConfig.encoder.positionConversionFactor(30); // Converts rotations into
+        // degrees.
         pivotConfig.closedLoop.pid(CoralMechanismConstants.kCoralKp,
                 CoralMechanismConstants.kCoralKi, CoralMechanismConstants.kCoralKd);
 
         m_pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        SmartDashboard.putNumber("CoralTilt", 0);
     }
 
     public double getAngle() {
@@ -60,19 +65,17 @@ public class CoralSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        setTarget(SmartDashboard.getNumber("CoralTilt", 0));
         SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
 
         double currentAngle = getAngle();
-        double feedforward = 0.06 * Math.cos(Math.toRadians(currentAngle));
+        double feedforward = 0.07 * Math.cos(Math.toRadians(currentAngle + 90));
 
-        /*
-         * m_pivotMotor.getClosedLoopController().setReference(
-         * m_setpoint,
-         * ControlType.kPosition,
-         * ClosedLoopSlot.kSlot0,
-         * feedforward, ArbFFUnits.kPercentOut);
-         */
-
+        m_pivotMotor.getClosedLoopController().setReference(
+                m_setpoint,
+                ControlType.kPosition,
+                ClosedLoopSlot.kSlot0,
+                feedforward, ArbFFUnits.kPercentOut);
     }
 
 }

@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,32 +47,33 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final RelativeEncoder m_encoder = m_master.getEncoder();
 
     // Feedforward stuff (if needed)
-    /*
-     * private final TrapezoidProfile m_profile = new TrapezoidProfile(new
-     * TrapezoidProfile.Constraints(1.75, 0.75));
-     * private final ElevatorFeedforward m_elevatorFeedforward = new
-     * ElevatorFeedforward(
-     * ElevatorConstants.kElevatorKs,
-     * ElevatorConstants.kElevatorKg,
-     * ElevatorConstants.kElevatorKv);
-     * 
-     * private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-     * private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-     */
+
+    private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(1.75, 0.75));
+    private final ElevatorFeedforward m_elevatorFeedforward = new ElevatorFeedforward(
+            ElevatorConstants.kElevatorKs,
+            ElevatorConstants.kElevatorKg,
+            ElevatorConstants.kElevatorKv);
+
+    private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+
     private ElevatorSim m_elevatorSim;
     private SparkMaxSim m_motorSim;
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
-        /*
-         * m_setpoint = m_profile.calculate(0.02, m_setpoint, m_goal);
-         * m_master.getClosedLoopController().setReference(
-         * m_setpoint.position,
-         * ControlType.kPosition,
-         * ClosedLoopSlot.kSlot0,
-         * m_elevatorFeedforward.calculate(m_setpoint.velocity));
-         */
+
+        m_master.getClosedLoopController().setReference(SmartDashboard.getNumber("ElevatorHeight", getPosition()),
+                ControlType.kPosition);
+
+        m_setpoint = m_profile.calculate(0.02, m_setpoint, m_goal);
+        m_master.getClosedLoopController().setReference(
+                m_setpoint.position,
+                ControlType.kPosition,
+                ClosedLoopSlot.kSlot0,
+                m_elevatorFeedforward.calculate(m_setpoint.velocity));
+
     }
 
     @Override
@@ -107,9 +109,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SparkMaxConfig masterConfig = new SparkMaxConfig();
         masterConfig.idleMode(IdleMode.kBrake);
 
-        masterConfig.encoder
-                .positionConversionFactor(ElevatorConstants.kPositionConversionFactor)
-                .velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor);
+        masterConfig.encoder.positionConversionFactor(ElevatorConstants.kPositionConversionFactor);
 
         masterConfig.closedLoop
                 .pid(ElevatorConstants.kElevatorP,
@@ -119,13 +119,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         SparkMaxConfig slaveConfig = new SparkMaxConfig();
         slaveConfig
-                .follow(ElevatorConstants.kMasterMotorId)
-                .inverted(true)
+                .follow(ElevatorConstants.kMasterMotorId, true)
                 .idleMode(IdleMode.kBrake);
 
-        slaveConfig.absoluteEncoder
-                .positionConversionFactor(ElevatorConstants.kPositionConversionFactor)
-                .velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor);
+        slaveConfig.encoder.positionConversionFactor(ElevatorConstants.kPositionConversionFactor);
 
         m_master.configure(masterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         m_slave.configure(slaveConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters); // Look up

@@ -10,13 +10,16 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 
 import java.util.logging.Logger;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
@@ -33,6 +36,7 @@ import frc.robot.RobotContainer.InteractionState;
 
 public class AlgaeSubsystem extends SubsystemBase {
     private final RelativeEncoder m_tiltEncoder;
+    private final ArmFeedforward m_feedforward;
     private final SparkMax m_intakeMotor;
     private final SparkMax m_tiltMotor;
 
@@ -47,11 +51,13 @@ public class AlgaeSubsystem extends SubsystemBase {
         m_intakeMotor = new SparkMax(AlgaeMechanismConstants.kIntakeMotorPort, MotorType.kBrushed);
         m_tiltMotor = new SparkMax(AlgaeMechanismConstants.kTiltMotorPort, MotorType.kBrushless);
 
+        m_feedforward = new ArmFeedforward(0.1, 0.1, 0.1);
+
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.idleMode(IdleMode.kBrake);
 
         SparkMaxConfig tiltConfig = new SparkMaxConfig();
-        tiltConfig.idleMode(IdleMode.kCoast);
+        tiltConfig.idleMode(IdleMode.kBrake);
         tiltConfig.closedLoop.pid(
                 AlgaeMechanismConstants.kTiltKp,
                 AlgaeMechanismConstants.kTiltKi,
@@ -59,8 +65,7 @@ public class AlgaeSubsystem extends SubsystemBase {
                 .outputRange(-1, 1);
 
         // Simulation only gives radians, so I have to do this
-        tiltConfig.encoder.positionConversionFactor(2 * Math.PI);
-        tiltConfig.encoder.velocityConversionFactor(Math.PI / 30);
+        tiltConfig.encoder.positionConversionFactor(30);
 
         m_intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -80,6 +85,20 @@ public class AlgaeSubsystem extends SubsystemBase {
                 Math.toRadians(180),
                 false,
                 0, 0, 0);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("AlgaeSubsystem::getPosition", getAngle());
+
+        double currentAngle = getAngle();
+        double feedforward = 0.07 * Math.cos(Math.toRadians(currentAngle + 90));
+        m_tiltMotor.getClosedLoopController().setReference(
+                SmartDashboard.getNumber("AlgaeTilt", 0),
+                ControlType.kPosition,
+                ClosedLoopSlot.kSlot0,
+                feedforward,
+                ArbFFUnits.kPercentOut);
     }
 
     @Override
@@ -123,6 +142,7 @@ public class AlgaeSubsystem extends SubsystemBase {
     public void setTiltTarget(double setpoint) {
         m_setpoint = RobotContainer.interactionState == InteractionState.Algae ? setpoint
                 : AlgaeMechanismConstants.kTargetDisabledAngle;
+
         SmartDashboard.putNumber("AlgaeTilt", m_setpoint);
         m_setpoint = Robot.isSimulation() ? Math.toRadians(m_setpoint) : m_setpoint;
 

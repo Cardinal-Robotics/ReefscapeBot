@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
@@ -18,6 +19,9 @@ public class SimulatedGame extends SubsystemBase {
     public SimulatedGame(ElevatorSubsystem elevatorSubsystem, AlgaeSubsystem algaeSubsystem) {
         m_elevatorSubsystem = elevatorSubsystem;
         m_algaeSubsystem = algaeSubsystem;
+
+        if (!Robot.isSimulation())
+            return;
 
         SimulatedArena.getInstance().placeGamePiecesOnField();
 
