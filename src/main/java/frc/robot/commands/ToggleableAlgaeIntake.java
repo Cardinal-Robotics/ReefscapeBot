@@ -4,13 +4,14 @@
 
 package frc.robot.commands;
 
-import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorPositions;
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
-import frc.robot.Constants.ElevatorConstants.InteractionState;
+import frc.robot.RobotContainer.InteractionState;
+import frc.robot.RobotContainer;
+import frc.robot.Constants.AlgaeMechanismConstants;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.AlgaeSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
 public class ToggleableAlgaeIntake extends Command {
@@ -43,7 +44,7 @@ public class ToggleableAlgaeIntake extends Command {
     public void initialize() {
         // Set the starting state based on whether algae is currently held
         m_currentState = m_hasAlgae ? AlgaeState.TILT_TO_RELEASE : AlgaeState.TILT_TO_INTAKE;
-        m_elevatorSubsystem.setInteractionState(InteractionState.Algae);
+        RobotContainer.interactionState = InteractionState.Algae;
 
         m_timer.reset();
         m_timer.stop();
@@ -54,8 +55,8 @@ public class ToggleableAlgaeIntake extends Command {
         switch (m_currentState) {
             case TILT_TO_INTAKE: // Tilts the algae mechanism downwards so that it can properly pull the algae
                                  // out of the reef.
-                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointIntake);
-                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetPointIntake)) {
+                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
+                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetIntakeAngle)) {
                     m_currentState = AlgaeState.INTAKING;
                     m_timer.reset();
                     m_timer.start();
@@ -74,8 +75,8 @@ public class ToggleableAlgaeIntake extends Command {
 
             case TILT_TO_DRIVE: // Moves the algae mechanism to the driving state so it can be driven around
                                 // with.
-                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointDrive);
-                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetPointDrive)) {
+                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetDriveAngle);
+                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetDriveAngle)) {
                     m_currentState = AlgaeState.IDLE;
                     m_hasAlgae = !m_hasAlgae; // Toggle the algae state
                 }
@@ -83,10 +84,10 @@ public class ToggleableAlgaeIntake extends Command {
 
             case TILT_TO_RELEASE: // Makes sure that the algae mechanism is faced downwards at the processor so
                                   // the ball can make it through.
-                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetPointRelease);
+                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetReleaseAngle);
                 m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.AlgaeScore);
 
-                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetPointRelease) && Math.abs(
+                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetReleaseAngle) && Math.abs(
                         m_elevatorSubsystem.getPosition() - ElevatorPositions.kElevatorPositionAlgaeScore) < 0.25) {
                     m_currentState = AlgaeState.ELEVATOR_AT_PROCESSOR;
                     m_timer.reset();

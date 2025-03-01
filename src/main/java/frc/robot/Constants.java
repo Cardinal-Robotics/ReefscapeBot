@@ -126,19 +126,12 @@ public final class Constants {
             L4
         }
 
-        public enum InteractionState {
-            Coral,
-            Algae
-        }
-
         public class ElevatorPositions {
             public static final double kElevatorPositionCoralIntake = 0.18;
-            public static final double kElevatorPositionAlgaeScore = 0.19;
+            public static final double kElevatorPositionAlgaeScore = 0.15;
 
-            public static final double kElevatorPositionAlgaeL1 = 0.0;
-            public static final double kElevatorPositionAlgaeL2 = 0.0;
-            public static final double kElevatorPositionAlgaeL3 = 0.0;
-            public static final double kElevatorPositionAlgaeL4 = 0.0;
+            public static final double kElevatorPositionAlgaeL2 = 0.60;
+            public static final double kElevatorPositionAlgaeL3 = 0.85;
 
             public static final double kElevatorPositionCoralL1 = 0.18;
             public static final double kElevatorPositionCoralL2 = 0.18;
@@ -180,7 +173,7 @@ public final class Constants {
 
         // PID & feed forward for tilt motor
         public static final double kTiltFeedForward = 0; // Note to future self: you should probably use REV Hardware
-        public static final double kTiltKp = 0; /////////// Client's PID tuning tool for this one.
+        public static final double kTiltKp = 0.5; /////////// Client's PID tuning tool for this one.
         public static final double kTiltKi = 0;
         public static final double kTiltKd = 0;
 
@@ -194,12 +187,14 @@ public final class Constants {
         public static final double kReleaseTime = 1.0;
 
         // Setpoints for tilt motor
-        public static final double kTargetPointIntake = 0; // The tilt motor's set point before grabbing the algae out
-                                                           // of the reef.
-        public static final double kTargetPointDrive = 0; // The tilt motor's set point when driving around, preferably
-                                                          // level.
-        public static final double kTargetPointRelease = 0; // The tilt motor's set point when releasing the algae into
-                                                            // the barge
+        public static final double kTargetIntakeAngle = 122.77; // The tilt motor's set point before grabbing the algae
+                                                                // out
+        // of the reef.
+        public static final double kTargetDriveAngle = 90; // The tilt motor's set point when driving around, preferably
+                                                           // level.
+        public static final double kTargetReleaseAngle = 90; // The tilt motor's set point when releasing the algae into
+                                                             // the barge.
+        public static final double kTargetDisabledAngle = 0; // The tilt motor's set point when it is not being used.
     }
 
     public static final class CoralMechanismConstants {
@@ -212,9 +207,9 @@ public final class Constants {
 
         public static final double kAllowedSetpointError = 3;
 
-        public static final double kL1Position = 50; // down
-        public static final double kL2_3Position = 0; // left
-        public static final double kL4Position = -50; // up
+        public static final double kTargetAngleL1 = 50; // down
+        public static final double kTargetAngleL2_3 = 0; // left
+        public static final double kTargetAngleL4 = -50; // up
         public static final double kCoralStore = 25;
 
         public static final double kIntakePosition = -25; // right

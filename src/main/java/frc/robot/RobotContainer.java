@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
-import frc.robot.Constants.ElevatorConstants.InteractionState;
 import frc.robot.commands.AlignAprilTag.TagPositions;
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.CoralMechanismConstants;
@@ -41,7 +40,13 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     // Misc.
     // ---------------------------------------------------------------------------------------------------------------------------------------
+    public static InteractionState interactionState = InteractionState.Coral;
     private final SendableChooser<Command> m_autoChooser;
+
+    public enum InteractionState {
+        Coral,
+        Algae
+    }
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -67,7 +72,7 @@ public class RobotContainer {
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
     private final DriverCameras m_driverCameras = new DriverCameras();
     // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
-    private final SimulatedGame m_gameSim = new SimulatedGame();
+    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem);
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -155,13 +160,13 @@ public class RobotContainer {
                 .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kCoralStore), m_coralSubsystem)
                 .until(() -> m_coralSubsystem.atTarget()));
         NamedCommands.registerCommand("CoralTiltL1", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL1Position), m_coralSubsystem)
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1), m_coralSubsystem)
                 .until(() -> m_coralSubsystem.atTarget()));
         NamedCommands.registerCommand("CoralTiltL2-L3", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL2_3Position), m_coralSubsystem)
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3), m_coralSubsystem)
                 .until(() -> m_coralSubsystem.atTarget()));
         NamedCommands.registerCommand("CoralTiltL4", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kL4Position), m_coralSubsystem)
+                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4), m_coralSubsystem)
                 .until(() -> m_coralSubsystem.atTarget()));
         NamedCommands.registerCommand("CoralRelease", Commands
                 .runOnce(() -> m_coralSubsystem.spinIntakeMotor(0.2), m_coralSubsystem)
@@ -215,9 +220,13 @@ public class RobotContainer {
 
         // State Controls
         m_operatorController.rightStick()
-                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.setInteractionState(InteractionState.Algae)));
+                .onTrue(Commands.runOnce(() -> interactionState = InteractionState.Algae));
+
         m_operatorController.leftStick()
-                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.setInteractionState(InteractionState.Coral)));
+                .onTrue(Commands.runOnce(() -> {
+                    interactionState = InteractionState.Coral;
+                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetDisabledAngle);
+                }));
 
         // Coral Controls
         m_operatorController.rightBumper()
@@ -232,26 +241,33 @@ public class RobotContainer {
                 .onTrue(m_toggleableAlgaeIntake);
 
         // Elevator Positions
-        m_operatorController.button(6)
+        m_operatorController.button(7)
                 .onTrue(Commands.runOnce(
                         () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake),
                         m_elevatorSubsystem));
-        m_operatorController.button(7)
+        m_operatorController.button(8)
                 .onTrue(Commands.runOnce(
                         () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.AlgaeScore),
                         m_elevatorSubsystem));
         m_operatorController.a()
-                .onTrue(Commands.runOnce(
-                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1),
+                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1),
                         m_elevatorSubsystem));
         m_operatorController.x()
-                .onTrue(Commands.runOnce(
-                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2),
-                        m_elevatorSubsystem));
+                .onTrue(
+                        Commands.runOnce(
+                                () -> {
+                                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2);
+                                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
+                                },
+                                m_elevatorSubsystem));
         m_operatorController.b()
-                .onTrue(Commands.runOnce(
-                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3),
-                        m_elevatorSubsystem));
+                .onTrue(
+                        Commands.runOnce(
+                                () -> {
+                                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3);
+                                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
+                                },
+                                m_elevatorSubsystem));
         m_operatorController.y()
                 .onTrue(Commands.runOnce(
                         () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4),
