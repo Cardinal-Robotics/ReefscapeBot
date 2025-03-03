@@ -62,7 +62,7 @@ public class AlgaeSubsystem extends SubsystemBase {
                 AlgaeMechanismConstants.kTiltKp,
                 AlgaeMechanismConstants.kTiltKi,
                 AlgaeMechanismConstants.kTiltKd)
-                .outputRange(-1, 1);
+                .outputRange(-0.005, 0.005);
 
         // Simulation only gives radians, so I have to do this
         tiltConfig.encoder.positionConversionFactor(30);
@@ -92,7 +92,7 @@ public class AlgaeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AlgaeSubsystem::getPosition", getAngle());
 
         double currentAngle = getAngle();
-        double feedforward = 0.07 * Math.cos(Math.toRadians(currentAngle + 90));
+        double feedforward = 0;// 0.06 * Math.cos(Math.toRadians(currentAngle + 90));
         m_tiltMotor.getClosedLoopController().setReference(
                 SmartDashboard.getNumber("AlgaeTilt", 0),
                 ControlType.kPosition,

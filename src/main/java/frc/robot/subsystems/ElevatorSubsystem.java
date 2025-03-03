@@ -61,19 +61,21 @@ public class ElevatorSubsystem extends SubsystemBase {
     private SparkMaxSim m_motorSim;
 
     @Override
-    public void periodic() {
+    public void periodic() { // 49 + 3/8
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
 
         m_master.getClosedLoopController().setReference(SmartDashboard.getNumber("ElevatorHeight", getPosition()),
                 ControlType.kPosition);
 
-        m_setpoint = m_profile.calculate(0.02, m_setpoint, m_goal);
-        m_master.getClosedLoopController().setReference(
-                m_setpoint.position,
-                ControlType.kPosition,
-                ClosedLoopSlot.kSlot0,
-                m_elevatorFeedforward.calculate(m_setpoint.velocity));
-
+        m_setpoint = m_profile.calculate(0.02,
+                new TrapezoidProfile.State(getPosition(), m_master.getEncoder().getVelocity()), m_goal);
+        /*
+         * m_master.getClosedLoopController().setReference(
+         * m_setpoint.position,
+         * ControlType.kPosition,
+         * ClosedLoopSlot.kSlot0,
+         * m_elevatorFeedforward.calculate(m_setpoint.velocity));
+         */
     }
 
     @Override
@@ -107,26 +109,28 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorSubsystem() {
         SmartDashboard.putNumber("ElevatorHeight", 0);
         SparkMaxConfig masterConfig = new SparkMaxConfig();
-        masterConfig.idleMode(IdleMode.kBrake);
+        masterConfig.idleMode(IdleMode.kCoast);
 
         masterConfig.encoder.positionConversionFactor(ElevatorConstants.kPositionConversionFactor);
+        masterConfig.encoder.velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor);
 
         masterConfig.closedLoop
                 .pid(ElevatorConstants.kElevatorP,
                         ElevatorConstants.kElevatorI,
                         ElevatorConstants.kElevatorD)
-                .outputRange(-1, 1);
+                .outputRange(-.7, .7);
 
         SparkMaxConfig slaveConfig = new SparkMaxConfig();
         slaveConfig
                 .follow(ElevatorConstants.kMasterMotorId, true)
-                .idleMode(IdleMode.kBrake);
+                .idleMode(IdleMode.kCoast);
 
         slaveConfig.encoder.positionConversionFactor(ElevatorConstants.kPositionConversionFactor);
 
         m_master.configure(masterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        m_slave.configure(slaveConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters); // Look up
-                                                                                                          // later
+        // m_slave.configure(slaveConfig, ResetMode.kResetSafeParameters,
+        // PersistMode.kNoPersistParameters); // Look up
+        // later
 
         // Simulation code
         if (!Robot.isSimulation())

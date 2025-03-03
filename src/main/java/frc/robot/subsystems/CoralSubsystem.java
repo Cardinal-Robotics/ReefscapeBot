@@ -36,7 +36,8 @@ public class CoralSubsystem extends SubsystemBase {
         pivotConfig.encoder.positionConversionFactor(30); // Converts rotations into
         // degrees.
         pivotConfig.closedLoop.pid(CoralMechanismConstants.kCoralKp,
-                CoralMechanismConstants.kCoralKi, CoralMechanismConstants.kCoralKd);
+                CoralMechanismConstants.kCoralKi, CoralMechanismConstants.kCoralKd)
+                .outputRange(-.1, .1);
 
         m_pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 

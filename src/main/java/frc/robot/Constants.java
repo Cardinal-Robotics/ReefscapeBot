@@ -106,7 +106,7 @@ public final class Constants {
         public static final int kSlaveMotorId = 16;
 
         // PID values for elevator controller
-        public static final double kElevatorP = 0.001;
+        public static final double kElevatorP = 0.1;
         public static final double kElevatorI = 0;
         public static final double kElevatorD = 0;
 
@@ -158,9 +158,12 @@ public final class Constants {
         // kElevatorDrumRadius)
         // * kElevatorGearRatio) / kElevatorEncoderCPR);
         public static final double kElevatorPulleyDiameter = 0.02032;
-        public static final double kPositionConversionFactor = Units.inchesToMeters(62) / 89.12281446531414986;
-        public static final double kVelocityConversionFactor = (Math.PI * kElevatorPulleyDiameter)
-                / (kElevatorGearRatio * 60);
+        public static final double kPositionConversionFactor = 0.006985 / 0.6009005308151245 // (1/20) *
+                * (0.6009005308151245 + Units.inchesToMeters(24 + (1 / 16)));// Units.inchesToMeters(62) /
+        // 89.12281446531414986;
+        public static final double kVelocityConversionFactor = kPositionConversionFactor / 60;// (Math.PI *
+                                                                                              // kElevatorPulleyDiameter)
+        // / (kElevatorGearRatio * 60);
     }
 
     public static final class AlgaeMechanismConstants {
