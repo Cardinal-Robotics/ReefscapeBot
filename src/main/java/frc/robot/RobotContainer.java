@@ -230,10 +230,10 @@ public class RobotContainer {
 
         // Coral Controls
         m_operatorController.rightBumper()
-                .onTrue(m_coralSubsystem.setMotors(0.2))
+                .onTrue(m_coralSubsystem.setMotors(1))
                 .onFalse(m_coralSubsystem.setMotors(0));
         m_operatorController.leftBumper()
-                .onTrue(m_coralSubsystem.setMotors(-0.2))
+                .onTrue(m_coralSubsystem.setMotors(-1))
                 .onFalse(m_coralSubsystem.setMotors(0));
 
         // Algae Controls

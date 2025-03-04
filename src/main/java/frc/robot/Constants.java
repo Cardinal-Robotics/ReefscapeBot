@@ -125,16 +125,16 @@ public final class Constants {
         }
 
         public class ElevatorPositions {
-            public static final double kElevatorPositionCoralIntake = 0.18;
-            public static final double kElevatorPositionAlgaeScore = 0.15;
+            public static final double kElevatorPositionCoralIntake = 0.533;
+            public static final double kElevatorPositionAlgaeScore = 0.32;
 
-            public static final double kElevatorPositionAlgaeL2 = 0.60;
-            public static final double kElevatorPositionAlgaeL3 = 0.85;
+            public static final double kElevatorPositionAlgaeL2 = 0.93;
+            public static final double kElevatorPositionAlgaeL3 = 1.295;
 
-            public static final double kElevatorPositionCoralL1 = 0.18;
-            public static final double kElevatorPositionCoralL2 = 0.18;
-            public static final double kElevatorPositionCoralL3 = 0.31;
-            public static final double kElevatorPositionCoralL4 = 0.88;
+            public static final double kElevatorPositionCoralL1 = 0.125;
+            public static final double kElevatorPositionCoralL2 = 0.23;
+            public static final double kElevatorPositionCoralL3 = 0.62;
+            public static final double kElevatorPositionCoralL4 = 1.295;
         }
 
         public static final double kMaxAcceleration = 0;
@@ -178,8 +178,8 @@ public final class Constants {
         public static final double kTiltKd = 0.00145;
 
         // Motor speeds (-100% to 100%) => (-1 to 1)
-        public static final double kIntakeSpeed = 0.85;
-        public static final double kReleaseSpeed = -0.85;
+        public static final double kIntakeSpeed = 1;
+        public static final double kReleaseSpeed = -1;
 
         // Time constants (how much time should the motors spend trying to
         // intake/release the algae).
@@ -187,14 +187,14 @@ public final class Constants {
         public static final double kReleaseTime = 1.0;
 
         // Setpoints for tilt motor
-        public static final double kTargetIntakeAngle = 122.77; // The tilt motor's set point before grabbing the algae
-                                                                // out
+        public static final double kTargetIntakeAngle = 120; // The tilt motor's set point before grabbing the algae
+                                                             // out
         // of the reef.
         public static final double kTargetDriveAngle = 0; // The tilt motor's set point when driving around, preferably
                                                           // level.
-        public static final double kTargetReleaseAngle = 120; // The tilt motor's set point when releasing the algae
-                                                              // into
-                                                              // the barge.
+        public static final double kTargetReleaseAngle = 94; // The tilt motor's set point when releasing the algae
+                                                             // into
+                                                             // the barge.
         public static final double kTargetDisabledAngle = 0; // The tilt motor's set point when it is not being used.
     }
 
@@ -208,11 +208,11 @@ public final class Constants {
 
         public static final double kAllowedSetpointError = 3;
 
-        public static final double kTargetAngleL1 = -90; // down
-        public static final double kTargetAngleL2_3 = -25; // left
-        public static final double kTargetAngleL4 = -50; // up
-        public static final double kCoralStore = -30;
+        public static final double kTargetAngleL1 = -32; // down
+        public static final double kTargetAngleL2_3 = -31; // left
+        public static final double kTargetAngleL4 = -18; // up
+        public static final double kCoralStore = -33;
 
-        public static final double kIntakePosition = -115; // needs to be changed, estimate
+        public static final double kIntakePosition = -133; // needs to be changed, estimate
     }
 }
