@@ -43,8 +43,8 @@ public class AlgaeSubsystem extends SubsystemBase {
     private double m_setpoint;
 
     // Simulation code
-    private SparkMaxSim m_tiltMotorSim;
     private SingleJointedArmSim m_armSim;
+    private SparkMaxSim m_tiltMotorSim;
 
     public AlgaeSubsystem() {
         SmartDashboard.putNumber("AlgaeTilt", 0);
@@ -91,10 +91,11 @@ public class AlgaeSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("AlgaeSubsystem::getPosition", getAngle());
 
-        double currentAngle = getAngle();
+        double setpoint = Robot.isSimulation() ? Math.toRadians(SmartDashboard.getNumber("AlgaeTilt", 0)) / 2
+                : SmartDashboard.getNumber("AlgaeTilt", 0);
         double feedforward = 0;// 0.06 * Math.cos(Math.toRadians(currentAngle + 90));
         m_tiltMotor.getClosedLoopController().setReference(
-                SmartDashboard.getNumber("AlgaeTilt", 0),
+                setpoint,
                 ControlType.kPosition,
                 ClosedLoopSlot.kSlot0,
                 feedforward,
@@ -109,9 +110,6 @@ public class AlgaeSubsystem extends SubsystemBase {
         m_tiltMotorSim.iterate(m_armSim.getVelocityRadPerSec(), RoboRioSim.getVInVoltage(), 0.020);
         m_armSim.update(0.020);
         SmartDashboard.putNumber("AlgaeSubsystem::getPosition", Math.toDegrees(m_armSim.getAngleRads()));
-
-        m_tiltMotor.getClosedLoopController().setReference(Math.toRadians(SmartDashboard.getNumber("AlgaeTilt", 0)),
-                ControlType.kPosition);
 
         RoboRioSim.setVInVoltage(
                 BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));

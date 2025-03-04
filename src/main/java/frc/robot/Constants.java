@@ -208,7 +208,7 @@ public final class Constants {
 
         public static final double kAllowedSetpointError = 3;
 
-        public static final double kTargetAngleL1 = 50; // down
+        public static final double kTargetAngleL1 = -90; // down
         public static final double kTargetAngleL2_3 = -25; // left
         public static final double kTargetAngleL4 = -50; // up
         public static final double kCoralStore = -30;

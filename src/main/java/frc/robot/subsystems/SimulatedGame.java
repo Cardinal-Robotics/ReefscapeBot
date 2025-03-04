@@ -15,22 +15,26 @@ import org.littletonrobotics.junction.Logger;
 public class SimulatedGame extends SubsystemBase {
     private final ElevatorSubsystem m_elevatorSubsystem;
     private final AlgaeSubsystem m_algaeSubsystem;
+    private final CoralSubsystem m_coralSubsystem;
 
-    public SimulatedGame(ElevatorSubsystem elevatorSubsystem, AlgaeSubsystem algaeSubsystem) {
+    public SimulatedGame(ElevatorSubsystem elevatorSubsystem, AlgaeSubsystem algaeSubsystem,
+            CoralSubsystem coralSubsystem) {
         m_elevatorSubsystem = elevatorSubsystem;
         m_algaeSubsystem = algaeSubsystem;
+        m_coralSubsystem = coralSubsystem;
 
         if (!Robot.isSimulation())
             return;
 
         SimulatedArena.getInstance().placeGamePiecesOnField();
 
-        Logger.recordOutput("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
-        Logger.recordOutput("FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     }
 
     @Override
     public void simulationPeriodic() {
+        Logger.recordOutput("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+        Logger.recordOutput("FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+
         Pose3d[] elevatorPoses = m_elevatorSubsystem.getSimulatedElevatorPositions();
 
         Logger.recordOutput("ZeroedComponentPoses",
@@ -39,7 +43,8 @@ public class SimulatedGame extends SubsystemBase {
                         elevatorPoses[1],
                         new Pose3d(0.235, 0, elevatorPoses[1].getZ() + 0.185,
                                 new Rotation3d(0, m_algaeSubsystem.getAngle(), 0)),
-                        new Pose3d(0, 0, elevatorPoses[1].getZ(), Rotation3d.kZero)
+                        new Pose3d(0.3, 0, elevatorPoses[1].getZ() + 0.365,
+                                new Rotation3d(0, m_coralSubsystem.getAngle(), 0))
                 });
     }
 }

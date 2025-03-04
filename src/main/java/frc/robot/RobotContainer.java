@@ -72,7 +72,7 @@ public class RobotContainer {
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
     private final DriverCameras m_driverCameras = new DriverCameras();
     // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
-    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem);
+    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem);
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -250,13 +250,17 @@ public class RobotContainer {
                         () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.AlgaeScore),
                         m_elevatorSubsystem));
         m_operatorController.a()
-                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1),
-                        m_elevatorSubsystem));
+                .onTrue(
+                        Commands.runOnce(() -> {
+                            m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1);
+                            m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1);
+                        }, m_elevatorSubsystem));
         m_operatorController.x()
                 .onTrue(
                         Commands.runOnce(
                                 () -> {
                                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2);
+                                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
                                     m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
                                 },
                                 m_elevatorSubsystem));
@@ -265,12 +269,16 @@ public class RobotContainer {
                         Commands.runOnce(
                                 () -> {
                                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3);
+                                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
                                     m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
                                 },
                                 m_elevatorSubsystem));
         m_operatorController.y()
                 .onTrue(Commands.runOnce(
-                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4),
+                        () -> {
+                            m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4);
+                            m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
+                        },
                         m_elevatorSubsystem));
 
     }

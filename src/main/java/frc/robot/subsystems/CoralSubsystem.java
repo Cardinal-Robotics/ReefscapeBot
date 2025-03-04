@@ -13,14 +13,22 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.CoralMechanismConstants;
+import frc.robot.RobotContainer.InteractionState;
 
 public class CoralSubsystem extends SubsystemBase {
     private final SparkMax m_pivotMotor = new SparkMax(CoralMechanismConstants.kCoralPivotID, MotorType.kBrushless);
@@ -28,6 +36,10 @@ public class CoralSubsystem extends SubsystemBase {
     private final RelativeEncoder m_pivotEncoder = m_pivotMotor.getEncoder();
 
     private double m_setpoint = 0;
+
+    // Simulation code
+    private SingleJointedArmSim m_armSim;
+    private SparkMaxSim m_pivotMotorSim;
 
     public CoralSubsystem() {
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
@@ -42,6 +54,20 @@ public class CoralSubsystem extends SubsystemBase {
         m_pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SmartDashboard.putNumber("CoralTilt", 0);
+
+        if (!Robot.isSimulation())
+            return;
+
+        m_pivotMotorSim = new SparkMaxSim(m_pivotMotor, DCMotor.getNEO(1));
+        m_armSim = new SingleJointedArmSim(
+                DCMotor.getNEO(1),
+                15,
+                SingleJointedArmSim.estimateMOI(0.5, 10),
+                0.5,
+                0,
+                Math.toRadians(180),
+                false,
+                0, 0, 0);
     }
 
     public double getAngle() {
@@ -61,7 +87,11 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public void setTarget(double target) {
-        m_setpoint = target;
+        SmartDashboard.putNumber("CoralTilt", target);
+        m_setpoint = Robot.isSimulation() ? Math.toRadians(target * -1) : target;
+
+        m_setpoint = RobotContainer.interactionState == InteractionState.Coral ? m_setpoint
+                : CoralMechanismConstants.kCoralStore;
     }
 
     @Override
@@ -79,4 +109,16 @@ public class CoralSubsystem extends SubsystemBase {
                 feedforward, ArbFFUnits.kPercentOut);
     }
 
+    @Override
+    public void simulationPeriodic() {
+        // In this method, we update our simulation of what our arm is doing
+        // First, we set our "inputs" (voltages)
+        m_armSim.setInput(m_pivotMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+        m_pivotMotorSim.iterate(m_armSim.getVelocityRadPerSec(), RoboRioSim.getVInVoltage(), 0.020);
+        m_armSim.update(0.020);
+        SmartDashboard.putNumber("CoralSubsystem::getPosition", Math.toDegrees(m_armSim.getAngleRads()));
+
+        RoboRioSim.setVInVoltage(
+                BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
+    }
 }
