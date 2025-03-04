@@ -63,6 +63,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() { // 49 + 3/8
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
+        SmartDashboard.putNumber("master motor output %", m_master.getAppliedOutput());
 
         m_master.getClosedLoopController().setReference(SmartDashboard.getNumber("ElevatorHeight", getPosition()),
                 ControlType.kPosition);
@@ -128,8 +129,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         slaveConfig.encoder.positionConversionFactor(ElevatorConstants.kPositionConversionFactor);
 
         m_master.configure(masterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        // m_slave.configure(slaveConfig, ResetMode.kResetSafeParameters,
-        // PersistMode.kNoPersistParameters); // Look up
+        m_slave.configure(slaveConfig, ResetMode.kResetSafeParameters,
+                PersistMode.kNoPersistParameters); // Look up
         // later
 
         // Simulation code

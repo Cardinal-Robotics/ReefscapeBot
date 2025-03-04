@@ -106,7 +106,7 @@ public final class Constants {
         public static final int kSlaveMotorId = 16;
 
         // PID values for elevator controller
-        public static final double kElevatorP = 0.1;
+        public static final double kElevatorP = 1.5;
         public static final double kElevatorI = 0;
         public static final double kElevatorD = 0;
 

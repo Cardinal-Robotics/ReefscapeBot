@@ -62,7 +62,7 @@ public class AlgaeSubsystem extends SubsystemBase {
                 AlgaeMechanismConstants.kTiltKp,
                 AlgaeMechanismConstants.kTiltKi,
                 AlgaeMechanismConstants.kTiltKd)
-                .outputRange(-0.005, 0.005);
+                .outputRange(-0.25, 0.25);
 
         // Simulation only gives radians, so I have to do this
         tiltConfig.encoder.positionConversionFactor(30);
@@ -90,16 +90,19 @@ public class AlgaeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("AlgaeSubsystem::getPosition", getAngle());
+        SmartDashboard.putNumber("algae motor %", m_tiltMotor.getAppliedOutput());
 
         double setpoint = Robot.isSimulation() ? Math.toRadians(SmartDashboard.getNumber("AlgaeTilt", 0)) / 2
                 : SmartDashboard.getNumber("AlgaeTilt", 0);
-        double feedforward = 0;// 0.06 * Math.cos(Math.toRadians(currentAngle + 90));
+        double currentAngle = getAngle();
+        double feedforward = 0.03 * Math.cos(Math.toRadians(currentAngle - 90));
+
         m_tiltMotor.getClosedLoopController().setReference(
                 setpoint,
                 ControlType.kPosition,
                 ClosedLoopSlot.kSlot0,
-                feedforward,
-                ArbFFUnits.kPercentOut);
+                feedforward, ArbFFUnits.kPercentOut);
+
     }
 
     @Override
