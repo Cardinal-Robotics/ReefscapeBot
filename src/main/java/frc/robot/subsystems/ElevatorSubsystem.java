@@ -60,17 +60,24 @@ public class ElevatorSubsystem extends SubsystemBase {
     private ElevatorSim m_elevatorSim;
     private SparkMaxSim m_motorSim;
 
+    public double getTarget() {
+        return m_setpoint.position;
+    }
+
     @Override
     public void periodic() { // 49 + 3/8
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
         SmartDashboard.putNumber("master motor output %", m_master.getAppliedOutput());
 
-        m_master.getClosedLoopController().setReference(SmartDashboard.getNumber("ElevatorHeight", getPosition()),
+        m_setpoint = new TrapezoidProfile.State(SmartDashboard.getNumber("ElevatorHeight", getPosition()), 0);
+
+        m_master.getClosedLoopController().setReference(m_setpoint.position,
                 ControlType.kPosition);
 
-        m_setpoint = m_profile.calculate(0.02,
-                new TrapezoidProfile.State(getPosition(), m_master.getEncoder().getVelocity()), m_goal);
         /*
+         * m_setpoint = m_profile.calculate(0.02,
+         * new TrapezoidProfile.State(getPosition(),
+         * m_master.getEncoder().getVelocity()), m_goal);
          * m_master.getClosedLoopController().setReference(
          * m_setpoint.position,
          * ControlType.kPosition,
@@ -167,7 +174,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                 target = ElevatorPositions.kElevatorPositionAlgaeScore;
                 break;
             case L1:
-                target = ElevatorPositions.kElevatorPositionCoralL1;
+                target = (RobotContainer.interactionState == InteractionState.Algae)
+                        ? ElevatorPositions.kElevatorPositionAlgaeScore
+                        : ElevatorPositions.kElevatorPositionCoralL1;
                 break;
             case L2:
                 target = (RobotContainer.interactionState == InteractionState.Algae)
@@ -184,7 +193,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 break;
         }
 
-        // m_goal = new TrapezoidProfile.State(target, 0);
+        m_setpoint = new TrapezoidProfile.State(target, 0);
         SmartDashboard.putNumber("ElevatorHeight", target);
         m_master.getClosedLoopController().setReference(target, ControlType.kPosition);
     }

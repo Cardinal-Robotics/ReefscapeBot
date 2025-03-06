@@ -69,7 +69,7 @@ public class RobotContainer {
     private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
     private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
-    private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
+    private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
     private final DriverCameras m_driverCameras = new DriverCameras();
     // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
     private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem);
@@ -187,12 +187,16 @@ public class RobotContainer {
          */
 
         // Climber controls
-        m_driverController.leftStick()
-                .onTrue(Commands.runOnce(() -> m_climberSubsystem.setGoal(ClimberConstants.kCrushingFrame),
-                        m_climberSubsystem));
-        m_driverController.rightStick()
-                .onTrue(Commands.runOnce(() -> m_climberSubsystem.setGoal(ClimberConstants.kCrushingCage),
-                        m_climberSubsystem));
+        /*
+         * m_driverController.leftStick()
+         * .onTrue(Commands.runOnce(() ->
+         * m_climberSubsystem.setGoal(ClimberConstants.kCrushingFrame),
+         * m_climberSubsystem));
+         * m_driverController.rightStick()
+         * .onTrue(Commands.runOnce(() ->
+         * m_climberSubsystem.setGoal(ClimberConstants.kCrushingCage),
+         * m_climberSubsystem));
+         */
 
         // Target AprilTag positions
         m_driverController.povUp().debounce(0.25)
@@ -220,7 +224,10 @@ public class RobotContainer {
 
         // State Controls
         m_operatorController.rightStick()
-                .onTrue(Commands.runOnce(() -> interactionState = InteractionState.Algae));
+                .onTrue(Commands.runOnce(() -> {
+                    interactionState = InteractionState.Algae;
+                    m_coralSubsystem.setTarget(CoralMechanismConstants.kCoralStore);
+                }));
 
         m_operatorController.leftStick()
                 .onTrue(Commands.runOnce(() -> {

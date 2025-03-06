@@ -28,20 +28,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.CoralMechanismConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.RobotContainer.InteractionState;
 
 public class CoralSubsystem extends SubsystemBase {
     private final SparkMax m_pivotMotor = new SparkMax(CoralMechanismConstants.kCoralPivotID, MotorType.kBrushless);
+
     private final WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(CoralMechanismConstants.kCoralIntakeID);
     private final RelativeEncoder m_pivotEncoder = m_pivotMotor.getEncoder();
+    private final ElevatorSubsystem m_elevator;
 
-    private double m_setpoint = 0;
+    private double m_setpoint = CoralMechanismConstants.kCoralStore;
 
     // Simulation code
     private SingleJointedArmSim m_armSim;
     private SparkMaxSim m_pivotMotorSim;
 
-    public CoralSubsystem() {
+    public CoralSubsystem(ElevatorSubsystem elevatorSubsystem) {
+        m_elevator = elevatorSubsystem;
+
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
         pivotConfig.idleMode(IdleMode.kBrake);
@@ -96,7 +101,12 @@ public class CoralSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        setTarget(SmartDashboard.getNumber("CoralTilt", 0));
+        if (m_elevator.getPosition() < m_elevator.getTarget() + .1
+                && m_elevator.getPosition() > m_elevator.getTarget() - .1)
+            setTarget(m_setpoint);
+        else
+            setTarget(CoralMechanismConstants.kCoralStore);
+
         SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
 
         double currentAngle = getAngle();

@@ -88,7 +88,7 @@ public final class Constants {
         // Ports/ID(s)
         public static final int kFollowerMotorId = 22;
         public static final int kLeaderMotorId = 21;
-        public static final int kEncoderId = 0;
+        public static final int kEncoderId = 8;
 
         // PID values for climber
         public static final double kClimberP = 0;
@@ -208,11 +208,11 @@ public final class Constants {
 
         public static final double kAllowedSetpointError = 3;
 
-        public static final double kTargetAngleL1 = -32; // down
-        public static final double kTargetAngleL2_3 = -31; // left
-        public static final double kTargetAngleL4 = -18; // up
-        public static final double kCoralStore = -33;
+        public static final double kTargetAngleL1 = -59; // down
+        public static final double kTargetAngleL2_3 = -58; // left
+        public static final double kTargetAngleL4 = -45; // up
+        public static final double kCoralStore = -60;
 
-        public static final double kIntakePosition = -133; // needs to be changed, estimate
+        public static final double kIntakePosition = -160; // needs to be changed, estimate
     }
 }
