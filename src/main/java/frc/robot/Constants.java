@@ -128,7 +128,7 @@ public final class Constants {
             public static final double kElevatorPositionCoralIntake = 0.533;
             public static final double kElevatorPositionAlgaeScore = 0.32;
 
-            public static final double kElevatorPositionAlgaeL2 = 0.93;
+            public static final double kElevatorPositionAlgaeL2 = 0.88;
             public static final double kElevatorPositionAlgaeL3 = 1.295;
 
             public static final double kElevatorPositionCoralL1 = 0.125;
@@ -187,14 +187,16 @@ public final class Constants {
         public static final double kReleaseTime = 1.0;
 
         // Setpoints for tilt motor
-        public static final double kTargetIntakeAngle = 120; // The tilt motor's set point before grabbing the algae
+        public static final double kTargetGroundIntakeAngle = 130; // The tilt motor's set point before grabbing the
+                                                                   // algae
+        public static final double kTargetIntakeAngle = 115; // The tilt motor's set point before grabbing the algae
                                                              // out
         // of the reef.
         public static final double kTargetDriveAngle = 0; // The tilt motor's set point when driving around, preferably
                                                           // level.
-        public static final double kTargetReleaseAngle = 94; // The tilt motor's set point when releasing the algae
-                                                             // into
-                                                             // the barge.
+        public static final double kTargetScoreAngle = 90; // The tilt motor's set point when releasing the algae
+                                                           // into
+                                                           // the barge.
         public static final double kTargetDisabledAngle = 0; // The tilt motor's set point when it is not being used.
     }
 
@@ -211,7 +213,7 @@ public final class Constants {
         public static final double kTargetAngleL1 = -59; // down
         public static final double kTargetAngleL2_3 = -58; // left
         public static final double kTargetAngleL4 = -45; // up
-        public static final double kCoralStore = -60;
+        public static final double kCoralStore = -80;
 
         public static final double kIntakePosition = -160; // needs to be changed, estimate
     }

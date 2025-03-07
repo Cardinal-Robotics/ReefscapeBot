@@ -53,6 +53,7 @@ public class SwerveSubsystem extends SubsystemBase {
             throw new RuntimeException(e);
         }
 
+        m_swerveDrive.setChassisDiscretization(true, 0.02);
         m_swerveDrive.setHeadingCorrection(true);
         m_swerveDrive.resetOdometry(getInitialPose());
         m_swerveDrive.field.setRobotPose(getInitialPose());

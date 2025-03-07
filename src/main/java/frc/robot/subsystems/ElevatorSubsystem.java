@@ -34,6 +34,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
@@ -55,7 +56,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorKv);
 
     private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
 
     private ElevatorSim m_elevatorSim;
     private SparkMaxSim m_motorSim;
@@ -69,7 +69,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
         SmartDashboard.putNumber("master motor output %", m_master.getAppliedOutput());
 
-        m_setpoint = new TrapezoidProfile.State(SmartDashboard.getNumber("ElevatorHeight", getPosition()), 0);
+        if (DriverStation.isDisabled())
+            m_setpoint = new TrapezoidProfile.State(getPosition(), 0);
 
         m_master.getClosedLoopController().setReference(m_setpoint.position,
                 ControlType.kPosition);
@@ -189,7 +190,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                         : ElevatorPositions.kElevatorPositionCoralL3;
                 break;
             case L4:
-                target = ElevatorPositions.kElevatorPositionCoralL4;
+                target = (RobotContainer.interactionState == InteractionState.Algae)
+                        ? ElevatorPositions.kElevatorPositionAlgaeScore
+                        : ElevatorPositions.kElevatorPositionCoralL4;
                 break;
         }
 

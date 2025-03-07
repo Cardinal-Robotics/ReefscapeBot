@@ -63,13 +63,13 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
+    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
-    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-    private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
-    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem);
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
+    private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
     private final DriverCameras m_driverCameras = new DriverCameras();
     // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
     private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem);
@@ -245,22 +245,26 @@ public class RobotContainer {
 
         // Algae Controls
         m_operatorController.rightTrigger()
-                .onTrue(m_toggleableAlgaeIntake);
+                .onTrue(m_algaeSubsystem.setMotors(-1))
+                .onFalse(m_algaeSubsystem.setMotors(0));
+        m_operatorController.leftTrigger()
+                .onTrue(m_algaeSubsystem.setMotors(1))
+                .onFalse(m_algaeSubsystem.setMotors(0));
 
         // Elevator Positions
         m_operatorController.button(7)
                 .onTrue(Commands.runOnce(
-                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake),
-                        m_elevatorSubsystem));
-        m_operatorController.button(8)
-                .onTrue(Commands.runOnce(
-                        () -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.AlgaeScore),
+                        () -> {
+                            m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake);
+                            m_coralSubsystem.setTarget(CoralMechanismConstants.kIntakePosition);
+                        },
                         m_elevatorSubsystem));
         m_operatorController.a()
                 .onTrue(
                         Commands.runOnce(() -> {
                             m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1);
                             m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1);
+                            m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetGroundIntakeAngle);
                         }, m_elevatorSubsystem));
         m_operatorController.x()
                 .onTrue(
@@ -285,6 +289,7 @@ public class RobotContainer {
                         () -> {
                             m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4);
                             m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
+                            m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
                         },
                         m_elevatorSubsystem));
 

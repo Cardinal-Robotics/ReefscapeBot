@@ -38,7 +38,8 @@ public class CoralSubsystem extends SubsystemBase {
     private final RelativeEncoder m_pivotEncoder = m_pivotMotor.getEncoder();
     private final ElevatorSubsystem m_elevator;
 
-    private double m_setpoint = CoralMechanismConstants.kCoralStore;
+    private double m_safetyTarget = CoralMechanismConstants.kCoralStore;
+    private double m_desiredTarget = CoralMechanismConstants.kCoralStore;
 
     // Simulation code
     private SingleJointedArmSim m_armSim;
@@ -80,7 +81,7 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public Command setMotors(double speed) {
-        return runOnce(() -> spinIntakeMotor(speed));
+        return run(() -> spinIntakeMotor(speed));
     }
 
     public void spinIntakeMotor(double speed) {
@@ -88,32 +89,32 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public boolean atTarget() {
-        return Math.abs(m_setpoint - getAngle()) > CoralMechanismConstants.kAllowedSetpointError;
+        return Math.abs(m_desiredTarget - getAngle()) > CoralMechanismConstants.kAllowedSetpointError;
     }
 
     public void setTarget(double target) {
         SmartDashboard.putNumber("CoralTilt", target);
-        m_setpoint = Robot.isSimulation() ? Math.toRadians(target * -1) : target;
-
-        m_setpoint = RobotContainer.interactionState == InteractionState.Coral ? m_setpoint
-                : CoralMechanismConstants.kCoralStore;
+        m_desiredTarget = Robot.isSimulation() ? Math.toRadians(target * -1) : target;
     }
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
+
         if (m_elevator.getPosition() < m_elevator.getTarget() + .1
                 && m_elevator.getPosition() > m_elevator.getTarget() - .1)
-            setTarget(m_setpoint);
+            m_safetyTarget = m_desiredTarget;
         else
-            setTarget(CoralMechanismConstants.kCoralStore);
+            m_safetyTarget = CoralMechanismConstants.kCoralStore;
 
-        SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
+        m_safetyTarget = RobotContainer.interactionState == InteractionState.Coral ? m_safetyTarget
+                : CoralMechanismConstants.kCoralStore;
 
         double currentAngle = getAngle();
         double feedforward = 0.07 * Math.cos(Math.toRadians(currentAngle + 90));
 
         m_pivotMotor.getClosedLoopController().setReference(
-                m_setpoint,
+                m_safetyTarget,
                 ControlType.kPosition,
                 ClosedLoopSlot.kSlot0,
                 feedforward, ArbFFUnits.kPercentOut);

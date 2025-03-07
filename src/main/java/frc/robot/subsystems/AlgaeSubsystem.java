@@ -14,6 +14,10 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 
 import java.util.logging.Logger;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -32,26 +36,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.AlgaeMechanismConstants;
+import frc.robot.Constants.CoralMechanismConstants;
+import frc.robot.Constants.ElevatorConstants.ElevatorPositions;
 import frc.robot.RobotContainer.InteractionState;
 
 public class AlgaeSubsystem extends SubsystemBase {
     private final RelativeEncoder m_tiltEncoder;
+    private final ElevatorSubsystem m_elevator;
     private final ArmFeedforward m_feedforward;
-    private final SparkMax m_intakeMotor;
+    private final WPI_TalonSRX m_intakeMotor;
     private final SparkMax m_tiltMotor;
 
-    private double m_setpoint;
+    private double m_desiredTarget;
+    private double m_realTarget;
 
     // Simulation code
     private SingleJointedArmSim m_armSim;
     private SparkMaxSim m_tiltMotorSim;
 
-    public AlgaeSubsystem() {
+    public AlgaeSubsystem(ElevatorSubsystem elevator) {
         SmartDashboard.putNumber("AlgaeTilt", 0);
-        m_intakeMotor = new SparkMax(AlgaeMechanismConstants.kIntakeMotorPort, MotorType.kBrushed);
+        m_intakeMotor = new WPI_TalonSRX(AlgaeMechanismConstants.kIntakeMotorPort);
         m_tiltMotor = new SparkMax(AlgaeMechanismConstants.kTiltMotorPort, MotorType.kBrushless);
-
         m_feedforward = new ArmFeedforward(0.1, 0.1, 0.1);
+        m_elevator = elevator;
 
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.idleMode(IdleMode.kBrake);
@@ -62,12 +70,11 @@ public class AlgaeSubsystem extends SubsystemBase {
                 AlgaeMechanismConstants.kTiltKp,
                 AlgaeMechanismConstants.kTiltKi,
                 AlgaeMechanismConstants.kTiltKd)
-                .outputRange(-0.25, 0.25);
+                .outputRange(-0.2, 0.1);
 
         // Simulation only gives radians, so I have to do this
         tiltConfig.encoder.positionConversionFactor(30);
 
-        m_intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_tiltEncoder = m_tiltMotor.getEncoder();
@@ -91,18 +98,22 @@ public class AlgaeSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("AlgaeSubsystem::getPosition", getAngle());
         SmartDashboard.putNumber("algae motor %", m_tiltMotor.getAppliedOutput());
+        // m_desiredTarget = SmartDashboard.getNumber("AlgaeTilt", getAngle());
 
-        double setpoint = Robot.isSimulation() ? Math.toRadians(SmartDashboard.getNumber("AlgaeTilt", 0)) / 2
-                : SmartDashboard.getNumber("AlgaeTilt", 0);
+        m_realTarget = (RobotContainer.interactionState == InteractionState.Algae) ? m_desiredTarget
+                : AlgaeMechanismConstants.kTargetDisabledAngle;
+
+        m_realTarget = (m_elevator.getPosition() >= ElevatorPositions.kElevatorPositionAlgaeScore - 0.1) ? m_realTarget
+                : AlgaeMechanismConstants.kTargetDisabledAngle;
+
         double currentAngle = getAngle();
-        double feedforward = 0.03 * Math.cos(Math.toRadians(currentAngle - 90));
+        double feedforward = 0.04 * Math.cos(Math.toRadians(currentAngle - 90));
 
         m_tiltMotor.getClosedLoopController().setReference(
-                setpoint,
+                m_realTarget,
                 ControlType.kPosition,
                 ClosedLoopSlot.kSlot0,
                 feedforward, ArbFFUnits.kPercentOut);
-
     }
 
     @Override
@@ -126,7 +137,7 @@ public class AlgaeSubsystem extends SubsystemBase {
     }
 
     public Command setMotors(double speed) {
-        return runOnce(() -> spinIntakeMotor(speed));
+        return run(() -> spinIntakeMotor(speed));
     }
 
     public void stopIntakeMotor() {
@@ -141,22 +152,17 @@ public class AlgaeSubsystem extends SubsystemBase {
     }
 
     public void setTiltTarget(double setpoint) {
-        m_setpoint = RobotContainer.interactionState == InteractionState.Algae ? setpoint
-                : AlgaeMechanismConstants.kTargetDisabledAngle;
-
-        SmartDashboard.putNumber("AlgaeTilt", m_setpoint);
-        m_setpoint = Robot.isSimulation() ? Math.toRadians(m_setpoint) : m_setpoint;
-
-        m_tiltMotor.getClosedLoopController().setReference(m_setpoint, ControlType.kPosition);
+        m_desiredTarget = Robot.isSimulation() ? Math.toRadians(setpoint) : setpoint;
+        SmartDashboard.putNumber("AlgaeTarget", m_desiredTarget);
     }
 
     public boolean isTiltMotorAtGoal(double target) {
-        double currentPosition = m_tiltMotor.getEncoder().getPosition();
+        double currentPosition = getAngle();
         double error = Math.abs(target - currentPosition);
         return error <= 0.2; // Returns true if within the tolerance range
     }
 
     public boolean isTiltMotorAtGoal() {
-        return isTiltMotorAtGoal(m_setpoint);
+        return isTiltMotorAtGoal(m_desiredTarget);
     }
 }

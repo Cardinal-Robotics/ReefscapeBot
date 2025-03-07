@@ -84,10 +84,10 @@ public class ToggleableAlgaeIntake extends Command {
 
             case TILT_TO_RELEASE: // Makes sure that the algae mechanism is faced downwards at the processor so
                                   // the ball can make it through.
-                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetReleaseAngle);
+                m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
                 // m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.AlgaeScore);
 
-                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetReleaseAngle) && Math.abs(
+                if (m_algaeSubsystem.isTiltMotorAtGoal(AlgaeMechanismConstants.kTargetScoreAngle) && Math.abs(
                         m_elevatorSubsystem.getPosition() - ElevatorPositions.kElevatorPositionAlgaeScore) < 0.25) {
                     m_currentState = AlgaeState.ELEVATOR_AT_PROCESSOR;
                     m_timer.reset();
