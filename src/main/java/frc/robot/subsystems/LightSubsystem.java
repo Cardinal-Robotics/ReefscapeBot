@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.LEDPattern;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Percent;
@@ -21,17 +23,17 @@ import static edu.wpi.first.units.Units.Second;
 import java.util.Map;
 
 public class LightSubsystem extends SubsystemBase {
-    AddressableLED m_led;
-    AddressableLEDBuffer m_ledBuffer;
-    LEDPattern m_rainbow;
-    Distance kLedSpacing;
-    LEDPattern m_scrollingRainbow;
-    LEDPattern m_evelatorPattern;
-    LEDPattern m_ChoppedRainbow;
+    private final AddressableLEDBuffer m_ledBuffer;
+    private final LEDPattern m_scrollingRainbow;
+    private final ElevatorSubsystem m_elevator;
+    private final Distance m_kLedSpacing;
+    private LEDPattern m_evelatorPattern;
+    private final LEDPattern m_rainbow;
+    private final AddressableLED m_led;
+    private float m_valor = 0;
 
     /** Creates a new LEDSubsystem. */
-
-    public LightSubsystem() {
+    public LightSubsystem(ElevatorSubsystem elevatorSubsystem) {
         // PWM port 9
         // Must be a PWM header, not MXP or DIO
         m_led = new AddressableLED(9);
@@ -42,11 +44,11 @@ public class LightSubsystem extends SubsystemBase {
 
         // Our LED strip has a density of 120 LEDs per meter
 
-        kLedSpacing = Meters.of(1 / 120.0);
+        m_kLedSpacing = Meters.of(1 / 120.0);
         // Create a new pattern that scrolls the rainbow pattern across the LED strip,
         // moving at a speed
         // of 1 meter per second.
-        m_scrollingRainbow = m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), kLedSpacing);
+        m_scrollingRainbow = m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), m_kLedSpacing);
 
         // Reuse buffer
         // Default to a length of 60, start empty output
@@ -57,67 +59,50 @@ public class LightSubsystem extends SubsystemBase {
         // Set the data
         m_led.setData(m_ledBuffer);
         m_led.start();
+
+        m_elevator = elevatorSubsystem;
     }
 
-    private double temp = 0;
+    public Command setConstantColor(int red, int green, int blue) {
+        return runOnce(() -> {
+            for (int i = 0; i < m_ledBuffer.getLength(); i++) {
+                m_ledBuffer.setRGB(i, red, green, blue);
+            }
 
-    public void setRed() {
-        temp += 0.1;
-        SmartDashboard.putNumber("setRed()", temp);
-        /*
-         * LEDPattern red = LEDPattern.solid(Color.kRed);
-         * 
-         * red.applyTo(m_ledBuffer);
-         */
-
-        for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-            m_ledBuffer.setRGB(i, 253, 11, 205);
-        }
-
-        // Set the data
-        m_led.setData(m_ledBuffer);
+            m_led.setData(m_ledBuffer);
+        });
     }
 
-    public void setBlue() {
-        temp += 1;
-        SmartDashboard.putString("Change?", "yes");
-
-        for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-            m_ledBuffer.setRGB(i, 0, 0, 255);
-        }
-
-        m_led.setData(m_ledBuffer);
+    public Command setRainbow() {
+        return runOnce(() -> {
+            m_scrollingRainbow.applyTo(m_ledBuffer); // Update the buffer with the rainbow animation
+            m_led.setData(m_ledBuffer); // Set the LEDs
+        });
     }
 
-    public void setRainbow() {
-        // Update the buffer with the rainbow animation
-        m_scrollingRainbow.applyTo(m_ledBuffer);
-        // Set the LEDs
-        m_led.setData(m_ledBuffer);
+    public Command elevatorPattern() {
+        return run(() -> {
+            System.out.println("EAA");
+            LEDPattern base = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kBlue, Color.kRed);
+            LEDPattern mask = LEDPattern.progressMaskLayer(() -> m_elevator.getPosition() / 1.3);
+            m_evelatorPattern = base.mask(mask);
+
+            m_evelatorPattern.applyTo(m_ledBuffer);
+
+            m_led.setData(m_ledBuffer);
+        }).until(() -> m_elevator.atTarget());
     }
 
-    public void elevatorPattern(float valor) {
-        LEDPattern base = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kBlue, Color.kRed);
-        LEDPattern mask = LEDPattern.progressMaskLayer(() -> valor / 50);
-        m_evelatorPattern = base.mask(mask);
-
-        m_evelatorPattern.applyTo(m_ledBuffer);
-
-        m_led.setData(m_ledBuffer);
+    public Command increaseValor() {
+        return Commands.run(() -> {
+            m_valor = Math.min(m_valor + 1, 100);
+        }, this);
     }
 
-    public float increaseValor(float valor) {
-        if (valor != 100.0) {
-            valor++;
-        }
-        return valor;
-    }
-
-    public float decreaseValor(float valor) {
-        if (valor != 0.0) {
-            valor--;
-        }
-        return valor;
+    public Command decreaseValor() {
+        return Commands.run(() -> {
+            m_valor = Math.max(m_valor - 1, 0);
+        }, this);
     }
 
     public void setChoppedRainbow() {
@@ -132,10 +117,5 @@ public class LightSubsystem extends SubsystemBase {
 
         // Write the data to the LED strip
         m_led.setData(m_ledBuffer);
-    }
-
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
     }
 }

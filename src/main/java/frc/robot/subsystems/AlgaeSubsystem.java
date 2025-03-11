@@ -28,16 +28,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.math.util.Units;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
+import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.CoralMechanismConstants;
-import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
 import frc.robot.RobotContainer.InteractionState;
 import frc.robot.RobotContainer;
 import frc.robot.Robot;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class AlgaeSubsystem extends SubsystemBase {
     private final RelativeEncoder m_tiltEncoder;

@@ -5,8 +5,8 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;

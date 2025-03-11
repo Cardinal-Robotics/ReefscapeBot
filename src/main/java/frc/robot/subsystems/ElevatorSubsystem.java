@@ -5,13 +5,11 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.sim.SparkMaxAlternateEncoderSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
@@ -29,12 +27,10 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 
@@ -65,6 +61,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public double getTarget() {
         return m_setpoint.position;
+    }
+
+    public boolean atTarget() {
+        return (getPosition() < getTarget() + .1) && (getPosition() > getTarget() - .1);
     }
 
     @Override
@@ -108,7 +108,8 @@ public class ElevatorSubsystem extends SubsystemBase {
      * position of the middle stage
      */
     public Pose3d[] getSimulatedElevatorPositions() {
-        double middleStageHight = m_encoder.getPosition() / (0.6009005308151245 + Units.inchesToMeters(24 + (1 / 16)));
+        double middleStageHight = m_encoder.getPosition() / (0.6009005308151245 + Units.inchesToMeters(24 + (1 / 16)))
+                * 0.6009005308151245;
         double innerStageHight = m_encoder.getPosition();
 
         return new Pose3d[] {
