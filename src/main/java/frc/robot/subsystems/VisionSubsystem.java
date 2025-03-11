@@ -228,6 +228,19 @@ public class VisionSubsystem extends SubsystemBase {
         return Optional.empty();
     }
 
+    public Optional<PhotonTrackedTarget> getBestTarget() {
+        for (Cameras camera : Cameras.values()) {
+            for (PhotonPipelineResult result : camera.resultsList) {
+                if (!result.hasTargets())
+                    continue;
+
+                return Optional.of(result.getBestTarget());
+            }
+        }
+
+        return Optional.empty();
+    }
+
     private final StructPublisher<Transform3d> m_publisher = NetworkTableInstance.getDefault()
             .getStructTopic("Photon Pose", Transform3d.struct).publish();
 

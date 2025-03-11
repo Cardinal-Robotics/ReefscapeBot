@@ -44,7 +44,7 @@ public class SimulatedGame extends SubsystemBase {
                         new Pose3d(0.235, 0, elevatorPoses[1].getZ() + 0.185,
                                 new Rotation3d(0, m_algaeSubsystem.getAngle(), 0)),
                         new Pose3d(0.3, 0, elevatorPoses[1].getZ() + 0.365,
-                                new Rotation3d(0, m_coralSubsystem.getAngle(), 0))
+                                new Rotation3d(0, -m_coralSubsystem.getAngle(), 0))
                 });
     }
 }

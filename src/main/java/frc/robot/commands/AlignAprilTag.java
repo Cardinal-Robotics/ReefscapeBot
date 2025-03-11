@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -25,7 +27,6 @@ public class AlignAprilTag extends Command {
     private final VisionSubsystem m_visionSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
 
-    private TagPositions m_tagPosition = TagPositions.TOP;
     private boolean m_finished = false;
     private double m_lastUpdated;
     private int m_targetId;
@@ -38,53 +39,18 @@ public class AlignAprilTag extends Command {
         addRequirements(m_swerveSubsystem);
     }
 
-    public AlignAprilTag(VisionSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem, TagPositions tagPosition) {
-        this(visionSubsystem, swerveSubsystem);
-        setTagPosition(tagPosition);
-    }
-
-    public enum TagPositions {
-        TOP_RIGHT,
-        TOP_LEFT,
-        TOP,
-
-        BOTTOM_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM,
-    }
-
     @Override
     public void initialize() {
         m_lastUpdated = Timer.getFPGATimestamp();
-        setTagPosition(m_tagPosition);
         m_finished = false;
-    }
 
-    public void setTagPosition(TagPositions tagPosition) {
-        m_tagPosition = tagPosition;
-
-        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-
-        switch (m_tagPosition) {
-            case TOP:
-                m_targetId = (alliance == Alliance.Red ? 10 : 21);
-                break;
-            case TOP_RIGHT:
-                m_targetId = (alliance == Alliance.Red ? 9 : 22);
-                break;
-            case TOP_LEFT:
-                m_targetId = (alliance == Alliance.Red ? 11 : 20);
-                break;
-            case BOTTOM:
-                m_targetId = (alliance == Alliance.Red ? 7 : 18);
-                break;
-            case BOTTOM_RIGHT:
-                m_targetId = (alliance == Alliance.Red ? 8 : 17);
-                break;
-            case BOTTOM_LEFT:
-                m_targetId = (alliance == Alliance.Red ? 6 : 19);
-                break;
+        Optional<PhotonTrackedTarget> target = m_visionSubsystem.getBestTarget();
+        if (target.isEmpty()) {
+            m_finished = true;
+            return;
         }
+
+        m_targetId = target.get().getFiducialId();
     }
 
     @Override

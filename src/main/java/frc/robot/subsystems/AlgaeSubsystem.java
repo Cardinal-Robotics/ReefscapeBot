@@ -4,41 +4,40 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
-
-import java.util.logging.Logger;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.math.util.Units;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.CoralMechanismConstants;
-import frc.robot.Constants.ElevatorConstants.ElevatorPositions;
+import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
 import frc.robot.RobotContainer.InteractionState;
+import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 public class AlgaeSubsystem extends SubsystemBase {
     private final RelativeEncoder m_tiltEncoder;
@@ -103,7 +102,7 @@ public class AlgaeSubsystem extends SubsystemBase {
         m_realTarget = (RobotContainer.interactionState == InteractionState.Algae) ? m_desiredTarget
                 : AlgaeMechanismConstants.kTargetDisabledAngle;
 
-        m_realTarget = (m_elevator.getPosition() >= ElevatorPositions.kElevatorPositionAlgaeScore - 0.1) ? m_realTarget
+        m_realTarget = (m_elevator.getPosition() >= ElevatorTarget.AlgaeScore.getAlgaePosition() - 0.1) ? m_realTarget
                 : AlgaeMechanismConstants.kTargetDisabledAngle;
 
         double currentAngle = getAngle();

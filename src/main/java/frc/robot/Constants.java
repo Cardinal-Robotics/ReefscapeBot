@@ -116,48 +116,30 @@ public final class Constants {
         public static final double kElevatorKv = 0;
 
         public enum ElevatorTarget {
-            CoralIntake,
-            AlgaeScore,
-            L1,
-            L2,
-            L3,
-            L4
+            CoralIntake(Double.NaN, 0.533),
+            AlgaeScore(0.32, Double.NaN),
+            L1(Double.NaN, 0.125),
+            L2(0.88, 0.23),
+            L3(1.295, 0.62),
+            L4(Double.NaN, 1.295);
+
+            private final double algaePosition;
+            private final double coralPosition;
+
+            ElevatorTarget(double algaePosition, double coralPosition) {
+                this.algaePosition = algaePosition;
+                this.coralPosition = coralPosition;
+            }
+
+            public double getAlgaePosition() {
+                return algaePosition;
+            }
+
+            public double getCoralPosition() {
+                return coralPosition;
+            }
         }
 
-        public class ElevatorPositions {
-            public static final double kElevatorPositionCoralIntake = 0.533;
-            public static final double kElevatorPositionAlgaeScore = 0.32;
-
-            public static final double kElevatorPositionAlgaeL2 = 0.88;
-            public static final double kElevatorPositionAlgaeL3 = 1.295;
-
-            public static final double kElevatorPositionCoralL1 = 0.125;
-            public static final double kElevatorPositionCoralL2 = 0.23;
-            public static final double kElevatorPositionCoralL3 = 0.62;
-            public static final double kElevatorPositionCoralL4 = 1.295;
-        }
-
-        public static final double kMaxAcceleration = 0;
-        public static final double kMaxVelocity = 0;
-
-        public static final double kCarriageMass = 4.0;
-
-        public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(74);
-        public static final double kMinElevatorHeightMeters = 0;
-
-        // distance per pulse = (distance per revolution) / (pulses per revolution)
-        // or just => (Pi * D) / ppr
-        // public static final double kElevatorEncoderDistPerPulse = ((Math.PI) * (2 *
-        // kElevatorDrumRadius) * ) / 4096; // CPR = 4096
-
-        public static final double kElevatorDrumRadius = 0;
-        public static final int kElevatorEncoderCPR = 4096; // counts per revolution
-        public static final int kElevatorGearRatio = 20; // 20:1
-
-        // public static final double kPositionConversionFactor = ((((2 * Math.PI) *
-        // kElevatorDrumRadius)
-        // * kElevatorGearRatio) / kElevatorEncoderCPR);
-        public static final double kElevatorPulleyDiameter = 0.02032;
         public static final double kPositionConversionFactor = 0.006985 / 0.6009005308151245 // (1/20) *
                 * (0.6009005308151245 + Units.inchesToMeters(24 + (1 / 16)));// Units.inchesToMeters(62) /
         // 89.12281446531414986;

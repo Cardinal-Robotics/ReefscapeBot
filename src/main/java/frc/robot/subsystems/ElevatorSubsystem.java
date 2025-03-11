@@ -4,13 +4,6 @@
 
 package frc.robot.subsystems;
 
-import frc.robot.Constants.ElevatorConstants.ElevatorPositions;
-import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
-import frc.robot.RobotContainer.InteractionState;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.RobotContainer;
-import frc.robot.Robot;
-
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.sim.SparkMaxAlternateEncoderSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -18,10 +11,16 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
+
+import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
+import frc.robot.RobotContainer.InteractionState;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.RobotContainer;
+import frc.robot.Robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -49,11 +48,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // Feedforward stuff (if needed)
 
-    private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(1.75, 0.75));
-    private final ElevatorFeedforward m_elevatorFeedforward = new ElevatorFeedforward(
-            ElevatorConstants.kElevatorKs,
-            ElevatorConstants.kElevatorKg,
-            ElevatorConstants.kElevatorKv);
+    /*
+     * private final TrapezoidProfile m_profile = new TrapezoidProfile(new
+     * TrapezoidProfile.Constraints(1.75, 0.75));
+     * private final ElevatorFeedforward m_elevatorFeedforward = new
+     * ElevatorFeedforward(
+     * ElevatorConstants.kElevatorKs,
+     * ElevatorConstants.kElevatorKg,
+     * ElevatorConstants.kElevatorKv);
+     */
 
     private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -105,9 +108,8 @@ public class ElevatorSubsystem extends SubsystemBase {
      * position of the middle stage
      */
     public Pose3d[] getSimulatedElevatorPositions() {
-        double middleStageHight = m_elevatorSim.getPositionMeters();
-        double innerStageHight = middleStageHight
-                + (Units.inchesToMeters(32.5) * (middleStageHight / Units.inchesToMeters(37.5)));
+        double middleStageHight = m_encoder.getPosition() / (0.6009005308151245 + Units.inchesToMeters(24 + (1 / 16)));
+        double innerStageHight = m_encoder.getPosition();
 
         return new Pose3d[] {
                 new Pose3d(0, 0, middleStageHight, Rotation3d.kZero),
@@ -152,7 +154,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 18.0,
                 Units.inchesToMeters(1.432) / 2,
                 0,
-                Units.inchesToMeters(37.5),
+                1.3,
                 false,
                 0,
                 0.001,
@@ -164,37 +166,25 @@ public class ElevatorSubsystem extends SubsystemBase {
         return m_encoder.getPosition();
     }
 
+    public void setElevatorGoal(ElevatorTarget goal, InteractionState state) {
+        RobotContainer.interactionState = state;
+        setElevatorGoal(goal);
+    }
+
+    public void setElevatorGoal(ElevatorTarget targetIfCoral, ElevatorTarget targetIfAlgae) {
+        if (RobotContainer.interactionState == InteractionState.Coral)
+            setElevatorGoal(targetIfCoral);
+        else if (RobotContainer.interactionState == InteractionState.Algae)
+            setElevatorGoal(targetIfAlgae);
+    }
+
     // --- Handles elevator target
     public void setElevatorGoal(ElevatorTarget goal) {
-        double target = ElevatorPositions.kElevatorPositionAlgaeScore; // idle position
-        switch (goal) {
-            case CoralIntake:
-                target = ElevatorPositions.kElevatorPositionCoralIntake;
-                break;
-            case AlgaeScore:
-                target = ElevatorPositions.kElevatorPositionAlgaeScore;
-                break;
-            case L1:
-                target = (RobotContainer.interactionState == InteractionState.Algae)
-                        ? ElevatorPositions.kElevatorPositionAlgaeScore
-                        : ElevatorPositions.kElevatorPositionCoralL1;
-                break;
-            case L2:
-                target = (RobotContainer.interactionState == InteractionState.Algae)
-                        ? ElevatorPositions.kElevatorPositionAlgaeL2
-                        : ElevatorPositions.kElevatorPositionCoralL2;
-                break;
-            case L3:
-                target = (RobotContainer.interactionState == InteractionState.Algae)
-                        ? ElevatorPositions.kElevatorPositionAlgaeL3
-                        : ElevatorPositions.kElevatorPositionCoralL3;
-                break;
-            case L4:
-                target = (RobotContainer.interactionState == InteractionState.Algae)
-                        ? ElevatorPositions.kElevatorPositionAlgaeScore
-                        : ElevatorPositions.kElevatorPositionCoralL4;
-                break;
-        }
+        double target = RobotContainer.interactionState == InteractionState.Coral ? goal.getCoralPosition()
+                : goal.getAlgaePosition();
+
+        if (target == Double.NaN)
+            target = m_setpoint.position;
 
         m_setpoint = new TrapezoidProfile.State(target, 0);
         SmartDashboard.putNumber("ElevatorHeight", target);

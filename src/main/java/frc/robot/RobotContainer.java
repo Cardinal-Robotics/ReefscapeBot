@@ -12,10 +12,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
-import frc.robot.commands.AlignAprilTag.TagPositions;
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.CoralMechanismConstants;
-import frc.robot.commands.ToggleableAlgaeIntake;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -32,7 +30,6 @@ import frc.robot.commands.AlignAprilTag;
 import frc.robot.commands.LEDCommand;
 
 import com.pathplanner.lib.auto.NamedCommands;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import swervelib.SwerveInputStream;
@@ -72,8 +69,8 @@ public class RobotContainer {
     private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
     private final DriverCameras m_driverCameras = new DriverCameras();
     // private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
-    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem);
 
+    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -104,8 +101,6 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    private final ToggleableAlgaeIntake m_toggleableAlgaeIntake = new ToggleableAlgaeIntake(m_elevatorSubsystem,
-            m_algaeSubsystem);
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -127,18 +122,8 @@ public class RobotContainer {
 
     private void registerNamedCommands() {
         // AprilTag Alignment
-        NamedCommands.registerCommand("AprilTagAlignTop",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.TOP));
-        NamedCommands.registerCommand("AprilTagAlignTopRight",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.TOP_RIGHT));
-        NamedCommands.registerCommand("AprilTagAlignTopLeft",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.TOP_LEFT));
-        NamedCommands.registerCommand("AprilTagAlignBottom",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.BOTTOM));
-        NamedCommands.registerCommand("AprilTagAlignBottomLeft",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.BOTTOM_LEFT));
-        NamedCommands.registerCommand("AprilTagAlignBottomRight",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, TagPositions.BOTTOM_RIGHT));
+        NamedCommands.registerCommand("AprilTagAlign",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive));
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake", Commands
@@ -198,20 +183,6 @@ public class RobotContainer {
          * m_climberSubsystem));
          */
 
-        // Target AprilTag positions
-        m_driverController.povUp().debounce(0.25)
-                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP)));
-        m_driverController.povUpRight()
-                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP_RIGHT)));
-        m_driverController.povUpLeft()
-                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.TOP_LEFT)));
-        m_driverController.povDown().debounce(0.25)
-                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM)));
-        m_driverController.povDownRight()
-                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM_RIGHT)));
-        m_driverController.povDownLeft()
-                .onTrue(Commands.runOnce(() -> m_alignAprilTag.setTagPosition(TagPositions.BOTTOM_LEFT)));
-
         /*
          * m_driverController.b()
          * .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() ==
@@ -262,7 +233,7 @@ public class RobotContainer {
         m_operatorController.a()
                 .onTrue(
                         Commands.runOnce(() -> {
-                            m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1);
+                            m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1, ElevatorTarget.AlgaeScore);
                             m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1);
                             m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetGroundIntakeAngle);
                         }, m_elevatorSubsystem));
@@ -287,7 +258,7 @@ public class RobotContainer {
         m_operatorController.y()
                 .onTrue(Commands.runOnce(
                         () -> {
-                            m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4);
+                            m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4, ElevatorTarget.AlgaeScore);
                             m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
                             m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
                         },
