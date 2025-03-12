@@ -62,13 +62,14 @@ public class RobotContainer {
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
-    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem);
+    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem, m_swerveDrive);
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
     private final LightSubsystem m_lightSubsystem = new LightSubsystem(m_elevatorSubsystem);
     // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
     private final DriverCameras m_driverCameras = new DriverCameras();
 
-    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem);
+    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem,
+            m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -166,6 +167,11 @@ public class RobotContainer {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.a().whileTrue(m_alignAprilTag);
+
+        m_driverController.povRight().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0.15, -0.5)));
+        m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(-0.2, -0.5)));
+        m_driverController.povUp().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0, -0.5)));
+
         /*
          * m_driverController.x()
          * .toggleOnTrue(Commands.runOnce(() ->
@@ -215,16 +221,12 @@ public class RobotContainer {
                 .onTrue(m_coralSubsystem.setMotors(-1))
                 .onFalse(m_coralSubsystem.setMotors(0));
 
-        boolean algaeReleased = false;
         // Algae Controls
         m_operatorController.rightTrigger()
-                .onTrue(m_algaeSubsystem.setMotors(-1).alongWith(m_lightSubsystem.setConstantColor(0, 0, 0)))
+                .onTrue(m_algaeSubsystem.setMotors(-1))
                 .onFalse(m_algaeSubsystem.setMotors(0));
         m_operatorController.leftTrigger()
-                .onTrue(m_algaeSubsystem.setMotors(1)
-                        .alongWith(DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
-                                ? m_lightSubsystem.setConstantColor(253, 11, 205)
-                                : m_lightSubsystem.setConstantColor(0, 0, 255)))
+                .onTrue(m_algaeSubsystem.setMotors(1))
                 .onFalse(m_algaeSubsystem.setMotors(0));
 
         // Elevator Positions

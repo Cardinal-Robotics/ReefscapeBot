@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -35,6 +36,16 @@ import frc.robot.RobotContainer.InteractionState;
 import frc.robot.RobotContainer;
 import frc.robot.Robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class AlgaeSubsystem extends SubsystemBase {
@@ -48,10 +59,12 @@ public class AlgaeSubsystem extends SubsystemBase {
     private double m_realTarget;
 
     // Simulation code
+    private SwerveDriveSimulation m_swerveDriveSimulation;
+    private IntakeSimulation m_intakeSim;
     private SingleJointedArmSim m_armSim;
     private SparkMaxSim m_tiltMotorSim;
 
-    public AlgaeSubsystem(ElevatorSubsystem elevator) {
+    public AlgaeSubsystem(ElevatorSubsystem elevator, SwerveSubsystem swerveSubsystem) {
         SmartDashboard.putNumber("AlgaeTilt", 0);
         m_intakeMotor = new WPI_TalonSRX(AlgaeMechanismConstants.kIntakeMotorPort);
         m_tiltMotor = new SparkMax(AlgaeMechanismConstants.kTiltMotorPort, MotorType.kBrushless);
@@ -70,7 +83,7 @@ public class AlgaeSubsystem extends SubsystemBase {
                 .outputRange(-0.2, 0.1);
 
         // Simulation only gives radians, so I have to do this
-        tiltConfig.encoder.positionConversionFactor(30);
+        tiltConfig.encoder.positionConversionFactor(Robot.isReal() ? 30 : 60);
 
         m_tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -79,7 +92,9 @@ public class AlgaeSubsystem extends SubsystemBase {
         if (!Robot.isSimulation())
             return;
 
+        m_swerveDriveSimulation = swerveSubsystem.getLibSwerveDrive().getMapleSimDrive().get();
         m_tiltMotorSim = new SparkMaxSim(m_tiltMotor, DCMotor.getNEO(1));
+
         m_armSim = new SingleJointedArmSim(
                 DCMotor.getNEO(1),
                 15,
@@ -89,6 +104,14 @@ public class AlgaeSubsystem extends SubsystemBase {
                 Math.toRadians(180),
                 false,
                 0, 0, 0);
+
+        m_intakeSim = IntakeSimulation.OverTheBumperIntake(
+                "Algae",
+                m_swerveDriveSimulation,
+                Meters.of(0.462600),
+                Meters.of(0.321503),
+                IntakeSide.FRONT,
+                1);
     }
 
     @Override
@@ -107,10 +130,10 @@ public class AlgaeSubsystem extends SubsystemBase {
         double feedforward = 0.04 * Math.cos(Math.toRadians(currentAngle - 90));
 
         m_tiltMotor.getClosedLoopController().setReference(
-                m_realTarget,
+                Robot.isSimulation() ? Math.toRadians(m_realTarget) : m_realTarget,
                 ControlType.kPosition,
                 ClosedLoopSlot.kSlot0,
-                feedforward, ArbFFUnits.kPercentOut);
+                0, ArbFFUnits.kPercentOut);
     }
 
     @Override
@@ -130,15 +153,26 @@ public class AlgaeSubsystem extends SubsystemBase {
      * @param speed The speed to set. Value should be between -1.0 and 1.0.
      */
     public void spinIntakeMotor(double speed) {
+        if (speed > 0 && m_intakeSim.getGamePiecesAmount() == 1) {
+            m_intakeSim.obtainGamePieceFromIntake();
+            SimulatedArena.getInstance().addGamePieceProjectile(new ReefscapeAlgaeOnFly(
+                    m_swerveDriveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+                    new Translation2d(0.257, 0),
+                    m_swerveDriveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                    m_swerveDriveSimulation.getSimulatedDriveTrainPose().getRotation(),
+                    Meters.of(m_elevator.getPosition() + 0.185),
+                    MetersPerSecond.of(0.5),
+                    Degrees.of(0)));
+        } else if (speed < 0)
+            m_intakeSim.startIntake();
+        else
+            m_intakeSim.stopIntake();
+
         m_intakeMotor.set(speed);
     }
 
     public Command setMotors(double speed) {
         return run(() -> spinIntakeMotor(speed));
-    }
-
-    public void stopIntakeMotor() {
-        spinIntakeMotor(0);
     }
 
     public double getAngle() {
@@ -149,7 +183,7 @@ public class AlgaeSubsystem extends SubsystemBase {
     }
 
     public void setTiltTarget(double setpoint) {
-        m_desiredTarget = Robot.isSimulation() ? Math.toRadians(setpoint) : setpoint;
+        m_desiredTarget = setpoint;
         SmartDashboard.putNumber("AlgaeTarget", m_desiredTarget);
     }
 

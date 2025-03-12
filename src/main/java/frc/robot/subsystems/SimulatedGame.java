@@ -9,22 +9,40 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.Robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 import org.littletonrobotics.junction.Logger;
 
 public class SimulatedGame extends SubsystemBase {
     private final ElevatorSubsystem m_elevatorSubsystem;
+    private final SwerveSubsystem m_swerveSubsystem;
     private final AlgaeSubsystem m_algaeSubsystem;
     private final CoralSubsystem m_coralSubsystem;
 
+    private IntakeSimulation m_coralIntakeSim;
+
     public SimulatedGame(ElevatorSubsystem elevatorSubsystem, AlgaeSubsystem algaeSubsystem,
-            CoralSubsystem coralSubsystem) {
+            CoralSubsystem coralSubsystem, SwerveSubsystem swerveSubsystem) {
         m_elevatorSubsystem = elevatorSubsystem;
+        m_swerveSubsystem = swerveSubsystem;
         m_algaeSubsystem = algaeSubsystem;
         m_coralSubsystem = coralSubsystem;
 
         if (!Robot.isSimulation())
             return;
+
+        /*
+         * m_coralIntakeSim = IntakeSimulation.OverTheBumperIntake(
+         * "Coral",
+         * m_swerveSubsystem.getLibSwerveDrive().getMapleSimDrive().get(),
+         * Meters.of(0.142976),
+         * Meters.of(0.493332),
+         * IntakeSide.FRONT,
+         * 1);
+         */
 
         SimulatedArena.getInstance().placeGamePiecesOnField();
 

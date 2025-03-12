@@ -80,17 +80,14 @@ public class LightSubsystem extends SubsystemBase {
         });
     }
 
-    public Command elevatorPattern() {
-        return run(() -> {
-            System.out.println("EAA");
-            LEDPattern base = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kBlue, Color.kRed);
-            LEDPattern mask = LEDPattern.progressMaskLayer(() -> m_elevator.getPosition() / 1.3);
-            m_evelatorPattern = base.mask(mask);
+    public void elevatorPattern() {
+        LEDPattern base = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kBlue, Color.kRed);
+        LEDPattern mask = LEDPattern.progressMaskLayer(() -> m_elevator.getPosition() / 1.3);
+        m_evelatorPattern = base.mask(mask);
 
-            m_evelatorPattern.applyTo(m_ledBuffer);
+        m_evelatorPattern.applyTo(m_ledBuffer);
 
-            m_led.setData(m_ledBuffer);
-        }).until(() -> m_elevator.atTarget());
+        m_led.setData(m_ledBuffer);
     }
 
     public Command increaseValor() {
@@ -117,5 +114,11 @@ public class LightSubsystem extends SubsystemBase {
 
         // Write the data to the LED strip
         m_led.setData(m_ledBuffer);
+    }
+
+    @Override
+    public void periodic() {
+        if (!m_elevator.atTarget())
+            elevatorPattern();
     }
 }

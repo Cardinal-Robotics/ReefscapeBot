@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.estimator.PoseEstimator;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -27,6 +29,7 @@ public class AlignAprilTag extends Command {
     private final VisionSubsystem m_visionSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
 
+    private Transform2d m_poseOffset = setOffsetPose(0, -0.5);
     private boolean m_finished = false;
     private double m_lastUpdated;
     private int m_targetId;
@@ -53,15 +56,28 @@ public class AlignAprilTag extends Command {
         m_targetId = target.get().getFiducialId();
     }
 
+    /**
+     * Think of a simple 2D graph where y is height and x is horizontal. To be away
+     * from and left of an AprilTag is like quadrant 3 (-,-)
+     * 
+     * @param x - Positive X goes past an AprilTag while negative X retreats
+     *          backwards from an AprilTag.
+     * @param y - Positive Y moves toward the right of an AprilTag and negative Y
+     *          goes to the left of an AprilTag.
+     */
+    public Transform2d setOffsetPose(double x, double y) {
+        return m_poseOffset = new Transform2d(y, -x, Rotation2d.kZero).inverse();
+    }
+
     @Override
     public void execute() {
         Optional<Pose2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
 
-        // If it has been more than half a second without seeing a target, stop moving.
+        // If it has been more than a second without seeing a target, stop moving.
         // This fixes issues when the AprilTag is physically out of view but the robot
         // is still set to keep moving forward. I'm praying the delay isn't that bad on
         // the real bot.
-        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 0.5) {
+        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
             m_finished = true;
             return;
@@ -70,12 +86,8 @@ public class AlignAprilTag extends Command {
         if (potentialPose.isEmpty())
             return;
 
-        // Positive X goes past an AprilTag, negative X goes away from an AprilTag.
-        // Positive Y is left of an AprilTag. Negative Y is right of an AprilTag.
-        Transform2d poseOffset = new Transform2d(-0.5, 0.5, Rotation2d.kZero);
-
         Pose2d pose = potentialPose.get()
-                .plus(poseOffset.inverse());
+                .plus(m_poseOffset);
 
         if (pose.getX() < 0.1 && pose.getY() < 0.1) {
             m_finished = true;
