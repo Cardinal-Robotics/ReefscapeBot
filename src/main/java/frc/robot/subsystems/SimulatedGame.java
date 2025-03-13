@@ -22,12 +22,12 @@ import java.util.List;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.ironmaple.utils.mathutils.GeometryConvertor;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
-import org.dyn4j.world.ContactCollisionData;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
 
@@ -41,10 +41,10 @@ public class SimulatedGame extends SubsystemBase {
             new Pose2d(16.7, 7.4, Rotation2d.kZero)
     };
     private ReefscapeCoralOnField[] m_coralSupplies = new ReefscapeCoralOnField[] {
-            new ReefscapeCoralOnField(m_coralSupplyPositions[0]),
-            new ReefscapeCoralOnField(m_coralSupplyPositions[1]),
-            new ReefscapeCoralOnField(m_coralSupplyPositions[2]),
-            new ReefscapeCoralOnField(m_coralSupplyPositions[3])
+            null,
+            null,
+            null,
+            null
     };
 
     private final SwerveDriveSimulation m_swerveSimulation;
@@ -55,6 +55,7 @@ public class SimulatedGame extends SubsystemBase {
 
     private IntakeSimulation m_algaeIntakeSim;
     private IntakeSimulation m_coralIntakeSim;
+    private SimulatedArena m_arena;
 
     public SimulatedGame(ElevatorSubsystem elevatorSubsystem, AlgaeSubsystem algaeSubsystem,
             CoralSubsystem coralSubsystem, SwerveSubsystem swerveSubsystem) {
@@ -83,26 +84,20 @@ public class SimulatedGame extends SubsystemBase {
                 IntakeSide.FRONT,
                 1);
 
-        SimulatedArena arena = SimulatedArena.getInstance();
-        arena.placeGamePiecesOnField();
-        for (ReefscapeCoralOnField coral : m_coralSupplies) {
+        m_arena = SimulatedArena.getInstance();
+        m_arena.placeGamePiecesOnField();
 
-            arena.addGamePiece(coral);
-        }
-    }
-
-    @Override
-    public void simulationPeriodic() {
         for (int i = 0; i < m_coralSupplies.length; i++) {
-            if (i == 0)
-                System.out.println(m_coralSupplies[i].getPose3d().getX());
-            if (m_coralSupplies[i].isEnabled())
+            if (m_coralSupplies[i] != null)
                 continue;
 
             m_coralSupplies[i] = new ReefscapeCoralOnField(m_coralSupplyPositions[i]);
             SimulatedArena.getInstance().addGamePiece(m_coralSupplies[i]);
         }
+    }
 
+    @Override
+    public void simulationPeriodic() {
         Pose3d[] elevatorPoses = m_elevatorSubsystem.getSimulatedElevatorPositions();
 
         Logger.recordOutput("ZeroedComponentPoses",
@@ -160,6 +155,16 @@ public class SimulatedGame extends SubsystemBase {
             coralGamePieces.add(new Pose3d(m_swerve.getPose()).plus(calculateStoredCoralPosition(elevatorPoses)));
         }
 
+        for (int i = 0; i < m_coralSupplies.length; i++) {
+            m_coralSupplies[i].setTransform(GeometryConvertor.toDyn4jTransform(m_coralSupplyPositions[i]));
+            if (m_coralSupplies[i].getOwner() != null)
+                continue;
+
+            m_coralSupplies[i] = new ReefscapeCoralOnField(m_coralSupplyPositions[i]);
+            m_arena.addGamePiece(m_coralSupplies[i]);
+
+        }
+
         Logger.recordOutput("FieldSimulation/Algae", algaeGamePieces.toArray(Pose3d[]::new));
         Logger.recordOutput("FieldSimulation/Coral", coralGamePieces.toArray(Pose3d[]::new));
     }
@@ -170,8 +175,8 @@ public class SimulatedGame extends SubsystemBase {
                 0,
                 elevatorPoses[1].getZ() + 0.365
                         + (Math.sin(Math.toRadians(90 + m_coralSubsystem.getAngle())) * (0.493332 + 0.0)),
-                new Rotation3d(0, Math.toRadians(-m_coralSubsystem.getAngle() - 36), 0));
-        Transform3d coralOffset = new Transform3d(-0.4, -0.01875, -0.05, Rotation3d.kZero);
+                new Rotation3d(0, Math.toRadians(-m_coralSubsystem.getAngle() - 22), 0));
+        Transform3d coralOffset = new Transform3d(-0.5, -0.01875, -0.2, Rotation3d.kZero);
         return coralPosition.plus(coralOffset);
     }
 
@@ -198,6 +203,6 @@ public class SimulatedGame extends SubsystemBase {
                 m_swerveSimulation.getSimulatedDriveTrainPose().getRotation(),
                 Meters.of(storedCoralPosition.getZ()),
                 MetersPerSecond.of(5),
-                Degrees.of(-(-m_coralSubsystem.getAngle() - 36))));
+                Degrees.of(-(-m_coralSubsystem.getAngle() - 22))));
     }
 }
