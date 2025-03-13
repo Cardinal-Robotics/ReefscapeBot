@@ -9,6 +9,12 @@
           "data": {
             "pathName": "forward top"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralIntake"
+          }
         }
       ]
     }

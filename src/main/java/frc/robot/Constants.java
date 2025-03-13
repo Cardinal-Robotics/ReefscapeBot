@@ -44,14 +44,14 @@ public final class Constants {
         public static final Pose2d kInitialRedRobotPose = new Pose2d(10.079, 0.595, Rotation2d.kZero);
 
         // PID values for translation (moving).
-        public static final double kPTrans = 0.0022445;
+        public static final double kPTrans = 5;
         public static final double kITrans = 0;
-        public static final double kDTrans = 0.35005;
+        public static final double kDTrans = 0;// 0.35005;
 
         // PID values for rotating.
-        public static final double kPAngular = 0.01;
+        public static final double kPAngular = 5;
         public static final double kIAngular = 0;
-        public static final double kDAngular = 0.003225;
+        public static final double kDAngular = 0;
 
         public static final int kFrontLeftDriveMotorPort = 2;
         public static final int kRearLeftDriveMotorPort = 5;
@@ -192,11 +192,11 @@ public final class Constants {
 
         public static final double kAllowedSetpointError = 3;
 
+        public static final double kTargetAngleIntake = -160;
+        public static final double kTargetAngleStore = -80;
         public static final double kTargetAngleL1 = -59; // down
         public static final double kTargetAngleL2_3 = -58; // left
         public static final double kTargetAngleL4 = -45; // up
-        public static final double kCoralStore = -80;
 
-        public static final double kIntakePosition = -160; // needs to be changed, estimate
     }
 }

@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -190,5 +191,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_setpoint = new TrapezoidProfile.State(target, 0);
         SmartDashboard.putNumber("ElevatorHeight", target);
         m_master.getClosedLoopController().setReference(target, ControlType.kPosition);
+    }
+
+    public Command setElevatorGoalCommand(ElevatorTarget goal) {
+        return run(() -> setElevatorGoal(goal)).until(() -> atTarget());
     }
 }

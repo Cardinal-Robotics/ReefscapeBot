@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -62,7 +63,7 @@ public class RobotContainer {
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
-    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem, m_swerveDrive);
+    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem);
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
     private final LightSubsystem m_lightSubsystem = new LightSubsystem(m_elevatorSubsystem);
     // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
@@ -124,43 +125,33 @@ public class RobotContainer {
 
     private void registerNamedCommands() {
         // AprilTag Alignment
-        NamedCommands.registerCommand("AprilTagAlign",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive));
+        NamedCommands.registerCommand("AprilTagAlignRight",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
+        NamedCommands.registerCommand("AprilTagAlignLeft",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
 
         // Elevator positions
-        NamedCommands.registerCommand("ElevatorCoralIntake", Commands
-                .runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake), m_elevatorSubsystem));
-        NamedCommands.registerCommand("ElevatorCoralL1",
-                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1), m_elevatorSubsystem));
-        NamedCommands.registerCommand("ElevatorCoralL2",
-                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2), m_elevatorSubsystem));
-        NamedCommands.registerCommand("ElevatorCoralL3",
-                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3), m_elevatorSubsystem));
-        NamedCommands.registerCommand("ElevatorCoralL4",
-                Commands.runOnce(() -> m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4), m_elevatorSubsystem));
+        NamedCommands.registerCommand("ElevatorCoralIntake",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.CoralIntake));
+        NamedCommands.registerCommand("ElevatorCoralL1", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L1));
+        NamedCommands.registerCommand("ElevatorCoralL2", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L2));
+        NamedCommands.registerCommand("ElevatorCoralL3", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L3));
+        NamedCommands.registerCommand("ElevatorCoralL4", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L4));
 
         // Coral mechanism
-        NamedCommands.registerCommand("CoralTiltIntake", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kIntakePosition), m_coralSubsystem)
-                .until(() -> m_coralSubsystem.atTarget()));
-        NamedCommands.registerCommand("CoralTiltIdle", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kCoralStore), m_coralSubsystem)
-                .until(() -> m_coralSubsystem.atTarget()));
-        NamedCommands.registerCommand("CoralTiltL1", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1), m_coralSubsystem)
-                .until(() -> m_coralSubsystem.atTarget()));
-        NamedCommands.registerCommand("CoralTiltL2-L3", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3), m_coralSubsystem)
-                .until(() -> m_coralSubsystem.atTarget()));
-        NamedCommands.registerCommand("CoralTiltL4", Commands
-                .runOnce(() -> m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4), m_coralSubsystem)
-                .until(() -> m_coralSubsystem.atTarget()));
-        NamedCommands.registerCommand("CoralRelease", Commands
-                .runOnce(() -> m_coralSubsystem.spinIntakeMotor(0.2), m_coralSubsystem)
-                .until(() -> m_coralSubsystem.atTarget()));
-        NamedCommands.registerCommand("CoralStopRelease", Commands
-                .runOnce(() -> m_coralSubsystem.spinIntakeMotor(0), m_coralSubsystem)
-                .until(() -> m_coralSubsystem.atTarget()));
+        NamedCommands.registerCommand("CoralTiltIntake",
+                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleIntake));
+        NamedCommands.registerCommand("CoralTiltStore",
+                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore));
+        NamedCommands.registerCommand("CoralTiltL1",
+                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL1));
+        NamedCommands.registerCommand("CoralTiltL2-L3",
+                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL2_3));
+        NamedCommands.registerCommand("CoralTiltL4",
+                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL4));
+
+        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-0.2, 2));
+        NamedCommands.registerCommand("CoralIntake", m_coralSubsystem.setIntakeMotorCommand(0.2, 1));
     }
 
     private void configureBindings() {
@@ -204,7 +195,7 @@ public class RobotContainer {
         m_operatorController.rightStick()
                 .onTrue(Commands.runOnce(() -> {
                     interactionState = InteractionState.Algae;
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kCoralStore);
+                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleStore);
                 }));
 
         m_operatorController.leftStick()
@@ -215,11 +206,11 @@ public class RobotContainer {
 
         // Coral Controls
         m_operatorController.rightBumper()
-                .onTrue(m_coralSubsystem.setMotors(1))
-                .onFalse(m_coralSubsystem.setMotors(0));
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(1))
+                .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
         m_operatorController.leftBumper()
-                .onTrue(m_coralSubsystem.setMotors(-1))
-                .onFalse(m_coralSubsystem.setMotors(0));
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-1))
+                .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
 
         // Algae Controls
         m_operatorController.rightTrigger()
@@ -234,7 +225,7 @@ public class RobotContainer {
                 .onTrue(Commands.runOnce(() -> {
                     m_lightSubsystem.elevatorPattern();
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kIntakePosition);
+                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleIntake);
                 }, m_elevatorSubsystem));
         m_operatorController.a()
                 .onTrue(Commands.runOnce(() -> {
@@ -260,7 +251,6 @@ public class RobotContainer {
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
                     m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
                 }, m_elevatorSubsystem));
-
     }
 
     public Command getAutonomousCommand() {

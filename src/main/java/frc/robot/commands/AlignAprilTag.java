@@ -34,6 +34,12 @@ public class AlignAprilTag extends Command {
     private double m_lastUpdated;
     private int m_targetId;
 
+    public AlignAprilTag(VisionSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem, double offsetX,
+            double offsetY) {
+        this(visionSubsystem, swerveSubsystem);
+        setOffsetPose(offsetX, offsetY);
+    }
+
     public AlignAprilTag(VisionSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem) {
         m_visionSubsystem = visionSubsystem;
         m_swerveSubsystem = swerveSubsystem;

@@ -19,7 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AprilTagAlignBottomLeft"
+            "name": "AprilTagAlignLeft"
           }
         },
         {
@@ -29,13 +29,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ElevatorCoralL4"
+                  "name": "ElevatorCoralL3"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "CoralTiltL4"
+                  "name": "CoralTiltL2-L3"
                 }
               }
             ]
@@ -50,13 +50,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CoralStopRelease"
+            "waitTime": 1.0
           }
         }
       ]
