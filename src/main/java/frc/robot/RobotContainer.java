@@ -206,10 +206,10 @@ public class RobotContainer {
 
         // Coral Controls
         m_operatorController.rightBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(1))
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-1))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
         m_operatorController.leftBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-1))
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(1))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
 
         // Algae Controls
@@ -222,35 +222,45 @@ public class RobotContainer {
 
         // Elevator Positions
         m_operatorController.button(7)
-                .onTrue(Commands.runOnce(() -> {
-                    m_lightSubsystem.elevatorPattern();
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleIntake);
-                }, m_elevatorSubsystem));
+                .onTrue(
+                        m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore)
+                                .alongWith(m_algaeSubsystem
+                                        .setTiltTargetCommand(AlgaeMechanismConstants.kTargetDisabledAngle))
+                                .andThen(m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.CoralIntake))
+                                .andThen(
+                                        m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleIntake)));
         m_operatorController.a()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1, ElevatorTarget.AlgaeScore);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetGroundIntakeAngle);
-                }, m_elevatorSubsystem));
+                .onTrue(
+                        m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore)
+                                .andThen(Commands.runOnce(() -> {
+                                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1, ElevatorTarget.AlgaeScore);
+                                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1);
+                                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetGroundIntakeAngle);
+                                })));
         m_operatorController.x()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
-                }, m_elevatorSubsystem));
+                .onTrue(
+                        m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore).andThen(
+                                Commands.runOnce(() -> {
+                                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2);
+                                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
+                                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
+                                })));
         m_operatorController.b()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
-                }, m_elevatorSubsystem));
+                .onTrue(
+                        m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore)
+                                .andThen(Commands.runOnce(() -> {
+                                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3);
+                                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
+                                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
+                                })));
         m_operatorController.y()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4, ElevatorTarget.AlgaeScore);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
-                }, m_elevatorSubsystem));
+                .onTrue(
+                        m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore)
+                                .andThen(Commands.runOnce(() -> {
+                                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4, ElevatorTarget.AlgaeScore);
+                                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
+                                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
+                                })));
     }
 
     public Command getAutonomousCommand() {

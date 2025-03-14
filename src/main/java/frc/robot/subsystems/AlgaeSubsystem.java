@@ -150,10 +150,14 @@ public class AlgaeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AlgaeTarget", m_desiredTarget);
     }
 
+    public Command setTiltTargetCommand(double setpoint) {
+        return run(() -> setTiltTarget(setpoint)).until(() -> isTiltMotorAtGoal(setpoint));
+    }
+
     public boolean isTiltMotorAtGoal(double target) {
         double currentPosition = getAngle();
         double error = Math.abs(target - currentPosition);
-        return error <= 0.2; // Returns true if within the tolerance range
+        return error <= 3; // Returns true if within the tolerance range
     }
 
     public boolean isTiltMotorAtGoal() {

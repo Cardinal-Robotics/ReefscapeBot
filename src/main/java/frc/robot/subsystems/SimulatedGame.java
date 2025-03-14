@@ -81,7 +81,7 @@ public class SimulatedGame extends SubsystemBase {
 
     public SimulatedGame(ElevatorSubsystem elevatorSubsystem, AlgaeSubsystem algaeSubsystem,
             CoralSubsystem coralSubsystem, SwerveSubsystem swerveSubsystem) {
-        m_swerveSimulation = swerveSubsystem.getLibSwerveDrive().getMapleSimDrive().get();
+        m_swerveSimulation = swerveSubsystem.getLibSwerveDrive().getMapleSimDrive().orElse(null);
         m_elevatorSubsystem = elevatorSubsystem;
         m_algaeSubsystem = algaeSubsystem;
         m_coralSubsystem = coralSubsystem;

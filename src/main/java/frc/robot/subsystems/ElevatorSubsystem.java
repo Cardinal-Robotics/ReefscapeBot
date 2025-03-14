@@ -196,4 +196,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command setElevatorGoalCommand(ElevatorTarget goal) {
         return run(() -> setElevatorGoal(goal)).until(() -> atTarget());
     }
+
+    public Command setElevatorGoalCommand(ElevatorTarget goal, InteractionState state) {
+        return run(() -> setElevatorGoal(goal, state)).until(() -> atTarget());
+    }
+
+    public Command setElevatorGoalCommand(ElevatorTarget targetIfCoral, ElevatorTarget targetIfAlgae) {
+        return run(() -> setElevatorGoal(targetIfCoral, targetIfAlgae)).until(() -> atTarget());
+    }
 }
