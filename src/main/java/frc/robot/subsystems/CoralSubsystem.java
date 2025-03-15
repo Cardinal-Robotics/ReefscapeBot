@@ -87,6 +87,10 @@ public class CoralSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
+        SmartDashboard.putNumber("Coral voltage error",
+                (m_intakeMotor.get() * m_intakeMotor.getBusVoltage()) - (m_intakeMotor.getMotorOutputVoltage()));
+
         if (m_elevator.getPosition() < m_elevator.getTarget() + .1
                 && m_elevator.getPosition() > m_elevator.getTarget() - .1)
             m_safetyTarget = m_desiredTarget;
@@ -177,7 +181,11 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public boolean atTarget() {
-        return Math.abs(m_desiredTarget - getAngle()) < CoralMechanismConstants.kAllowedSetpointError;
+        return atTarget(m_desiredTarget);
+    }
+
+    public boolean atTarget(double target) {
+        return Math.abs(target - getAngle()) < CoralMechanismConstants.kAllowedSetpointError;
     }
 
     public void setTarget(double target) {

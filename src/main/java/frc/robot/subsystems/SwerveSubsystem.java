@@ -32,6 +32,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.Matrix;
 
+import org.littletonrobotics.junction.Logger;
+
 import org.photonvision.EstimatedRobotPose;
 
 import frc.robot.Constants.DriveConstants;
@@ -39,8 +41,6 @@ import frc.robot.Constants.DriveConstants;
 import java.util.function.Supplier;
 
 public class SwerveSubsystem extends SubsystemBase {
-    StructPublisher<Pose2d> m_publisher = NetworkTableInstance.getDefault()
-            .getStructTopic("YAGSL Pose", Pose2d.struct).publish();
     private SwerveDrive m_swerveDrive;
 
     public SwerveSubsystem() {
@@ -54,17 +54,16 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         m_swerveDrive.setChassisDiscretization(true, 0.02);
+        m_swerveDrive.field.setRobotPose(getInitialPose());
         m_swerveDrive.setHeadingCorrection(true);
         m_swerveDrive.resetOdometry(getInitialPose());
-        m_swerveDrive.field.setRobotPose(getInitialPose());
-        m_publisher.set(m_swerveDrive.getPose());
 
         setupPathPlanner();
     }
 
     @Override
     public void periodic() {
-        this.m_publisher.set(m_swerveDrive.getPose());
+        Logger.recordOutput("YAGSL Pose", m_swerveDrive.getPose());
     }
 
     private Pose2d getInitialPose() {
