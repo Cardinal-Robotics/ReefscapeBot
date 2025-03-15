@@ -59,7 +59,7 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
+    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem(null);
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
@@ -107,6 +107,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
+        m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
 
         registerNamedCommands();
         configureBindings();
@@ -206,19 +207,19 @@ public class RobotContainer {
 
         // Coral Controls
         m_operatorController.rightBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(1))
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(0.2))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
         m_operatorController.leftBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-1))
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-0.2))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
 
         // Algae Controls
         m_operatorController.rightTrigger()
-                .onTrue(m_algaeSubsystem.setMotors(-1))
-                .onFalse(m_algaeSubsystem.setMotors(0));
+                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(-1))
+                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0));
         m_operatorController.leftTrigger()
-                .onTrue(m_algaeSubsystem.setMotors(1))
-                .onFalse(m_algaeSubsystem.setMotors(0));
+                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(1))
+                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0));
 
         // Elevator Positions
         m_operatorController.button(7)
@@ -226,31 +227,35 @@ public class RobotContainer {
                     m_lightSubsystem.elevatorPattern();
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleIntake);
-                }, m_elevatorSubsystem));
+                }));
+
         m_operatorController.a()
                 .onTrue(Commands.runOnce(() -> {
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1, ElevatorTarget.AlgaeScore);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1);
                     m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetGroundIntakeAngle);
-                }, m_elevatorSubsystem));
+                }));
+
         m_operatorController.x()
                 .onTrue(Commands.runOnce(() -> {
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
                     m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
-                }, m_elevatorSubsystem));
+                }));
+
         m_operatorController.b()
                 .onTrue(Commands.runOnce(() -> {
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
                     m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
-                }, m_elevatorSubsystem));
+                }));
+
         m_operatorController.y()
                 .onTrue(Commands.runOnce(() -> {
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4, ElevatorTarget.AlgaeScore);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
                     m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
-                }, m_elevatorSubsystem));
+                }));
     }
 
     public Command getAutonomousCommand() {

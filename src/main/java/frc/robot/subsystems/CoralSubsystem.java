@@ -56,8 +56,7 @@ public class CoralSubsystem extends SubsystemBase {
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
         pivotConfig.idleMode(IdleMode.kBrake);
-        pivotConfig.encoder.positionConversionFactor(Robot.isReal() ? 30 : 60); // Converts rotations into
-        // degrees.
+        pivotConfig.encoder.positionConversionFactor(Robot.isReal() ? 30 : 60); // Converts rotations into degrees.
         pivotConfig.closedLoop.pid(CoralMechanismConstants.kCoralKp,
                 CoralMechanismConstants.kCoralKi, CoralMechanismConstants.kCoralKd)
                 .outputRange(-.1, .1);
@@ -85,8 +84,7 @@ public class CoralSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
         SmartDashboard.putNumber("Coral voltage error",
-                m_intakeMotor.getMotorOutputVoltage()
-                        - (m_intakeMotor.getMotorOutputPercent() * m_intakeMotor.getBusVoltage()));
+                (m_intakeMotor.get() * m_intakeMotor.getBusVoltage()) - (m_intakeMotor.getMotorOutputVoltage()));
 
         if (m_elevator.getPosition() < m_elevator.getTarget() + .1
                 && m_elevator.getPosition() > m_elevator.getTarget() - .1)
@@ -174,7 +172,11 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public boolean atTarget() {
-        return Math.abs(m_desiredTarget - getAngle()) > CoralMechanismConstants.kAllowedSetpointError;
+        return atTarget(m_desiredTarget);
+    }
+
+    public boolean atTarget(double target) {
+        return Math.abs(target - getAngle()) < CoralMechanismConstants.kAllowedSetpointError;
     }
 
     public void setTarget(double target) {

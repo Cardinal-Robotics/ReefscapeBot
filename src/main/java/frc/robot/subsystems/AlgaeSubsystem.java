@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
@@ -21,9 +20,10 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.RobotController;
@@ -137,8 +137,14 @@ public class AlgaeSubsystem extends SubsystemBase {
         m_intakeMotor.set(speed);
     }
 
-    public Command setMotors(double speed) {
+    public Command spinIntakeMotorCommand(double speed) {
         return run(() -> spinIntakeMotor(speed));
+    }
+
+    public Command spinIntakeMotorCommand(double speed, double duration) {
+        return spinIntakeMotorCommand(speed)
+                .andThen(new WaitCommand(duration))
+                .andThen(spinIntakeMotorCommand(0));
     }
 
     public double getAngle() {
