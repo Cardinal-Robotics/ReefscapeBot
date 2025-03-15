@@ -10,8 +10,10 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
@@ -36,6 +38,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 
+import java.util.function.Consumer;
+
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -43,19 +47,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     // DO NOT CHANGE TO FOLLOWER
     private final SparkMax m_slave = new SparkMax(ElevatorConstants.kSlaveMotorId, MotorType.kBrushless);
     private final RelativeEncoder m_encoder = m_master.getEncoder();
+    private Consumer<Double> m_scaleDriverInputConsumer = null;
     private CoralSubsystem m_coralSubsystem = null;
 
     // Feedforward stuff (if needed)
 
-    /*
-     * private final TrapezoidProfile m_profile = new TrapezoidProfile(new
-     * TrapezoidProfile.Constraints(1.75, 0.75));
-     * private final ElevatorFeedforward m_elevatorFeedforward = new
-     * ElevatorFeedforward(
-     * ElevatorConstants.kElevatorKs,
-     * ElevatorConstants.kElevatorKg,
-     * ElevatorConstants.kElevatorKv);
-     */
+    private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(1.75, 0.75));
 
     private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -67,7 +64,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public boolean atTarget() {
-        return (getPosition() < getTarget() + .1) && (getPosition() > getTarget() - .1);
+        /*
+         * if (getTarget() == 0 && getPosition() > 0.001)
+         * return false;
+         */
+        return (getPosition() < getTarget() + .05) && (getPosition() > getTarget() - .05);
     }
 
     @Override
@@ -75,9 +76,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("master motor output %", m_master.getAppliedOutput());
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
 
+        if (m_scaleDriverInputConsumer != null)
+            m_scaleDriverInputConsumer.accept(0.8 * Math.max((1 - (getPosition() / 1.3)), 0.1));
+
         double targetPosition = m_setpoint.position;
 
-        if (m_coralSubsystem == null || !m_coralSubsystem.atTarget(CoralMechanismConstants.kTargetAngleStore))
+        if (m_coralSubsystem == null || ((m_coralSubsystem.getAngle() < 35) && (!m_coralSubsystem.atTarget())))
             targetPosition = getPosition();
 
         if (DriverStation.isDisabled())
@@ -92,7 +96,8 @@ public class ElevatorSubsystem extends SubsystemBase {
          * targetPosition = getPosition();
          */
 
-        m_master.getClosedLoopController().setReference(targetPosition, ControlType.kPosition);
+        m_master.getClosedLoopController().setReference(targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0,
+                Robot.isSimulation() ? 0 : ElevatorConstants.kElevatorFF, ArbFFUnits.kPercentOut);
 
         /*
          * m_setpoint = m_profile.calculate(0.02,
@@ -134,8 +139,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         };
     }
 
-    public ElevatorSubsystem(CoralSubsystem coralSubsystem) {
+    public ElevatorSubsystem(CoralSubsystem coralSubsystem, Consumer<Double> scaleDriverInputConsumer) {
+        SmartDashboard.putNumber("ElevatorFF %", 0);
         SmartDashboard.putNumber("ElevatorHeight", 0);
+        m_scaleDriverInputConsumer = scaleDriverInputConsumer;
         SparkMaxConfig masterConfig = new SparkMaxConfig();
         masterConfig.idleMode(IdleMode.kCoast);
         m_coralSubsystem = coralSubsystem;
@@ -181,6 +188,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     // Getters & setters
     public void setCoralSubsystem(CoralSubsystem coralSubsystem) {
         this.m_coralSubsystem = coralSubsystem;
+    }
+
+    public void setScaleDriverInputConsumer(Consumer<Double> scaleDriverInputConsumer) {
+        this.m_scaleDriverInputConsumer = scaleDriverInputConsumer;
     }
 
     public double getPosition() {

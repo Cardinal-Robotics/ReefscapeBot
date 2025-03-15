@@ -38,6 +38,7 @@ import org.photonvision.EstimatedRobotPose;
 
 import frc.robot.Constants.DriveConstants;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -84,7 +85,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetGyro() {
-        this.m_swerveDrive.setGyro(Rotation3d.kZero);
+        this.m_swerveDrive.zeroGyro();
     }
 
     public Rotation2d getRotation() {

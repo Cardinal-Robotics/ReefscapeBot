@@ -59,7 +59,7 @@ public class RobotContainer {
     //
     // Subsystems
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem(null);
+    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem(null, null);
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
@@ -90,6 +90,7 @@ public class RobotContainer {
                                                    // to register. This way slight micro-movements doesn't suddenly move
                                                    // the robot.
             .scaleTranslation(0.8) // If the joystick goes to 100%, this scales it down to 80%.
+            .scaleRotation(0.8)
             .allianceRelativeControl(true); // Field orientation flips to be on the your team's side.
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -108,6 +109,10 @@ public class RobotContainer {
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
         m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
+        m_elevatorSubsystem.setScaleDriverInputConsumer((Double scale) -> {
+            m_driveInputStream.scaleTranslation(scale);
+            m_driveInputStream.scaleRotation(scale);
+        });
 
         registerNamedCommands();
         configureBindings();
@@ -207,10 +212,10 @@ public class RobotContainer {
 
         // Coral Controls
         m_operatorController.rightBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(0.2))
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(0.5))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
         m_operatorController.leftBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-0.2))
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-0.5))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
 
         // Algae Controls

@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -59,12 +60,15 @@ public class CoralSubsystem extends SubsystemBase {
         pivotConfig.idleMode(IdleMode.kBrake);
         pivotConfig.encoder.positionConversionFactor(Robot.isReal() ? 30 : 60); // Converts rotations into degrees.
         pivotConfig.encoder.velocityConversionFactor(0.5);
+        pivotConfig.inverted(true);
 
         pivotConfig.closedLoop.maxMotion.maxVelocity(30);
-        pivotConfig.closedLoop.maxMotion.maxAcceleration(5);
+        pivotConfig.closedLoop.maxMotion.maxAcceleration(10);
+        pivotConfig.closedLoop.maxMotion.positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal);
+
         pivotConfig.closedLoop.pid(CoralMechanismConstants.kCoralKp,
-                CoralMechanismConstants.kCoralKi, CoralMechanismConstants.kCoralKd);
-        // .outputRange(-.1, .1);
+                CoralMechanismConstants.kCoralKi, CoralMechanismConstants.kCoralKd)
+                .outputRange(-.1, .25);
 
         m_pivotMotor.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -79,20 +83,21 @@ public class CoralSubsystem extends SubsystemBase {
                 15,
                 SingleJointedArmSim.estimateMOI(0.5, 10),
                 0.5,
-                Math.toRadians(-360),
                 Math.toRadians(0),
+                Math.toRadians(180),
                 false,
                 0, 0, 0);
     }
 
     @Override
     public void periodic() {
+        setTarget(SmartDashboard.getNumber("CoralTilt", m_desiredTarget));
+
         SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
         SmartDashboard.putNumber("Coral voltage error",
                 (m_intakeMotor.get() * m_intakeMotor.getBusVoltage()) - (m_intakeMotor.getMotorOutputVoltage()));
 
-        if (m_elevator.getPosition() < m_elevator.getTarget() + .1
-                && m_elevator.getPosition() > m_elevator.getTarget() - .1)
+        if (m_elevator.atTarget())
             m_safetyTarget = m_desiredTarget;
         else
             m_safetyTarget = CoralMechanismConstants.kTargetAngleStore;
@@ -101,15 +106,15 @@ public class CoralSubsystem extends SubsystemBase {
                 : CoralMechanismConstants.kTargetAngleStore;
 
         double currentAngle = getAngle();
-        double feedforward = 0.07 * Math.cos(Math.toRadians(currentAngle + 90));
+        double feedforward = -0.065 * Math.cos(Math.toRadians(currentAngle - 90));
         SmartDashboard.putNumber("CORAL pos", getAngle());
         SmartDashboard.putNumber("CORAL vel", m_pivotEncoder.getVelocity());
 
-        m_pivotMotor.set(feedforward);
+        // m_pivotMotor.set(feedforward);
 
         m_pivotMotor.getClosedLoopController().setReference(
                 Robot.isSimulation() ? Math.toRadians(m_safetyTarget) : m_safetyTarget,
-                ControlType.kMAXMotionPositionControl,
+                ControlType.kPosition,
                 ClosedLoopSlot.kSlot0,
                 Robot.isSimulation() ? 0 : feedforward, ArbFFUnits.kPercentOut);
     }
