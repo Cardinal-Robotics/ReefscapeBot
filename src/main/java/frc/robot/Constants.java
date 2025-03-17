@@ -112,7 +112,7 @@ public final class Constants {
         public static final double kElevatorD = 0;
 
         public enum ElevatorTarget {
-            CoralIntake(Double.NaN, -.03),
+            CoralIntake(Double.NaN, -.02),
             AlgaeScore(0.32, Double.NaN),
             L1(Double.NaN, 0.125),
             L2(0.88, 0.23),
@@ -188,7 +188,7 @@ public final class Constants {
 
         public static final double kAllowedSetpointError = 3;
 
-        public static final double kTargetAngleIntake = 2;
+        public static final double kTargetAngleIntake = 0;
         public static final double kTargetAngleStore = 50;
         public static final double kTargetAngleL1 = 59; // down
         public static final double kTargetAngleL2_3 = 37; // left

@@ -31,7 +31,7 @@ public class Robot extends LoggedRobot {
     public Robot() {
         Logger.recordMetadata("Reefscape", "CatfishWaves"); // Set a metadata value
 
-        if (isSimulation()) {
+        if (true) {
             Logger.addDataReceiver(new NT4Publisher());
             Logger.start();
         }

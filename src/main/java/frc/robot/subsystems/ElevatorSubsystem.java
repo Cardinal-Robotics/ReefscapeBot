@@ -64,10 +64,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public boolean atTarget() {
-        /*
-         * if (getTarget() == 0 && getPosition() > 0.001)
-         * return false;
-         */
+        if (getTarget() < 0.02)
+            return (getPosition() < getTarget() + .03) && (getPosition() > getTarget() - .03);
+
         return (getPosition() < getTarget() + .05) && (getPosition() > getTarget() - .05);
     }
 
@@ -215,7 +214,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double target = RobotContainer.interactionState == InteractionState.Coral ? goal.getCoralPosition()
                 : goal.getAlgaePosition();
 
-        if (target == Double.NaN)
+        if (Double.isNaN(target))
             target = m_setpoint.position;
 
         m_setpoint = new TrapezoidProfile.State(target, 0);

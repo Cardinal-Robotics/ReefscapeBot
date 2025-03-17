@@ -92,6 +92,7 @@ public class CoralSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         setTarget(SmartDashboard.getNumber("CoralTilt", m_desiredTarget));
+        SmartDashboard.putBoolean("atTarget Coral", atTarget());
 
         SmartDashboard.putNumber("CoralSubsystem::getAngle", getAngle());
         SmartDashboard.putNumber("Coral voltage error",
