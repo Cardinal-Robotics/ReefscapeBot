@@ -62,10 +62,12 @@ public class RobotContainer {
     private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem(null, null);
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
-    private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
+    // private final VisionSubsystem m_visionSubsystem = new
+    // VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
     private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem);
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
-    private final LightSubsystem m_lightSubsystem = new LightSubsystem(m_elevatorSubsystem);
+    // private final LightSubsystem m_lightSubsystem = new
+    // LightSubsystem(m_elevatorSubsystem);
     // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
     private final DriverCameras m_driverCameras = new DriverCameras();
 
@@ -102,7 +104,8 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive);
+    // private final AlignAprilTag m_alignAprilTag = new
+    // AlignAprilTag(m_visionSubsystem, m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -123,18 +126,22 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
 
         // m_coralsubsystem.setDefaultCommand(m_coralCommand);
-        m_lightSubsystem.setDefaultCommand(
-                DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
-                        ? m_lightSubsystem.setConstantColor(253, 11, 205)
-                        : m_lightSubsystem.setConstantColor(0, 0, 255));
+        /*
+         * m_lightSubsystem.setDefaultCommand(
+         * DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
+         * ? m_lightSubsystem.setConstantColor(253, 11, 205)
+         * : m_lightSubsystem.setConstantColor(0, 0, 255));
+         */
     }
 
     private void registerNamedCommands() {
         // AprilTag Alignment
-        NamedCommands.registerCommand("AprilTagAlignRight",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
-        NamedCommands.registerCommand("AprilTagAlignLeft",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
+        /*
+         * NamedCommands.registerCommand("AprilTagAlignRight",
+         * new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
+         * NamedCommands.registerCommand("AprilTagAlignLeft",
+         * new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
+         */
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake",
@@ -163,11 +170,16 @@ public class RobotContainer {
     private void configureBindings() {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
-        m_driverController.a().whileTrue(m_alignAprilTag);
-
-        m_driverController.povRight().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0.15, -0.5)));
-        m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(-0.2, -0.5)));
-        m_driverController.povUp().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0, -0.5)));
+        /*
+         * m_driverController.a().whileTrue(m_alignAprilTag);
+         * 
+         * m_driverController.povRight().onTrue(Commands.runOnce(() ->
+         * m_alignAprilTag.setOffsetPose(0.15, -0.5)));
+         * m_driverController.povLeft().onTrue(Commands.runOnce(() ->
+         * m_alignAprilTag.setOffsetPose(-0.2, -0.5)));
+         * m_driverController.povUp().onTrue(Commands.runOnce(() ->
+         * m_alignAprilTag.setOffsetPose(0, -0.5)));
+         */
 
         /*
          * m_driverController.x()
@@ -211,28 +223,31 @@ public class RobotContainer {
                 }));
 
         // Coral Controls
-        m_operatorController.rightBumper()
+        m_operatorController.leftBumper()
                 .onTrue(m_coralSubsystem.setIntakeMotorCommand(0.5))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
-        m_operatorController.leftBumper()
+        m_operatorController.rightBumper()
                 .onTrue(m_coralSubsystem.setIntakeMotorCommand(-0.5))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
 
         // Algae Controls
-        m_operatorController.rightTrigger()
-                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(-1))
-                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0));
         m_operatorController.leftTrigger()
+                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(-1))
+                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(-0.1));
+        m_operatorController.rightTrigger()
                 .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(1))
                 .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0));
 
         // Elevator Positions
         m_operatorController.button(7)
                 .onTrue(Commands.runOnce(() -> {
-                    m_lightSubsystem.elevatorPattern();
+                    // m_lightSubsystem.elevatorPattern();
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleIntake);
                 }));
+
+        m_operatorController.button(8).and(() -> m_elevatorSubsystem.getPosition() < 0.1)
+                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.resetEncoder()));
 
         m_operatorController.a()
                 .onTrue(Commands.runOnce(() -> {

@@ -186,6 +186,10 @@ public class CoralSubsystem extends SubsystemBase {
         m_intakeMotor.set(speed);
     }
 
+    public boolean atSafetyTarget() {
+        return atTarget(m_safetyTarget);
+    }
+
     public boolean atTarget() {
         return atTarget(m_desiredTarget);
     }

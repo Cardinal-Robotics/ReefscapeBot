@@ -80,8 +80,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         double targetPosition = m_setpoint.position;
 
-        if (m_coralSubsystem == null || ((m_coralSubsystem.getAngle() < 35) && (!m_coralSubsystem.atTarget())))
+        if (m_coralSubsystem == null || ((m_coralSubsystem.getAngle() < 35) && (!atTarget())))
             targetPosition = getPosition();
+
+        /*
+         * boolean atDangerousHeightForCoral = getPosition() < 0.016751348972320557;
+         * if (m_coralSubsystem == null || ((m_coralSubsystem.getAngle() < 35) &&
+         * atDangerousHeightForCoral))
+         * targetPosition = getPosition();
+         */
 
         if (DriverStation.isDisabled())
             m_setpoint = new TrapezoidProfile.State(getPosition(), 0);
@@ -121,6 +128,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         RoboRioSim.setVInVoltage(
                 BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+    }
+
+    public void resetEncoder() {
+        m_encoder.setPosition(0);
     }
 
     /**

@@ -144,7 +144,7 @@ public class AlgaeSubsystem extends SubsystemBase {
     public Command spinIntakeMotorCommand(double speed, double duration) {
         return spinIntakeMotorCommand(speed)
                 .andThen(new WaitCommand(duration))
-                .andThen(spinIntakeMotorCommand(0));
+                .andThen(spinIntakeMotorCommand(-.1));
     }
 
     public double getAngle() {
