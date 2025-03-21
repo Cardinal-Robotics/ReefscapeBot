@@ -37,6 +37,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Robot;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public class CoralSubsystem extends SubsystemBase {
     private final SparkMax m_pivotMotor = new SparkMax(CoralMechanismConstants.kCoralPivotID, MotorType.kBrushless);
@@ -176,6 +177,10 @@ public class CoralSubsystem extends SubsystemBase {
         return run(() -> spinIntakeMotor(speed))
                 .andThen(new WaitCommand(duration))
                 .andThen(setIntakeMotorCommand(0));
+    }
+
+    public Command setIntakeMotorCommand(DoubleSupplier speedSupplier) {
+        return runOnce(() -> spinIntakeMotor(speedSupplier.getAsDouble()));
     }
 
     public Command setIntakeMotorCommand(double speed) {

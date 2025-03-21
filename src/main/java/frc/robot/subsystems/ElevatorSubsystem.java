@@ -59,6 +59,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private ElevatorSim m_elevatorSim;
     private SparkMaxSim m_motorSim;
 
+    public static double coralReleaseSpeed = -0.3;
+
     public double getTarget() {
         return m_setpoint.position;
     }
@@ -222,6 +224,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // --- Handles elevator target
     public void setElevatorGoal(ElevatorTarget goal) {
+        if (goal == ElevatorTarget.L1)
+            coralReleaseSpeed = -0.8;
+        else
+            coralReleaseSpeed = -0.3;
+
         double target = RobotContainer.interactionState == InteractionState.Coral ? goal.getCoralPosition()
                 : goal.getAlgaePosition();
 

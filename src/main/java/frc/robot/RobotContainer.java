@@ -85,8 +85,10 @@ public class RobotContainer {
             .withControllerHeadingAxis( // Maps joystick rotation to rotation on field. So if the joystick goes bottom
                                         // right, the robot rotates to the bottom red from the perspective of your
                                         // alliance
-                    () -> m_driverController.getRightX() * -1,
-                    () -> m_driverController.getRightY() * -1)
+                    () -> m_driverController.getRightX()
+                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1),
+                    () -> m_driverController.getRightY()
+                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1))
             .headingWhile(true)
             .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the deadband for it
                                                    // to register. This way slight micro-movements doesn't suddenly move
@@ -227,7 +229,7 @@ public class RobotContainer {
                 .onTrue(m_coralSubsystem.setIntakeMotorCommand(0.5))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
         m_operatorController.rightBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(-0.5))
+                .onTrue(m_coralSubsystem.setIntakeMotorCommand(() -> ElevatorSubsystem.coralReleaseSpeed))
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
 
         // Algae Controls
