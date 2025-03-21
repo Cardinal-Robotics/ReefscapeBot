@@ -30,9 +30,48 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "CoralRelease"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralRelease"
+                }
+              },
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CoralRelease"
+                      }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "ElevatorCoralIntake"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "CoralTiltIntake"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]

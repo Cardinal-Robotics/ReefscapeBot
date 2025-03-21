@@ -174,7 +174,7 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public Command setIntakeMotorCommand(double speed, double duration) {
-        return run(() -> spinIntakeMotor(speed))
+        return runOnce(() -> spinIntakeMotor(speed))
                 .andThen(new WaitCommand(duration))
                 .andThen(setIntakeMotorCommand(0));
     }

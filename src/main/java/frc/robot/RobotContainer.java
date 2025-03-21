@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
@@ -165,13 +167,16 @@ public class RobotContainer {
         NamedCommands.registerCommand("CoralTiltL4",
                 m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL4));
 
-        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-0.2, 2));
+        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-0.8, 2));
         NamedCommands.registerCommand("CoralIntake", m_coralSubsystem.setIntakeMotorCommand(0.2, 1));
     }
 
     private void configureBindings() {
         // Driver controls
         m_driverController.y().onTrue(m_resetGyro);
+        m_driverController.rightBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, -0.35)));
+        m_driverController.leftBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, 0.35)));
+
         /*
          * m_driverController.a().whileTrue(m_alignAprilTag);
          * 
@@ -262,14 +267,14 @@ public class RobotContainer {
                 .onTrue(Commands.runOnce(() -> {
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
+                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngleL2);
                 }));
 
         m_operatorController.b()
                 .onTrue(Commands.runOnce(() -> {
                     m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3);
                     m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngle);
+                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngleL3);
                 }));
 
         m_operatorController.y()

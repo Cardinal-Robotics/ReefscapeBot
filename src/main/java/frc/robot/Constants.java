@@ -117,7 +117,7 @@ public final class Constants {
             L1(Double.NaN, 0.125),
             L2(0.88, 0.23),
             L3(1.295, 0.62),
-            L4(Double.NaN, 1.295);
+            L4(Double.NaN, 1.275); // coral 1.295
 
             private final double algaePosition;
             private final double coralPosition;
@@ -167,9 +167,10 @@ public final class Constants {
         // Setpoints for tilt motor
         public static final double kTargetGroundIntakeAngle = 130; // The tilt motor's set point before grabbing the
                                                                    // algae
-        public static final double kTargetIntakeAngle = 115; // The tilt motor's set point before grabbing the algae
-                                                             // out
-        // of the reef.
+                                                                   // out
+                                                                   // of the reef.
+        public static final double kTargetIntakeAngleL2 = 115; // The tilt motor's set point before grabbing the algae
+        public static final double kTargetIntakeAngleL3 = 110; // The tilt motor's set point before grabbing the algae
         public static final double kTargetDriveAngle = 0; // The tilt motor's set point when driving around, preferably
                                                           // level.
         public static final double kTargetScoreAngle = 90; // The tilt motor's set point when releasing the algae
