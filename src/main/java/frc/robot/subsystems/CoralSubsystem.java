@@ -59,7 +59,7 @@ public class CoralSubsystem extends SubsystemBase {
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
         pivotConfig.idleMode(IdleMode.kBrake);
-        pivotConfig.encoder.positionConversionFactor(Robot.isReal() ? 30 : 60); // Converts rotations into degrees.
+        pivotConfig.encoder.positionConversionFactor(Robot.isReal() ? 15 : 60); // Converts rotations into degrees.
         pivotConfig.encoder.velocityConversionFactor(0.5);
         pivotConfig.inverted(true);
 
@@ -204,6 +204,9 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public void setTarget(double target) {
+        if (RobotContainer.interactionState == InteractionState.Algae)
+            target = CoralMechanismConstants.kTargetAngleStore;
+
         SmartDashboard.putNumber("CoralTilt", target);
         m_desiredTarget = target;
     }

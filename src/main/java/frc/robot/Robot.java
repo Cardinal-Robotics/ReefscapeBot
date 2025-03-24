@@ -10,6 +10,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -30,6 +31,7 @@ public class Robot extends LoggedRobot {
      */
     public Robot() {
         Logger.recordMetadata("Reefscape", "CatfishWaves"); // Set a metadata value
+        PortForwarder.add(5800, "photonvision.local", 5800);
 
         if (true) {
             Logger.addDataReceiver(new NT4Publisher());
