@@ -27,6 +27,7 @@ import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.LightSubsystem;
 import frc.robot.subsystems.SimulatedGame;
+import frc.robot.subsystems.SpinnyheheboiSubsytem;
 import frc.robot.subsystems.DriverCameras;
 import frc.robot.commands.AlignAprilTag;
 
@@ -67,6 +68,7 @@ public class RobotContainer {
     private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
     private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem);
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
+    private final SpinnyheheboiSubsytem m_SpinnyheheboiSubsytem = new SpinnyheheboiSubsytem();
     // private final LightSubsystem m_lightSubsystem = new
     // LightSubsystem(m_elevatorSubsystem);
     // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();

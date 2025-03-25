@@ -59,8 +59,8 @@ public class CoralSubsystem extends SubsystemBase {
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
         pivotConfig.idleMode(IdleMode.kBrake);
-        pivotConfig.encoder.positionConversionFactor(Robot.isReal() ? 15 : 60); // Converts rotations into degrees.
-        pivotConfig.encoder.velocityConversionFactor(0.5);
+        pivotConfig.encoder.positionConversionFactor(Robot.isReal() ? 8 : 60); // Converts rotations into degrees.
+        pivotConfig.encoder.velocityConversionFactor(.13333);
         pivotConfig.inverted(true);
 
         pivotConfig.closedLoop.maxMotion.maxVelocity(30);
@@ -122,7 +122,8 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public double getAngle() {
-        return Robot.isSimulation() ? Math.toDegrees(m_pivotEncoder.getPosition()) : m_pivotEncoder.getPosition();
+        return Robot.isSimulation() ? Math.toDegrees(m_pivotEncoder.getPosition() + 18.4)
+                : m_pivotEncoder.getPosition();
     }
 
     public double getIntakeSpeed() {
