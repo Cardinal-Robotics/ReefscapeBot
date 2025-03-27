@@ -109,8 +109,7 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    // private final AlignAprilTag m_alignAprilTag = new
-    // AlignAprilTag(m_visionSubsystem, m_swerveDrive);
+    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -141,12 +140,11 @@ public class RobotContainer {
 
     private void registerNamedCommands() {
         // AprilTag Alignment
-        /*
-         * NamedCommands.registerCommand("AprilTagAlignRight",
-         * new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
-         * NamedCommands.registerCommand("AprilTagAlignLeft",
-         * new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
-         */
+
+        NamedCommands.registerCommand("AprilTagAlignRight",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
+        NamedCommands.registerCommand("AprilTagAlignLeft",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake",
@@ -168,7 +166,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("CoralTiltL4",
                 m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL4));
 
-        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-0.8, 2));
+        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-1, 2));
         NamedCommands.registerCommand("CoralIntake", m_coralSubsystem.setIntakeMotorCommand(0.2, 1));
     }
 
@@ -178,16 +176,11 @@ public class RobotContainer {
         m_driverController.rightBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, -0.35)));
         m_driverController.leftBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, 0.35)));
 
-        /*
-         * m_driverController.a().whileTrue(m_alignAprilTag);
-         * 
-         * m_driverController.povRight().onTrue(Commands.runOnce(() ->
-         * m_alignAprilTag.setOffsetPose(0.15, -0.5)));
-         * m_driverController.povLeft().onTrue(Commands.runOnce(() ->
-         * m_alignAprilTag.setOffsetPose(-0.2, -0.5)));
-         * m_driverController.povUp().onTrue(Commands.runOnce(() ->
-         * m_alignAprilTag.setOffsetPose(0, -0.5)));
-         */
+        m_driverController.a().whileTrue(m_alignAprilTag);
+
+        m_driverController.povRight().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0.15, -0.5)));
+        m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(-0.2, -0.5)));
+        m_driverController.povUp().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0, -0.5)));
 
         /*
          * m_driverController.x()

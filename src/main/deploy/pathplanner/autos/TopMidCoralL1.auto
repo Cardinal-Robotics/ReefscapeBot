@@ -3,7 +3,45 @@
   "command": {
     "type": "sequential",
     "data": {
-      "commands": []
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Top Middle Reef"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralTiltL2-L3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorCoralL2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralRelease"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopMidToStart"
+          }
+        }
+      ]
     }
   },
   "resetOdom": true,

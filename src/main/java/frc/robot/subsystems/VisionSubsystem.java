@@ -468,7 +468,7 @@ public class VisionSubsystem extends SubsystemBase {
                     return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
                 });
                 if (!resultsList.isEmpty()) {
-                    updateEstimatedGlobalPose();
+                    // updateEstimatedGlobalPose();
                 }
             }
         }
