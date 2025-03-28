@@ -24,13 +24,16 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.Matrix;
 
 import org.littletonrobotics.junction.Logger;
@@ -38,6 +41,7 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.VisionSubsystem.Cameras;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -65,6 +69,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Logger.recordOutput("cam/" + Cameras.LEFT_CAM.name(),
+                new Pose3d(m_swerveDrive.getPose()).plus(Cameras.LEFT_CAM.robotToCamTransform));
         Logger.recordOutput("YAGSL Pose", m_swerveDrive.getPose());
         double speedError = (m_swerveDrive.getModules()[0].getDriveMotor().getVelocity()
                 - m_swerveDrive.getStates()[0].speedMetersPerSecond)

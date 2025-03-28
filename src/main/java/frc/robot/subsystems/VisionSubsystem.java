@@ -274,19 +274,22 @@ public class VisionSubsystem extends SubsystemBase {
     public enum Cameras {
         /** Left camera */
         LEFT_CAM("leftCamera",
-                new Rotation3d(0, Math.toRadians(0), Math.toRadians(-30)),
-                new Translation3d(Units.inchesToMeters(12.056),
-                        Units.inchesToMeters(10.981),
-                        Units.inchesToMeters(8.44)),
+                new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-45)),
+                new Translation3d(
+                        Units.inchesToMeters(11.214283),
+                        Units.inchesToMeters(7.546075),
+                        Units.inchesToMeters(4.809542)),
                 VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
         /** Right Camera */
-        RIGHT_CAM("rightCamera",
-                new Rotation3d(0, Math.toRadians(0), Math.toRadians(30)),
-                new Translation3d(Units.inchesToMeters(12.056),
-                        Units.inchesToMeters(-10.981),
-                        Units.inchesToMeters(8.44)),
-                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+        /*
+         * RIGHT_CAM("rightCamera",
+         * new Rotation3d(0, Math.toRadians(0), Math.toRadians(30)),
+         * new Translation3d(Units.inchesToMeters(12.056),
+         * Units.inchesToMeters(-10.981),
+         * Units.inchesToMeters(8.44)),
+         * VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1))
+         */;
 
         /**
          * Latency alert to use when high latency is detected.
@@ -312,7 +315,7 @@ public class VisionSubsystem extends SubsystemBase {
          * Transform of the camera rotation and translation relative to the center of
          * the robot
          */
-        private final Transform3d robotToCamTransform;
+        public final Transform3d robotToCamTransform;
         /**
          * Current standard deviations used.
          */
@@ -353,6 +356,7 @@ public class VisionSubsystem extends SubsystemBase {
          */
         Cameras(String name, Rotation3d robotToCamRotation, Translation3d robotToCamTranslation,
                 Matrix<N3, N1> singleTagStdDevs, Matrix<N3, N1> multiTagStdDevsMatrix) {
+
             latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
 
             camera = new PhotonCamera(name);

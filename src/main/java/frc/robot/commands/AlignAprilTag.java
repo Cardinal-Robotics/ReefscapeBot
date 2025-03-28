@@ -83,7 +83,7 @@ public class AlignAprilTag extends Command {
         // This fixes issues when the AprilTag is physically out of view but the robot
         // is still set to keep moving forward. I'm praying the delay isn't that bad on
         // the real bot.
-        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
+        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 2.5) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
             m_finished = true;
             return;
@@ -95,7 +95,7 @@ public class AlignAprilTag extends Command {
         Pose2d pose = potentialPose.get()
                 .plus(m_poseOffset);
 
-        if (pose.getX() < 0.1 && pose.getY() < 0.1) {
+        if (pose.getX() < .1 && pose.getY() < .1) {
             m_finished = true;
             return;
         }
