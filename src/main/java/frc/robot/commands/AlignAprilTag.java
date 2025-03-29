@@ -22,6 +22,7 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem.Cameras;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.Optional;
@@ -61,35 +62,41 @@ public class AlignAprilTag extends Command {
         }
 
         m_targetId = target.get().getFiducialId();
-        m_targetId = 19;
     }
 
     /**
      * Think of a simple 2D graph where y is height and x is horizontal. To be away
      * from and left of an AprilTag is like quadrant 3 (-,-)
      * 
-     * @param x - Positive X goes past an AprilTag while negative X retreats
-     *          backwards from an AprilTag.
-     * @param y - Positive Y moves toward the right of an AprilTag and negative Y
+     * @param x - Positive X moves toward the right of an AprilTag and negative X
      *          goes to the left of an AprilTag.
+     * @param y - Positive Y goes past an AprilTag while negative Y retreats
+     *          backwards from an AprilTag.
      */
     public Transform2d setOffsetPose(double x, double y) {
-        return m_poseOffset = new Transform2d(y, -x, Rotation2d.kZero).inverse();
+        return m_poseOffset = new Transform2d(y, x, Rotation2d.kZero);
     }
 
     @Override
     public void execute() {
+        Logger.recordOutput("connected()", Cameras.LEFT_CAM.camera.isConnected());
+
         Optional<Pose2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
 
         // If it has been more than a second without seeing a target, stop moving.
         // This fixes issues when the AprilTag is physically out of view but the robot
         // is still set to keep moving forward. I'm praying the delay isn't that bad on
         // the real bot.
-        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
-            m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
-            m_finished = true;
-            return;
-        }
+        /*
+         * if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
+         * m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
+         * m_finished = true;
+         * return;
+         * }
+         * 
+         * 
+         * 
+         */
 
         if (potentialPose.isEmpty()) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
@@ -99,7 +106,7 @@ public class AlignAprilTag extends Command {
         Pose2d pose = potentialPose.get()
                 .plus(m_poseOffset);
 
-        if (pose.getX() < .1 && pose.getY() < .1) {
+        if (pose.getX() < .02 && pose.getY() < .02) {
             m_finished = true;
             return;
         }
@@ -108,19 +115,21 @@ public class AlignAprilTag extends Command {
         // odometry is perfect, because VisionSubsytem::getAprilTagPose doesn't get the
         // actual AprilTag data but it gets where the AprilTag *should* be on the
         // field).
-        Rotation2d targetRotation = m_swerveSubsystem.getPose().getRotation().plus(pose.getRotation());
+        Rotation2d targetRotation = pose.getRotation().rotateBy(Rotation2d.k180deg);
 
         double omegaRadiansPerSecond = m_swerveSubsystem.getLibSwerveDrive().swerveController.headingCalculate(
-                m_swerveSubsystem.getPose().getRotation().getRadians(), // More alliance flipping.
+                m_swerveSubsystem.getPose().getRotation().getRadians(),
                 targetRotation.getRadians());
 
         m_swerveSubsystem.getLibSwerveDrive().swerveController.lastAngleScalar = targetRotation.getRadians();
 
         ChassisSpeeds targetRelativeSpeeds = new ChassisSpeeds(
-                pose.getX(), // Forward velocity
-                pose.getY(), // Sideways velocity
+                pose.getX() * 0.5, // Forward velocity
+                pose.getY() * 0.5, // Sideways velocity
                 omegaRadiansPerSecond // Rotational velocity
         );
+
+        Logger.recordOutput("speeds", targetRelativeSpeeds);
 
         m_swerveSubsystem.getLibSwerveDrive().drive(targetRelativeSpeeds);
         m_lastUpdated = Timer.getFPGATimestamp();

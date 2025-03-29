@@ -100,8 +100,12 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        getRobotPoseRelativeToAprilTag(19);
-        this.updatePoseEstimation();
+        if (Robot.isSimulation())
+            this.updatePoseEstimation();
+
+        for (Cameras camera : Cameras.values()) {
+            camera.updateUnreadResults();
+        }
     }
 
     /**
@@ -210,18 +214,17 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public Optional<TargetAndCamera> getTargetFromId(int id) {
         for (Cameras camera : Cameras.values()) {
-            for (PhotonPipelineResult result : camera.resultsList) {
-                if (!result.hasTargets())
-                    continue;
+            PhotonPipelineResult result = camera.camera.getLatestResult();
+            if (!result.hasTargets())
+                continue;
 
-                for (PhotonTrackedTarget target : result.getTargets()) {
-                    if (target.getFiducialId() == id) {
-                        return Optional.of(new TargetAndCamera(target, camera)); // Returns the camera because some
-                                                                                 // other functions like
-                                                                                 // getRobotPoseRelativeToAprilTag()
-                                                                                 // needs to adjust for the camera's
-                                                                                 // offset to get the robot pose.
-                    }
+            for (PhotonTrackedTarget target : result.getTargets()) {
+                if (target.getFiducialId() == id) {
+                    return Optional.of(new TargetAndCamera(target, camera)); // Returns the camera because some
+                                                                             // other functions like
+                                                                             // getRobotPoseRelativeToAprilTag()
+                                                                             // needs to adjust for the camera's
+                                                                             // offset to get the robot pose.
                 }
             }
         }
@@ -260,7 +263,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         return Optional
                 .of(new Pose2d(tagToRobot.getTranslation().toTranslation2d(),
-                        PhotonUtils.getYawToPose(m_swerveDrive.getPose(), retranslatedPose.toPose2d())));
+                        retranslatedPose.getRotation().toRotation2d()));
     }
 
     /**
@@ -275,7 +278,7 @@ public class VisionSubsystem extends SubsystemBase {
     public enum Cameras {
         /** Left camera */
         LEFT_CAM("leftCamera",
-                new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-45)),
+                new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-43)),
                 new Translation3d(
                         Units.inchesToMeters(11.214283),
                         Units.inchesToMeters(7.546075),
@@ -283,14 +286,12 @@ public class VisionSubsystem extends SubsystemBase {
                 VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
         /** Right Camera */
-        /*
-         * RIGHT_CAM("rightCamera",
-         * new Rotation3d(0, Math.toRadians(0), Math.toRadians(30)),
-         * new Translation3d(Units.inchesToMeters(12.056),
-         * Units.inchesToMeters(-10.981),
-         * Units.inchesToMeters(8.44)),
-         * VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1))
-         */;
+        RIGHT_CAM("rightCamera",
+                new Rotation3d(0, Math.toRadians(-15), Math.toRadians(45)),
+                new Translation3d(Units.inchesToMeters(11.214283),
+                        Units.inchesToMeters(-7.546075),
+                        Units.inchesToMeters(4.809542)),
+                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
 
         /**
          * Latency alert to use when high latency is detected.
@@ -473,7 +474,7 @@ public class VisionSubsystem extends SubsystemBase {
                     return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
                 });
                 if (!resultsList.isEmpty()) {
-                    // updateEstimatedGlobalPose();
+                    updateEstimatedGlobalPose();
                 }
             }
         }

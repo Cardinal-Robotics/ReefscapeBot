@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,6 +33,13 @@ import frc.robot.subsystems.DriverCameras;
 import frc.robot.commands.AlignAprilTag;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathfindingCommand;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+
+import org.photonvision.PhotonUtils;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import swervelib.SwerveInputStream;
@@ -175,12 +183,28 @@ public class RobotContainer {
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.rightBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, -0.35)));
         m_driverController.leftBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, 0.35)));
+        /*
+         * ArrayList<Pose2d> algaeProcessors = new ArrayList<Pose2d>();
+         * algaeProcessors.add(new Pose2d(11.55, 7.5, Rotation2d.kCCW_90deg));
+         * algaeProcessors.add(new Pose2d(6, 0.5, Rotation2d.kCW_90deg));
+         * algaeProcessors.stream().sorted(
+         * Comparator.comparingDouble((pose) ->
+         * PhotonUtils.getDistanceToPose(m_swerveDrive.getPose(), pose))).;
+         */
 
         m_driverController.a().whileTrue(m_alignAprilTag);
+        /*
+         * m_driverController.b().and(
+         * () -> 0 < 1)
+         * .whileTrue(m_swerveDrive.driveToPose(new Pose2d(11.55, 7.5,
+         * Rotation2d.kCCW_90deg)));
+         */
 
-        m_driverController.povRight().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0.15, -0.5)));
-        m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(-0.2, -0.5)));
-        m_driverController.povUp().onTrue(Commands.runOnce(() -> m_alignAprilTag.setOffsetPose(0, -0.5)));
+        // m_driverController.povRight().onTrue(Commands.runOnce(() ->
+        // m_alignAprilTag.setOffsetPose(-0.5, 0.15)));
+        m_driverController.povRight().whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.5, -0.05));
+        m_driverController.povLeft().whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.5, -0.5));
+        m_driverController.povUp().whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.5, 0));
 
         /*
          * m_driverController.x()

@@ -69,8 +69,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("cam/" + Cameras.LEFT_CAM.name(),
-                new Pose3d(m_swerveDrive.getPose()).plus(Cameras.LEFT_CAM.robotToCamTransform));
         Logger.recordOutput("YAGSL Pose", m_swerveDrive.getPose());
         double speedError = (m_swerveDrive.getModules()[0].getDriveMotor().getVelocity()
                 - m_swerveDrive.getStates()[0].speedMetersPerSecond)
@@ -143,8 +141,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public Command driveToPose(Pose2d pose) {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                m_swerveDrive.getMaximumChassisVelocity(), 4.0,
-                m_swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+                m_swerveDrive.getMaximumChassisVelocity(), 1.0,
+                m_swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(180));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         return AutoBuilder.pathfindToPose(
