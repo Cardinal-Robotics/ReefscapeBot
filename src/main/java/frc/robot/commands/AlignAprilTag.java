@@ -18,6 +18,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import frc.robot.subsystems.VisionSubsystem;
@@ -104,16 +105,10 @@ public class AlignAprilTag extends Command {
         // odometry is perfect, because VisionSubsytem::getAprilTagPose doesn't get the
         // actual AprilTag data but it gets where the AprilTag *should* be on the
         // field).
-        Rotation2d targetRotation = VisionSubsystem.getAprilTagPose(m_targetId, Transform2d.kZero).getRotation()
-                .rotateBy(Rotation2d.k180deg) // Gets the opposite direction of the tag so that the robot faces the tag.
-                .rotateBy(DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red ? Rotation2d.k180deg
-                        : Rotation2d.kZero); // Flipping alliance stuff
+        Rotation2d targetRotation = m_swerveSubsystem.getPose().getRotation().minus(pose.getRotation());
 
         double omegaRadiansPerSecond = m_swerveSubsystem.getLibSwerveDrive().swerveController.headingCalculate(
-                m_swerveSubsystem.getPose().getRotation()
-                        .rotateBy(DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red ? Rotation2d.k180deg
-                                : Rotation2d.kZero)
-                        .getRadians(), // More alliance flipping.
+                m_swerveSubsystem.getPose().getRotation().getRadians(), // More alliance flipping.
                 targetRotation.getRadians());
 
         m_swerveSubsystem.getLibSwerveDrive().swerveController.lastAngleScalar = targetRotation.getRadians();

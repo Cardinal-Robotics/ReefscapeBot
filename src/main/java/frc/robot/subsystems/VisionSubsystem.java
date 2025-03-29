@@ -100,6 +100,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        getRobotPoseRelativeToAprilTag(19);
         this.updatePoseEstimation();
     }
 
@@ -255,7 +256,8 @@ public class VisionSubsystem extends SubsystemBase {
         Transform3d tagToCamera = target.getBestCameraToTarget().inverse();
 
         Transform3d tagToRobot = tagToCamera.plus(camera.robotToCamTransform.inverse());
-        m_publisher.set(tagToRobot);
+        Logger.recordOutput("Retranslated AT Pose", new Pose3d(m_swerveDrive.getPose()).plus(tagToRobot.inverse()));
+        System.out.println("rotation " + Math.toDegrees(tagToRobot.getRotation().getAngle()));
 
         return Optional
                 .of(new Pose2d(tagToRobot.getTranslation().toTranslation2d(),
