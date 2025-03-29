@@ -61,6 +61,7 @@ public class AlignAprilTag extends Command {
         }
 
         m_targetId = target.get().getFiducialId();
+        m_targetId = 19;
     }
 
     /**
@@ -84,14 +85,16 @@ public class AlignAprilTag extends Command {
         // This fixes issues when the AprilTag is physically out of view but the robot
         // is still set to keep moving forward. I'm praying the delay isn't that bad on
         // the real bot.
-        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 2.5) {
+        if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
             m_finished = true;
             return;
         }
 
-        if (potentialPose.isEmpty())
+        if (potentialPose.isEmpty()) {
+            m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
             return;
+        }
 
         Pose2d pose = potentialPose.get()
                 .plus(m_poseOffset);
@@ -105,7 +108,7 @@ public class AlignAprilTag extends Command {
         // odometry is perfect, because VisionSubsytem::getAprilTagPose doesn't get the
         // actual AprilTag data but it gets where the AprilTag *should* be on the
         // field).
-        Rotation2d targetRotation = m_swerveSubsystem.getPose().getRotation().minus(pose.getRotation());
+        Rotation2d targetRotation = m_swerveSubsystem.getPose().getRotation().plus(pose.getRotation());
 
         double omegaRadiansPerSecond = m_swerveSubsystem.getLibSwerveDrive().swerveController.headingCalculate(
                 m_swerveSubsystem.getPose().getRotation().getRadians(), // More alliance flipping.

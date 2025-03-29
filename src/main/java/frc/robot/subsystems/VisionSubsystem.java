@@ -256,12 +256,11 @@ public class VisionSubsystem extends SubsystemBase {
         Transform3d tagToCamera = target.getBestCameraToTarget().inverse();
 
         Transform3d tagToRobot = tagToCamera.plus(camera.robotToCamTransform.inverse());
-        Logger.recordOutput("Retranslated AT Pose", new Pose3d(m_swerveDrive.getPose()).plus(tagToRobot.inverse()));
-        System.out.println("rotation " + Math.toDegrees(tagToRobot.getRotation().getAngle()));
+        Pose3d retranslatedPose = new Pose3d(m_swerveDrive.getPose()).plus(tagToRobot.inverse());
 
         return Optional
                 .of(new Pose2d(tagToRobot.getTranslation().toTranslation2d(),
-                        tagToRobot.getRotation().toRotation2d()));
+                        PhotonUtils.getYawToPose(m_swerveDrive.getPose(), retranslatedPose.toPose2d())));
     }
 
     /**
