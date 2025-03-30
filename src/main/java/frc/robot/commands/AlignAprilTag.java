@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,8 +22,11 @@ import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.VisionSubsystem.Cameras;
+import frc.robot.Robot;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.Optional;
@@ -30,6 +34,9 @@ import java.util.Optional;
 public class AlignAprilTag extends Command {
     private final VisionSubsystem m_visionSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
+
+    private final PIDController xTranslationController = new PIDController(1, 0, 0);
+    private final PIDController yTranslationController = new PIDController(1, 0, 0);
 
     private Transform2d m_poseOffset = setOffsetPose(0, -0.5);
     private boolean m_finished = false;
@@ -48,6 +55,8 @@ public class AlignAprilTag extends Command {
 
         addRequirements(m_visionSubsystem);
         addRequirements(m_swerveSubsystem);
+        SmartDashboard.putNumber("X", 0);
+        SmartDashboard.putNumber("Y", 0);
     }
 
     @Override
@@ -62,6 +71,7 @@ public class AlignAprilTag extends Command {
         }
 
         m_targetId = target.get().getFiducialId();
+
     }
 
     /**
@@ -74,14 +84,14 @@ public class AlignAprilTag extends Command {
      *          backwards from an AprilTag.
      */
     public Transform2d setOffsetPose(double x, double y) {
-        return m_poseOffset = new Transform2d(y, x, Rotation2d.kZero);
+        return m_poseOffset = new Transform2d(x, y, Rotation2d.kZero);
     }
 
     @Override
     public void execute() {
-        Logger.recordOutput("connected()", Cameras.LEFT_CAM.camera.isConnected());
-
-        Optional<Pose2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
+        if (Robot.isSimulation())
+            m_targetId = 19;
+        Optional<Transform2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
 
         // If it has been more than a second without seeing a target, stop moving.
         // This fixes issues when the AprilTag is physically out of view but the robot
@@ -103,8 +113,13 @@ public class AlignAprilTag extends Command {
             return;
         }
 
-        Pose2d pose = potentialPose.get()
-                .plus(m_poseOffset);
+        Transform2d pose = potentialPose.get()
+                .plus(m_poseOffset.plus(Transform2d.kZero));
+
+        Logger.recordOutput("Offset pose",
+                new Pose2d(m_swerveSubsystem.getPose().getTranslation().plus(pose.getTranslation()).getX(),
+                        m_swerveSubsystem.getPose().getTranslation().plus(pose.getTranslation()).getY(),
+                        Rotation2d.kZero));
 
         if (pose.getX() < .02 && pose.getY() < .02) {
             m_finished = true;
@@ -124,14 +139,17 @@ public class AlignAprilTag extends Command {
         m_swerveSubsystem.getLibSwerveDrive().swerveController.lastAngleScalar = targetRotation.getRadians();
 
         ChassisSpeeds targetRelativeSpeeds = new ChassisSpeeds(
-                pose.getX() * 0.5, // Forward velocity
-                pose.getY() * 0.5, // Sideways velocity
+                -xTranslationController.calculate(pose.getX(), m_poseOffset.getX()), // Forward velocity
+                -yTranslationController.calculate(pose.getY(), m_poseOffset.getY()), // Sideways velocity
                 omegaRadiansPerSecond // Rotational velocity
         );
+
+        System.out.println("X: " + xTranslationController.calculate(pose.getX(), m_poseOffset.getX()));
 
         Logger.recordOutput("speeds", targetRelativeSpeeds);
 
         m_swerveSubsystem.getLibSwerveDrive().drive(targetRelativeSpeeds);
+
         m_lastUpdated = Timer.getFPGATimestamp();
     }
 

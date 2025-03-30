@@ -21,6 +21,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -248,7 +249,7 @@ public class VisionSubsystem extends SubsystemBase {
     private final StructPublisher<Transform3d> m_publisher = NetworkTableInstance.getDefault()
             .getStructTopic("Photon Pose", Transform3d.struct).publish();
 
-    public Optional<Pose2d> getRobotPoseRelativeToAprilTag(int id) {
+    public Optional<Transform2d> getRobotPoseRelativeToAprilTag(int id) {
         Optional<TargetAndCamera> data = getTargetFromId(id);
         if (data.isEmpty())
             return Optional.empty();
@@ -260,10 +261,23 @@ public class VisionSubsystem extends SubsystemBase {
 
         Transform3d tagToRobot = tagToCamera.plus(camera.robotToCamTransform.inverse());
         Pose3d retranslatedPose = new Pose3d(m_swerveDrive.getPose()).plus(tagToRobot.inverse());
+        /*
+         * System.out.println("RTP: " +
+         * Math.toDegrees(retranslatedPose.getRotation().getZ()) + " RR: "
+         * + tagToRobot.getRotation().toRotation2d().getDegrees() + " SH: "
+         * + m_swerveDrive.getOdometryHeading());
+         */
 
+        Logger.recordOutput("blankAT", Pose3d.kZero);
+        Logger.recordOutput("tagToRobot", tagToRobot);
         return Optional
-                .of(new Pose2d(tagToRobot.getTranslation().toTranslation2d(),
+                .of(new Transform2d(tagToRobot.getX(), tagToRobot.getY(),
                         retranslatedPose.getRotation().toRotation2d()));
+        /*
+         * return Optional
+         * .of(new Pose2d(tagToRobot.getTranslation().toTranslation2d(),
+         * retranslatedPose.getRotation().toRotation2d()));
+         */
     }
 
     /**
