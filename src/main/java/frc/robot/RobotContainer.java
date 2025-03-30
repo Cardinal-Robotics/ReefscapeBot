@@ -117,7 +117,8 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive);
+    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive,
+            m_elevatorSubsystem);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -150,9 +151,9 @@ public class RobotContainer {
         // AprilTag Alignment
 
         NamedCommands.registerCommand("AprilTagAlignRight",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.15, -0.5));
         NamedCommands.registerCommand("AprilTagAlignLeft",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, -0.2, -0.5));
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake",
@@ -202,9 +203,12 @@ public class RobotContainer {
 
         // m_driverController.povRight().onTrue(Commands.runOnce(() ->
         // m_alignAprilTag.setOffsetPose(-0.5, 0.15)));
-        m_driverController.povRight().whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.5, 0.05));
-        m_driverController.povLeft().whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.5, 0.5));
-        m_driverController.povUp().whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.5, 0));
+        m_driverController.povRight()
+                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
+        m_driverController.povLeft()
+                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
+        m_driverController.povUp()
+                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
 
         /*
          * m_driverController.x()

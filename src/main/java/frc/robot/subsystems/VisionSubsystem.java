@@ -21,7 +21,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -57,6 +56,7 @@ public class VisionSubsystem extends SubsystemBase {
     public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
             AprilTagFields.k2025Reefscape);
 
+    public static final boolean poseEstimationEnabled = Robot.isReal() ? false : true;
     public VisionSystemSim visionSim;
 
     /**
@@ -101,11 +101,12 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Robot.isSimulation())
+        if (poseEstimationEnabled)
             this.updatePoseEstimation();
-
-        for (Cameras camera : Cameras.values()) {
-            camera.updateUnreadResults();
+        else {
+            for (Cameras camera : Cameras.values()) {
+                camera.updateUnreadResults();
+            }
         }
     }
 
@@ -215,17 +216,18 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public Optional<TargetAndCamera> getTargetFromId(int id) {
         for (Cameras camera : Cameras.values()) {
-            PhotonPipelineResult result = camera.camera.getLatestResult();
-            if (!result.hasTargets())
-                continue;
+            for (PhotonPipelineResult result : camera.resultsList) {
+                if (result == null || !result.hasTargets())
+                    continue;
 
-            for (PhotonTrackedTarget target : result.getTargets()) {
-                if (target.getFiducialId() == id) {
-                    return Optional.of(new TargetAndCamera(target, camera)); // Returns the camera because some
-                                                                             // other functions like
-                                                                             // getRobotPoseRelativeToAprilTag()
-                                                                             // needs to adjust for the camera's
-                                                                             // offset to get the robot pose.
+                for (PhotonTrackedTarget target : result.getTargets()) {
+                    if (target.getFiducialId() == id) {
+                        return Optional.of(new TargetAndCamera(target, camera)); // Returns the camera because some
+                                                                                 // other functions like
+                                                                                 // getRobotPoseRelativeToAprilTag()
+                                                                                 // needs to adjust for the camera's
+                                                                                 // offset to get the robot pose.
+                    }
                 }
             }
         }
@@ -290,20 +292,19 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public enum Cameras {
+        /** Right Camera */
+        RIGHT_CAM("rightCamera",
+                new Rotation3d(0, Math.toRadians(-15), Math.toRadians(45)),
+                new Translation3d(Units.inchesToMeters(11.214283),
+                        Units.inchesToMeters(-7.546075),
+                        Units.inchesToMeters(4.809542)),
+                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
         /** Left camera */
         LEFT_CAM("leftCamera",
                 new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-43)),
                 new Translation3d(
                         Units.inchesToMeters(11.214283),
                         Units.inchesToMeters(7.546075),
-                        Units.inchesToMeters(4.809542)),
-                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-
-        /** Right Camera */
-        RIGHT_CAM("rightCamera",
-                new Rotation3d(0, Math.toRadians(-15), Math.toRadians(45)),
-                new Translation3d(Units.inchesToMeters(11.214283),
-                        Units.inchesToMeters(-7.546075),
                         Units.inchesToMeters(4.809542)),
                 VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
 
@@ -474,22 +475,18 @@ public class VisionSubsystem extends SubsystemBase {
             double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
             double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
             double debounceTime = Milliseconds.of(15).in(Seconds);
-
             for (PhotonPipelineResult result : resultsList) {
                 mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
             }
 
-            if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
-                    (currentTimestamp - lastReadTimestamp) >= debounceTime) {
-                resultsList = Robot.isReal() ? camera.getAllUnreadResults()
-                        : cameraSim.getCamera().getAllUnreadResults();
-                lastReadTimestamp = currentTimestamp;
-                resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
-                    return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
-                });
-                if (!resultsList.isEmpty()) {
+            resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+            lastReadTimestamp = currentTimestamp;
+            resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
+                return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
+            });
+            if (!resultsList.isEmpty()) {
+                if (VisionSubsystem.poseEstimationEnabled)
                     updateEstimatedGlobalPose();
-                }
             }
         }
 
