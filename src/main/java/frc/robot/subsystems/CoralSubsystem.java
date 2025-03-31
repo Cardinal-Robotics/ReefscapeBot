@@ -122,7 +122,7 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public double getAngle() {
-        return Robot.isSimulation() ? Math.toDegrees(m_pivotEncoder.getPosition() + 18.4)
+        return Robot.isSimulation() ? Math.toDegrees(m_pivotEncoder.getPosition())
                 : m_pivotEncoder.getPosition();
     }
 

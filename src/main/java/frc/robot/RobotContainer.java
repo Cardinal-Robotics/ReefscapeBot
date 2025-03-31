@@ -8,37 +8,33 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.CoralMechanismConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.SpinnyheheboiSubsytem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
-import frc.robot.subsystems.LightSubsystem;
 import frc.robot.subsystems.SimulatedGame;
-import frc.robot.subsystems.SpinnyheheboiSubsytem;
-import frc.robot.subsystems.DriverCameras;
 import frc.robot.commands.AlignAprilTag;
+import frc.robot.commands.DriveToInteractionArea;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-
-import org.photonvision.PhotonUtils;
+import java.lang.StackWalker.Option;
+import java.util.List;
+import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -47,6 +43,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     // Misc.
     // ---------------------------------------------------------------------------------------------------------------------------------------
+    private Optional<Command> m_interactionAreaDriveCommand = Optional.empty();
     public static InteractionState interactionState = InteractionState.Coral;
     private final SendableChooser<Command> m_autoChooser;
 
@@ -80,7 +77,6 @@ public class RobotContainer {
     // private final LightSubsystem m_lightSubsystem = new
     // LightSubsystem(m_elevatorSubsystem);
     // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
-    private final DriverCameras m_driverCameras = new DriverCameras();
 
     private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem,
             m_swerveDrive);
@@ -117,6 +113,7 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
+    private final DriveToInteractionArea m_driveToInteractionArea = new DriveToInteractionArea(m_swerveDrive);
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive,
             m_elevatorSubsystem);
     // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -138,6 +135,10 @@ public class RobotContainer {
         m_autoChooser = AutoBuilder.buildAutoChooser("Leave");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
 
+        PathPlannerLogging.setLogActivePathCallback((List<Pose2d> trajectory) -> {
+            m_swerveDrive.getLibSwerveDrive().field.getObject("trajectory").setPoses(trajectory);
+        });
+
         // m_coralsubsystem.setDefaultCommand(m_coralCommand);
         /*
          * m_lightSubsystem.setDefaultCommand(
@@ -151,9 +152,9 @@ public class RobotContainer {
         // AprilTag Alignment
 
         NamedCommands.registerCommand("AprilTagAlignRight",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.15, -0.5));
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
         NamedCommands.registerCommand("AprilTagAlignLeft",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, -0.2, -0.5));
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake",
@@ -184,14 +185,6 @@ public class RobotContainer {
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.rightBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, -0.35)));
         m_driverController.leftBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, 0.35)));
-        /*
-         * ArrayList<Pose2d> algaeProcessors = new ArrayList<Pose2d>();
-         * algaeProcessors.add(new Pose2d(11.55, 7.5, Rotation2d.kCCW_90deg));
-         * algaeProcessors.add(new Pose2d(6, 0.5, Rotation2d.kCW_90deg));
-         * algaeProcessors.stream().sorted(
-         * Comparator.comparingDouble((pose) ->
-         * PhotonUtils.getDistanceToPose(m_swerveDrive.getPose(), pose))).;
-         */
 
         m_driverController.a().whileTrue(m_alignAprilTag);
         /*
@@ -209,6 +202,19 @@ public class RobotContainer {
                 .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
         m_driverController.povUp()
                 .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
+        /*
+         * m_driverController.povDown().whileTrue(Commands.run(() -> {
+         * Pose2d nearestPose =
+         * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas);
+         * double distance =
+         * nearestPose.getTranslation().getDistance(m_swerveDrive.getPose().
+         * getTranslation());
+         * if (distance < 1)
+         * m_swerveDrive.driveToPose(nearestPose).until(() ->
+         * !m_driverController.povDown().getAsBoolean())
+         * .schedule();
+         * }));
+         */
 
         /*
          * m_driverController.x()

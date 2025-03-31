@@ -53,8 +53,9 @@ public class AlignAprilTag extends Command {
 
         addRequirements(m_visionSubsystem);
         addRequirements(m_swerveSubsystem);
-        SmartDashboard.putNumber("X", 0);
-        SmartDashboard.putNumber("Y", 0);
+
+        SmartDashboard.putNumber("customAlignX", 0);
+        SmartDashboard.putNumber("customAlignY", 0);
     }
 
     @Override
@@ -62,7 +63,8 @@ public class AlignAprilTag extends Command {
         m_lastUpdated = Timer.getFPGATimestamp();
         m_finished = false;
 
-        Optional<PhotonTrackedTarget> target = m_visionSubsystem.getBestTarget();
+        Optional<PhotonTrackedTarget> target = Robot.isSimulation() ? m_visionSubsystem.getClosestTarget()
+                : m_visionSubsystem.getBestTarget();
         if (target.isEmpty()) {
             m_finished = true;
             return;
@@ -87,8 +89,8 @@ public class AlignAprilTag extends Command {
 
     @Override
     public void execute() {
-        if (Robot.isSimulation())
-            m_targetId = 19;
+        // m_poseOffset = new Transform2d(SmartDashboard.getNumber("customAlignX", 0),
+        // SmartDashboard.getNumber("customAlignY", 0), Rotation2d.kZero);
         Optional<Transform2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
 
         // If it has been more than a second without seeing a target, stop moving.

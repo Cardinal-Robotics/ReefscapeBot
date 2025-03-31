@@ -43,6 +43,7 @@ import swervelib.SwerveDrive;
 
 import java.util.function.Supplier;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.List;
 
@@ -242,6 +243,21 @@ public class VisionSubsystem extends SubsystemBase {
                     continue;
 
                 return Optional.of(result.getBestTarget());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<PhotonTrackedTarget> getClosestTarget() {
+        for (Cameras camera : Cameras.values()) {
+            for (PhotonPipelineResult result : camera.resultsList) {
+                if (!result.hasTargets())
+                    continue;
+
+                return result.getTargets().stream().sorted(Comparator.comparing((PhotonTrackedTarget target) -> {
+                    return target.bestCameraToTarget.getTranslation().getDistance(Translation3d.kZero);
+                })).findFirst();
             }
         }
 

@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.math.util.Units;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -82,22 +84,10 @@ public final class Constants {
         public static final boolean kRearLeftNotVersH = false;
         public static final boolean kFrontRightNotVersH = true;
         public static final boolean kRearRightNotVersH = false;
-    }
 
-    public static final class ClimberConstants {
-        // Ports/ID(s)
-        public static final int kFollowerMotorId = 22;
-        public static final int kLeaderMotorId = 21;
-        public static final int kEncoderId = 8;
-
-        // PID values for climber
-        public static final double kClimberP = 0;
-        public static final double kClimberI = 0;
-        public static final double kClimberD = 0;
-
-        // Positions
-        public static final double kCrushingFrame = 0;
-        public static final double kCrushingCage = 0;
+        public static final List<Pose2d> kInteractionAreas = List.of(
+                new Pose2d(11.55, 7.7, Rotation2d.kCCW_90deg),
+                new Pose2d(6, 0.4, Rotation2d.kCW_90deg));
     }
 
     public static final class ElevatorConstants {
