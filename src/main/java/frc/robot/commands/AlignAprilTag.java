@@ -92,6 +92,7 @@ public class AlignAprilTag extends Command {
         // m_poseOffset = new Transform2d(SmartDashboard.getNumber("customAlignX", 0),
         // SmartDashboard.getNumber("customAlignY", 0), Rotation2d.kZero);
         Optional<Transform2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
+        Logger.recordOutput("K", potentialPose.isPresent() ? potentialPose.get() : Transform2d.kZero);
 
         // If it has been more than a second without seeing a target, stop moving.
         // This fixes issues when the AprilTag is physically out of view but the robot

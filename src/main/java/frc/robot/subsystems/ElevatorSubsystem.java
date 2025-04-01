@@ -224,7 +224,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // --- Handles elevator target
     public void setElevatorGoal(ElevatorTarget goal) {
-        if (goal == ElevatorTarget.L1)
+        if (goal == ElevatorTarget.L1 || goal == ElevatorTarget.CoralIntake)
             coralReleaseSpeed = -0.3;
         else
             coralReleaseSpeed = -0.3;

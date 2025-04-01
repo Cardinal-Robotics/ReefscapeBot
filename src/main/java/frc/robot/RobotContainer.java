@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -92,10 +94,8 @@ public class RobotContainer {
             .withControllerHeadingAxis( // Maps joystick rotation to rotation on field. So if the joystick goes bottom
                                         // right, the robot rotates to the bottom red from the perspective of your
                                         // alliance
-                    () -> m_driverController.getRightX()
-                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1),
-                    () -> m_driverController.getRightY()
-                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1))
+                    () -> m_driverController.getRightX(),
+                    () -> m_driverController.getRightY())
             .headingWhile(true)
             .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the deadband for it
                                                    // to register. This way slight micro-movements doesn't suddenly move
@@ -120,6 +120,11 @@ public class RobotContainer {
     //
 
     public RobotContainer() {
+        var leftCamera = new HttpCamera("left", "http://photonvision.local:1182/stream.mjpg");
+        var rightCamera = new HttpCamera("right", "http://photonvision.local:1184/stream.mjpg");
+        CameraServer.startAutomaticCapture(leftCamera);
+        CameraServer.startAutomaticCapture(rightCamera);
+
         DriverStation.silenceJoystickConnectionWarning(true);
         m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
         m_elevatorSubsystem.setScaleDriverInputConsumer((Double scale) -> {
@@ -185,6 +190,8 @@ public class RobotContainer {
         m_driverController.y().onTrue(m_resetGyro);
         m_driverController.rightBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, -0.35)));
         m_driverController.leftBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, 0.35)));
+        m_driverController.rightTrigger().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0.35, 0)));
+        m_driverController.leftTrigger().whileTrue(m_swerveDrive.driveRelative(new Translation2d(-0.35, 0)));
 
         m_driverController.a().whileTrue(m_alignAprilTag);
         /*

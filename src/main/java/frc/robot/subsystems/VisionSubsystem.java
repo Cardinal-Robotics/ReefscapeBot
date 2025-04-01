@@ -55,9 +55,9 @@ import frc.robot.Robot;
  */
 public class VisionSubsystem extends SubsystemBase {
     public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
-            AprilTagFields.k2025Reefscape);
+            AprilTagFields.k2025ReefscapeWelded);
 
-    public static final boolean poseEstimationEnabled = Robot.isReal() ? false : true;
+    public static final boolean poseEstimationEnabled = true;
     public VisionSystemSim visionSim;
 
     /**
@@ -317,11 +317,11 @@ public class VisionSubsystem extends SubsystemBase {
                 VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
         /** Left camera */
         LEFT_CAM("leftCamera",
-                new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-43)),
+                new Rotation3d(0, Math.toRadians(-18), Math.toRadians(-45)),
                 new Translation3d(
-                        Units.inchesToMeters(11.214283),
-                        Units.inchesToMeters(7.546075),
-                        Units.inchesToMeters(4.809542)),
+                        Units.inchesToMeters(11.282061),
+                        Units.inchesToMeters(7.478297),
+                        Units.inchesToMeters(4.834880)),
                 VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
 
         /**
