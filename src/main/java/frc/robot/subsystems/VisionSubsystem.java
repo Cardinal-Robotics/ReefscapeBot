@@ -286,8 +286,10 @@ public class VisionSubsystem extends SubsystemBase {
          * + m_swerveDrive.getOdometryHeading());
          */
 
-        Logger.recordOutput("blankAT", Pose3d.kZero);
-        Logger.recordOutput("tagToRobot", tagToRobot);
+        /*
+         * Logger.recordOutput("blankAT", Pose3d.kZero);
+         * Logger.recordOutput("tagToRobot", tagToRobot);
+         */
         return Optional
                 .of(new Transform2d(tagToRobot.getX(), tagToRobot.getY(),
                         retranslatedPose.getRotation().toRotation2d()));

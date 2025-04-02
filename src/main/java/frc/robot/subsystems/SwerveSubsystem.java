@@ -69,12 +69,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("YAGSL Pose", m_swerveDrive.getPose());
-        double speedError = (m_swerveDrive.getModules()[0].getDriveMotor().getVelocity()
-                - m_swerveDrive.getStates()[0].speedMetersPerSecond)
-                / m_swerveDrive.getModules()[0].getDriveMotor().getVelocity();
-
-        Logger.recordOutput("Left Module Speed error", speedError);
+        /*
+         * Logger.recordOutput("YAGSL Pose", m_swerveDrive.getPose());
+         * double speedError =
+         * (m_swerveDrive.getModules()[0].getDriveMotor().getVelocity()
+         * - m_swerveDrive.getStates()[0].speedMetersPerSecond)
+         * / m_swerveDrive.getModules()[0].getDriveMotor().getVelocity();
+         * 
+         * Logger.recordOutput("Left Module Speed error", speedError);
+         */
     }
 
     private Pose2d getInitialPose() {

@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +39,9 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import java.lang.StackWalker.Option;
 import java.util.List;
 import java.util.Optional;
+
+import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -129,7 +134,8 @@ public class RobotContainer {
         m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
         m_elevatorSubsystem.setScaleDriverInputConsumer((Double scale) -> {
             m_driveInputStream.scaleTranslation(scale);
-            m_driveInputStream.scaleRotation(scale);
+
+            m_swerveDrive.getLibSwerveDrive().swerveController.config.maxAngularVelocity = (4 * Math.PI) * scale;
         });
 
         registerNamedCommands();
@@ -270,12 +276,41 @@ public class RobotContainer {
                 .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
         m_operatorController.rightBumper()
                 .onTrue(m_coralSubsystem.setIntakeMotorCommand(() -> ElevatorSubsystem.coralReleaseSpeed))
-                .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
+                .onFalse(m_coralSubsystem.setIntakeMotorCommand(0))
+                .onFalse(Commands.runOnce(() -> {
+                    Optional<PhotonTrackedTarget> target = Robot.isSimulation() ? m_visionSubsystem.getClosestTarget()
+                            : m_visionSubsystem.getBestTarget();
+                    if (target.isEmpty())
+                        return;
+
+                    Optional<Transform2d> potentialPose = m_visionSubsystem
+                            .getRobotPoseRelativeToAprilTag(target.get().fiducialId);
+
+                    if (potentialPose.isEmpty())
+                        return;
+
+                    Logger.recordOutput("Offset", potentialPose.get());
+                }));
 
         // Algae Controls
         m_operatorController.leftTrigger()
                 .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(-1))
-                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(-0.1));
+                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(-0.1))
+                .onFalse(Commands.runOnce(() -> {
+                    Optional<PhotonTrackedTarget> target = Robot.isSimulation() ? m_visionSubsystem.getClosestTarget()
+                            : m_visionSubsystem.getBestTarget();
+                    if (target.isEmpty())
+                        return;
+
+                    Optional<Transform2d> potentialPose = m_visionSubsystem
+                            .getRobotPoseRelativeToAprilTag(target.get().fiducialId);
+
+                    if (potentialPose.isEmpty())
+                        return;
+
+                    Logger.recordOutput("Offset", potentialPose.get());
+                }));
+
         m_operatorController.rightTrigger()
                 .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(1))
                 .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0));

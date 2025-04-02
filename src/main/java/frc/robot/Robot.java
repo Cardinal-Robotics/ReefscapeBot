@@ -5,6 +5,8 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
@@ -34,7 +36,8 @@ public class Robot extends LoggedRobot {
         PortForwarder.add(5800, "photonvision.local", 5800);
 
         if (true) {
-            Logger.addDataReceiver(new NT4Publisher());
+            // Logger.addDataReceiver(new NT4Publisher());
+            Logger.addDataReceiver(new WPILOGWriter());
             Logger.start();
         }
 

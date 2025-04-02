@@ -92,7 +92,8 @@ public class AlignAprilTag extends Command {
         // m_poseOffset = new Transform2d(SmartDashboard.getNumber("customAlignX", 0),
         // SmartDashboard.getNumber("customAlignY", 0), Rotation2d.kZero);
         Optional<Transform2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
-        Logger.recordOutput("K", potentialPose.isPresent() ? potentialPose.get() : Transform2d.kZero);
+        // Logger.recordOutput("K", potentialPose.isPresent() ? potentialPose.get() :
+        // Transform2d.kZero);
 
         // If it has been more than a second without seeing a target, stop moving.
         // This fixes issues when the AprilTag is physically out of view but the robot
@@ -112,10 +113,15 @@ public class AlignAprilTag extends Command {
         if (pose == null)
             return;
 
-        Logger.recordOutput("Offset pose",
-                new Pose2d(m_swerveSubsystem.getPose().getTranslation().plus(pose.getTranslation()).getX(),
-                        m_swerveSubsystem.getPose().getTranslation().plus(pose.getTranslation()).getY(),
-                        Rotation2d.kZero));
+        /*
+         * Logger.recordOutput("Offset pose",
+         * new
+         * Pose2d(m_swerveSubsystem.getPose().getTranslation().plus(pose.getTranslation(
+         * )).getX(),
+         * m_swerveSubsystem.getPose().getTranslation().plus(pose.getTranslation()).getY
+         * (),
+         * Rotation2d.kZero));
+         */
 
         /*
          * if (pose.getX() < .02 && pose.getY() < .02) {
@@ -145,9 +151,10 @@ public class AlignAprilTag extends Command {
                 MathUtil.clamp(yTranslationSpeed, -speedLimiter, speedLimiter), // Sideways velocity
                 omegaRadiansPerSecond // Rotational velocity
         );
-
-        Logger.recordOutput("AT Align X Error", xTranslationController.getError());
-        Logger.recordOutput("AT Align Y Error", yTranslationController.getError());
+        /*
+         * Logger.recordOutput("AT Align X Error", xTranslationController.getError());
+         * Logger.recordOutput("AT Align Y Error", yTranslationController.getError());
+         */
 
         m_swerveSubsystem.getLibSwerveDrive().drive(targetRelativeSpeeds);
 
