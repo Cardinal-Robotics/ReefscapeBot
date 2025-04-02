@@ -35,11 +35,11 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("Reefscape", "CatfishWaves"); // Set a metadata value
         PortForwarder.add(5800, "photonvision.local", 5800);
 
-        if (true) {
-            // Logger.addDataReceiver(new NT4Publisher());
-            Logger.addDataReceiver(new WPILOGWriter());
-            Logger.start();
-        }
+        if (Robot.isSimulation())
+            Logger.addDataReceiver(new NT4Publisher());
+
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.start();
 
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our

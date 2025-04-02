@@ -30,8 +30,8 @@ public class AlignAprilTag extends Command {
     private final VisionSubsystem m_visionSubsystem;
     private final SwerveSubsystem m_swerveSubsystem;
 
-    private final PIDController xTranslationController = new PIDController(1, 0, 0);
-    private final PIDController yTranslationController = new PIDController(5, 0, 0);
+    private final PIDController xTranslationController = new PIDController(5, 0, 0.05);
+    private final PIDController yTranslationController = new PIDController(5, 0, 0.05);
 
     private Transform2d m_poseOffset = setOffsetPose(0, -0.5);
     private boolean m_finished = false;
@@ -144,17 +144,23 @@ public class AlignAprilTag extends Command {
 
         double xTranslationSpeed = -xTranslationController.calculate(pose.getX(), m_poseOffset.getX());
         double yTranslationSpeed = -yTranslationController.calculate(pose.getY(), m_poseOffset.getY());
-        double speedLimiter = Math.max((1 - (m_elevatorSubsystem.getPosition() / 1.3)), 0.1);
+
+        // Compensate for rotation while we're driving. If we're turning 30 degrees and
+        // going 1m/s to the left, it's not going to face 30 degrees and be one meter to
+        // the left. It will follow a curved path of 1 meter (I think).
+        double xAdjustedTranslationSpeed = xTranslationSpeed - (omegaRadiansPerSecond * yTranslationSpeed);
+        double yAdjustedTranslationSpeed = yTranslationSpeed + (omegaRadiansPerSecond * xTranslationSpeed);
+
+        double speedLimiter = Math.max(2 * (1 - (m_elevatorSubsystem.getPosition() / 1.3)), 0.3);
 
         ChassisSpeeds targetRelativeSpeeds = new ChassisSpeeds(
-                MathUtil.clamp(xTranslationSpeed, -speedLimiter, speedLimiter), // Forward velocity
-                MathUtil.clamp(yTranslationSpeed, -speedLimiter, speedLimiter), // Sideways velocity
+                MathUtil.clamp(xAdjustedTranslationSpeed, -speedLimiter, speedLimiter), // Forward velocity
+                MathUtil.clamp(yAdjustedTranslationSpeed, -speedLimiter, speedLimiter), // Sideways velocity
                 omegaRadiansPerSecond // Rotational velocity
         );
-        /*
-         * Logger.recordOutput("AT Align X Error", xTranslationController.getError());
-         * Logger.recordOutput("AT Align Y Error", yTranslationController.getError());
-         */
+
+        Logger.recordOutput("AT Align X Error", xTranslationController.getError());
+        Logger.recordOutput("AT Align Y Error", yTranslationController.getError());
 
         m_swerveSubsystem.getLibSwerveDrive().drive(targetRelativeSpeeds);
 
