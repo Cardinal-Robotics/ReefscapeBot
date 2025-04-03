@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "to middle back coral"
+            "pathName": "forward middle"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Leaves",
   "choreoAuto": false
 }

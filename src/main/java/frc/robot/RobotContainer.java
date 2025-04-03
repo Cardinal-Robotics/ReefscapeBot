@@ -54,6 +54,8 @@ public class RobotContainer {
     public static InteractionState interactionState = InteractionState.Coral;
     private final SendableChooser<Command> m_autoChooser;
 
+    boolean rotationInverted;
+
     public enum InteractionState {
         Coral,
         Algae
@@ -99,8 +101,10 @@ public class RobotContainer {
             .withControllerHeadingAxis( // Maps joystick rotation to rotation on field. So if the joystick goes bottom
                                         // right, the robot rotates to the bottom red from the perspective of your
                                         // alliance
-                    () -> m_driverController.getRightX(),
-                    () -> m_driverController.getRightY())
+                    () -> m_driverController.getRightX()
+                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1),
+                    () -> m_driverController.getRightY()
+                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1))
             .headingWhile(true)
             .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the deadband for it
                                                    // to register. This way slight micro-movements doesn't suddenly move
