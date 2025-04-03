@@ -189,10 +189,10 @@ public final class Constants {
 
         public static final double kAllowedSetpointError = 3;
 
-        public static final double kTargetAngleIntake = 0;
+        public static final double kTargetAngleIntake = -6;
         public static final double kTargetAngleStore = 50;
-        public static final double kTargetAngleL1 = 59; // down
-        public static final double kTargetAngleL2_3 = 37; // left
+        public static final double kTargetAngleL1 = 26.66; // down
+        public static final double kTargetAngleL2_3 = 26.66; // left
         public static final double kTargetAngleL4 = 17; // up
     }
 }

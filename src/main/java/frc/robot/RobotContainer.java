@@ -64,8 +64,7 @@ public class RobotContainer {
     private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem(null, null);
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
-    // private final VisionSubsystem m_visionSubsystem = new
-    // VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
+    private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
     private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem);
     private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
     // private final LightSubsystem m_lightSubsystem = new
@@ -140,12 +139,11 @@ public class RobotContainer {
 
     private void registerNamedCommands() {
         // AprilTag Alignment
-        /*
-         * NamedCommands.registerCommand("AprilTagAlignRight",
-         * new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
-         * NamedCommands.registerCommand("AprilTagAlignLeft",
-         * new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
-         */
+
+        NamedCommands.registerCommand("AprilTagAlignRight",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, 0.15, -0.5));
+        NamedCommands.registerCommand("AprilTagAlignLeft",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, -0.2, -0.5));
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake",
