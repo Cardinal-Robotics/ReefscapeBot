@@ -103,6 +103,12 @@ public class AlignAprilTag extends Command {
         // is still set to keep moving forward. I'm praying the delay isn't that bad on
         // the real bot.
 
+        if (xTranslationController.atSetpoint() && yTranslationController.atSetpoint()) {
+            m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
+            m_finished = true;
+            return;
+        }
+
         if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
             m_finished = true;
@@ -125,11 +131,6 @@ public class AlignAprilTag extends Command {
          * (),
          * Rotation2d.kZero));
          */
-
-        if (xTranslationController.atSetpoint() && yTranslationController.atSetpoint()) {
-            m_finished = true;
-            return;
-        }
 
         // Calculates the propper speed to correctly face the AprilTag (assuming
         // odometry is perfect, because VisionSubsytem::getAprilTagPose doesn't get the

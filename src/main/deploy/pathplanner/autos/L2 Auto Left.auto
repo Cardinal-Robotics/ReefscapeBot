@@ -73,9 +73,34 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AprilTagAlignRight"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralTiltL2-L3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorCoralL2"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "AprilTagAlignRight"
+            "name": "CoralRelease"
           }
         }
       ]
