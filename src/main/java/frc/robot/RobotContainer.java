@@ -96,8 +96,10 @@ public class RobotContainer {
     // YAGSL Swerve input streams
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final SwerveInputStream m_driveInputStream = SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
-            () -> m_driverController.getLeftY() * -1,
-            () -> m_driverController.getLeftX() * -1)
+            () -> m_driverController.getLeftY() * -1
+                    * (SmartDashboard.getBoolean("Invert Translation", false) ? -1 : 1),
+            () -> m_driverController.getLeftX() * -1
+                    * (SmartDashboard.getBoolean("Invert Translation", false) ? -1 : 1))
             .withControllerHeadingAxis( // Maps joystick rotation to rotation on field. So if the joystick goes bottom
                                         // right, the robot rotates to the bottom red from the perspective of your
                                         // alliance

@@ -19,6 +19,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.StructPublisher;
@@ -65,6 +66,9 @@ public class SwerveSubsystem extends SubsystemBase {
         m_swerveDrive.resetOdometry(getInitialPose());
 
         setupPathPlanner();
+
+        SmartDashboard.putBoolean("Invert Rotation", false);
+        SmartDashboard.putBoolean("Invert Translation", false);
     }
 
     @Override
