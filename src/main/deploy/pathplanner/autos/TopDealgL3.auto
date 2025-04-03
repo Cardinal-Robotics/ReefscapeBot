@@ -1,0 +1,93 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Ante Top Middle Reef"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorAlgaeL2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AlgaeTiltL2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AprilTagAlignCenter"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "@Top Middle Reef = Tilt"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeRelease"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ProcessorToIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AlgaeTiltStore"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorCoralIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralTiltIntake"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -84,7 +84,7 @@ public class CoralSubsystem extends SubsystemBase {
                 15,
                 SingleJointedArmSim.estimateMOI(0.5, 10),
                 0.5,
-                Math.toRadians(0),
+                Math.toRadians(-10),
                 Math.toRadians(180),
                 false,
                 0, 0, 0);

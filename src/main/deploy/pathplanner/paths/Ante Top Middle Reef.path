@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.590213815789473,
-        "y": 5.410526315789473
+        "x": 7.578,
+        "y": 3.940241477272727
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.590213815789473,
-        "y": 5.410526315789473
+        "x": 6.740386363636365,
+        "y": 3.940241477272727
       },
       "isLocked": false,
-      "linkedName": "topleftrightahudsu"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.2772500000000002,
-        "y": 7.07675
+        "x": 6.071299342105262,
+        "y": 3.940241477272727
       },
       "prevControl": {
-        "x": 2.095095394736842,
-        "y": 6.816963815789473
+        "x": 6.574263110255498,
+        "y": 3.940241477272727
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "coral station top"
+      "linkedName": "Ante-TMR"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -55.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

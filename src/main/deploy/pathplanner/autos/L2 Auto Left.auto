@@ -1,0 +1,87 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartTopToL2TopLeftButRightIDK"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralTiltL2-L3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorCoralL2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AprilTagAlignLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralRelease"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New New New Path"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ElevatorCoralIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralTiltIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralStationToTopLeftReefL2Right"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AprilTagAlignRight"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

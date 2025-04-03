@@ -56,6 +56,9 @@ public class AlignAprilTag extends Command {
 
         SmartDashboard.putNumber("customAlignX", 0);
         SmartDashboard.putNumber("customAlignY", 0);
+
+        xTranslationController.setTolerance(0.02);
+        yTranslationController.setTolerance(0.02);
     }
 
     @Override
@@ -123,12 +126,10 @@ public class AlignAprilTag extends Command {
          * Rotation2d.kZero));
          */
 
-        /*
-         * if (pose.getX() < .02 && pose.getY() < .02) {
-         * m_finished = true;
-         * return;
-         * }
-         */
+        if (xTranslationController.atSetpoint() && yTranslationController.atSetpoint()) {
+            m_finished = true;
+            return;
+        }
 
         // Calculates the propper speed to correctly face the AprilTag (assuming
         // odometry is perfect, because VisionSubsytem::getAprilTagPose doesn't get the

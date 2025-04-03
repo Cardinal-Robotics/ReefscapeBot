@@ -166,14 +166,33 @@ public class RobotContainer {
                 new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
         NamedCommands.registerCommand("AprilTagAlignLeft",
                 new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
+        NamedCommands.registerCommand("AprilTagAlignCenter",
+                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake",
                 m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.CoralIntake));
-        NamedCommands.registerCommand("ElevatorCoralL1", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L1));
-        NamedCommands.registerCommand("ElevatorCoralL2", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L2));
-        NamedCommands.registerCommand("ElevatorCoralL3", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L3));
-        NamedCommands.registerCommand("ElevatorCoralL4", m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L4));
+        NamedCommands.registerCommand("ElevatorCoralL1",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L1, InteractionState.Coral));
+        NamedCommands.registerCommand("ElevatorCoralL2",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L2, InteractionState.Coral));
+        NamedCommands.registerCommand("ElevatorCoralL3",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L3, InteractionState.Coral));
+        NamedCommands.registerCommand("ElevatorCoralL4",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L4, InteractionState.Coral));
+        NamedCommands.registerCommand("ElevatorAlgaeL1",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L1, InteractionState.Algae));
+        NamedCommands.registerCommand("ElevatorAlgaeL2",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L2, InteractionState.Algae));
+        NamedCommands.registerCommand("ElevatorAlgaeL3",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L3, InteractionState.Algae));
+        NamedCommands.registerCommand("ElevatorAlgaeL4",
+                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L4, InteractionState.Algae));
+
+        NamedCommands.registerCommand("InteractionAlgae",
+                Commands.runOnce(() -> interactionState = InteractionState.Algae));
+        NamedCommands.registerCommand("InteractionCoral",
+                Commands.runOnce(() -> interactionState = InteractionState.Coral));
 
         // Coral mechanism
         NamedCommands.registerCommand("CoralTiltIntake",
@@ -186,6 +205,16 @@ public class RobotContainer {
                 m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL2_3));
         NamedCommands.registerCommand("CoralTiltL4",
                 m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL4));
+
+        NamedCommands.registerCommand("AlgaeTiltStore",
+                m_algaeSubsystem.setTiltTargetCommand(AlgaeMechanismConstants.kTargetDisabledAngle));
+        NamedCommands.registerCommand("AlgaeTiltL2",
+                m_algaeSubsystem.setTiltTargetCommand(AlgaeMechanismConstants.kTargetIntakeAngleL2));
+        NamedCommands.registerCommand("AlgaeTiltL3",
+                m_algaeSubsystem.setTiltTargetCommand(AlgaeMechanismConstants.kTargetIntakeAngleL3));
+
+        NamedCommands.registerCommand("AlgaeRelease", m_algaeSubsystem.spinIntakeMotorCommand(0.65, 2));
+        NamedCommands.registerCommand("AlgaeIntake", m_algaeSubsystem.spinIntakeMotorCommand(-0.65, 1.5));
 
         NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-1, 2));
         NamedCommands.registerCommand("CoralIntake", m_coralSubsystem.setIntakeMotorCommand(0.2, 1));
