@@ -295,7 +295,11 @@ public class RobotContainer {
         // Algae Controls
         m_operatorController.leftTrigger()
                 .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(-1))
-                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(-0.1))
+                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(-0.1));
+
+        m_operatorController.rightTrigger()
+                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(1))
+                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0))
                 .onFalse(Commands.runOnce(() -> {
                     Optional<PhotonTrackedTarget> target = Robot.isSimulation() ? m_visionSubsystem.getClosestTarget()
                             : m_visionSubsystem.getBestTarget();
@@ -310,10 +314,6 @@ public class RobotContainer {
 
                     Logger.recordOutput("Offset", potentialPose.get());
                 }));
-
-        m_operatorController.rightTrigger()
-                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(1))
-                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0));
 
         // Elevator Positions
         m_operatorController.button(7)
