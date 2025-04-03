@@ -243,11 +243,11 @@ public class RobotContainer {
         // m_driverController.povRight().onTrue(Commands.runOnce(() ->
         // m_alignAprilTag.setOffsetPose(-0.5, 0.15)));
         m_driverController.povRight()
-                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
+                .onTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
         m_driverController.povLeft()
-                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
+                .onTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
         m_driverController.povUp()
-                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
+                .onTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
         /*
          * m_driverController.povDown().whileTrue(Commands.run(() -> {
          * Pose2d nearestPose =

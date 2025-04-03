@@ -108,6 +108,7 @@ public class AlignAprilTag extends Command {
             m_finished = true;
             return;
         }
+        System.out.println("at target");
 
         if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
