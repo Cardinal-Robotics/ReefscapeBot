@@ -87,7 +87,11 @@ public final class Constants {
 
         public static final List<Pose2d> kInteractionAreas = List.of(
                 new Pose2d(11.55, 7.7, Rotation2d.kCCW_90deg),
-                new Pose2d(6, 0.4, Rotation2d.kCW_90deg));
+                new Pose2d(6, 0.4, Rotation2d.kCW_90deg),
+                new Pose2d(16.4, 0.9, new Rotation2d(130)),
+                new Pose2d(16.4, 7, new Rotation2d(-130)),
+                new Pose2d(1, 7, new Rotation2d(-50)),
+                new Pose2d(1, 0.9, new Rotation2d(50)));
     }
 
     public static final class ElevatorConstants {

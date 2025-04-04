@@ -10,10 +10,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,12 +34,15 @@ import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.SimulatedGame;
 import frc.robot.commands.AlignAprilTag;
-import frc.robot.commands.DriveToInteractionArea;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import java.lang.StackWalker.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,11 +56,8 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     // Misc.
     // ---------------------------------------------------------------------------------------------------------------------------------------
-    private Optional<Command> m_interactionAreaDriveCommand = Optional.empty();
     public static InteractionState interactionState = InteractionState.Coral;
     private final SendableChooser<Command> m_autoChooser;
-
-    boolean rotationInverted;
 
     public enum InteractionState {
         Coral,
@@ -104,15 +107,16 @@ public class RobotContainer {
                                         // right, the robot rotates to the bottom red from the perspective of your
                                         // alliance
                     () -> m_driverController.getRightX()
+                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
                             * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1),
                     () -> m_driverController.getRightY()
+                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
                             * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1))
             .headingWhile(true)
             .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the deadband for it
                                                    // to register. This way slight micro-movements doesn't suddenly move
                                                    // the robot.
             .scaleTranslation(0.8) // If the joystick goes to 100%, this scales it down to 80%.
-            .scaleRotation(0.8)
             .allianceRelativeControl(true); // Field orientation flips to be on the your team's side.
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -124,17 +128,14 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    private final DriveToInteractionArea m_driveToInteractionArea = new DriveToInteractionArea(m_swerveDrive);
     private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive,
             m_elevatorSubsystem);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
     public RobotContainer() {
-        var leftCamera = new HttpCamera("left", "http://photonvision.local:1182/stream.mjpg");
-        var rightCamera = new HttpCamera("right", "http://photonvision.local:1184/stream.mjpg");
-        CameraServer.startAutomaticCapture(leftCamera);
-        CameraServer.startAutomaticCapture(rightCamera);
+        SmartDashboard.putBoolean("Invert Translation", false);
+        SmartDashboard.putBoolean("Invert Rotation", false);
 
         DriverStation.silenceJoystickConnectionWarning(true);
         m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
@@ -152,8 +153,20 @@ public class RobotContainer {
         m_autoChooser = AutoBuilder.buildAutoChooser("Leave");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
 
-        PathPlannerLogging.setLogActivePathCallback((List<Pose2d> trajectory) -> {
-            m_swerveDrive.getLibSwerveDrive().field.getObject("trajectory").setPoses(trajectory);
+        m_autoChooser.onChange((Command selectedCommand) -> {
+            String commandName = selectedCommand.getName();
+            try {
+                List<PathPlannerPath> trajectory = PathPlannerAuto.getPathGroupFromAutoFile(commandName);
+                List<Pose2d> poses = new ArrayList<>();
+
+                for (PathPlannerPath path : trajectory) {
+                    poses.addAll(path.getPathPoses());
+                }
+
+                m_swerveDrive.getLibSwerveDrive().field.getObject("trajectory").setPoses(poses);
+            } catch (Exception exception) {
+
+            }
         });
 
         // m_coralsubsystem.setDefaultCommand(m_coralCommand);
@@ -251,16 +264,27 @@ public class RobotContainer {
         m_driverController.povUp()
                 .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
         /*
-         * m_driverController.povDown().whileTrue(Commands.run(() -> {
+         * m_driveInputStream.driveToPose(() ->
+         * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas),
+         * new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(3, 1)),
+         * new ProfiledPIDController(0.1, 0, 0,
+         * new TrapezoidProfile.Constraints(Units.degreesToRadians(30),
+         * Units.degreesToRadians(30))));
+         * 
+         * m_driverController.povDown()
+         * .and(() -> m_elevatorSubsystem.getPosition() <
+         * ElevatorTarget.CoralIntake.getCoralPosition() + 0.1)
+         * .whileTrue(Commands.runEnd(() -> {
          * Pose2d nearestPose =
          * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas);
-         * double distance =
-         * nearestPose.getTranslation().getDistance(m_swerveDrive.getPose().
-         * getTranslation());
-         * if (distance < 1)
-         * m_swerveDrive.driveToPose(nearestPose).until(() ->
-         * !m_driverController.povDown().getAsBoolean())
-         * .schedule();
+         * double distance = nearestPose.getTranslation()
+         * .getDistance(m_swerveDrive.getPose().getTranslation());
+         * if (distance > 2)
+         * m_driveInputStream.driveToPoseEnabled(false);
+         * else
+         * m_driveInputStream.driveToPoseEnabled(true);
+         * }, () -> {
+         * m_driveInputStream.driveToPoseEnabled(false);
          * }));
          */
 

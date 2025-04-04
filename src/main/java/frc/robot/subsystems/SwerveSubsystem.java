@@ -66,9 +66,6 @@ public class SwerveSubsystem extends SubsystemBase {
         m_swerveDrive.resetOdometry(getInitialPose());
 
         setupPathPlanner();
-
-        SmartDashboard.putBoolean("Invert Rotation", false);
-        SmartDashboard.putBoolean("Invert Translation", false);
     }
 
     @Override
