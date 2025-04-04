@@ -36,9 +36,13 @@ import frc.robot.subsystems.SimulatedGame;
 import frc.robot.commands.AlignAprilTag;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import java.lang.StackWalker.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,15 +99,19 @@ public class RobotContainer {
     // YAGSL Swerve input streams
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final SwerveInputStream m_driveInputStream = SwerveInputStream.of(m_swerveDrive.getLibSwerveDrive(),
-            () -> m_driverController.getLeftY() * -1,
-            () -> m_driverController.getLeftX() * -1)
+            () -> m_driverController.getLeftY() * -1
+                    * (SmartDashboard.getBoolean("Invert Translation", false) ? -1 : 1),
+            () -> m_driverController.getLeftX() * -1
+                    * (SmartDashboard.getBoolean("Invert Translation", false) ? -1 : 1))
             .withControllerHeadingAxis( // Maps joystick rotation to rotation on field. So if the joystick goes bottom
                                         // right, the robot rotates to the bottom red from the perspective of your
                                         // alliance
                     () -> m_driverController.getRightX()
-                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1),
+                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
+                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1),
                     () -> m_driverController.getRightY()
-                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1))
+                            * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
+                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1))
             .headingWhile(true)
             .deadband(OperatorConstants.kDeadband) // The joystick has to exceed the deadband for it
                                                    // to register. This way slight micro-movements doesn't suddenly move
@@ -126,10 +134,8 @@ public class RobotContainer {
     //
 
     public RobotContainer() {
-        var leftCamera = new HttpCamera("left", "http://photonvision.local:1182/stream.mjpg");
-        var rightCamera = new HttpCamera("right", "http://photonvision.local:1184/stream.mjpg");
-        CameraServer.startAutomaticCapture(leftCamera);
-        CameraServer.startAutomaticCapture(rightCamera);
+        SmartDashboard.putBoolean("Invert Translation", false);
+        SmartDashboard.putBoolean("Invert Rotation", false);
 
         DriverStation.silenceJoystickConnectionWarning(true);
         m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
@@ -147,8 +153,20 @@ public class RobotContainer {
         m_autoChooser = AutoBuilder.buildAutoChooser("Leave");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
 
-        PathPlannerLogging.setLogActivePathCallback((List<Pose2d> trajectory) -> {
-            m_swerveDrive.getLibSwerveDrive().field.getObject("trajectory").setPoses(trajectory);
+        m_autoChooser.onChange((Command selectedCommand) -> {
+            String commandName = selectedCommand.getName();
+            try {
+                List<PathPlannerPath> trajectory = PathPlannerAuto.getPathGroupFromAutoFile(commandName);
+                List<Pose2d> poses = new ArrayList<>();
+
+                for (PathPlannerPath path : trajectory) {
+                    poses.addAll(path.getPathPoses());
+                }
+
+                m_swerveDrive.getLibSwerveDrive().field.getObject("trajectory").setPoses(poses);
+            } catch (Exception exception) {
+
+            }
         });
 
         // m_coralsubsystem.setDefaultCommand(m_coralCommand);
