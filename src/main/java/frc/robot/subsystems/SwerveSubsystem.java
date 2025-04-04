@@ -67,8 +67,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
         setupPathPlanner();
 
-        SmartDashboard.putBoolean("Invert Rotation", false);
-        SmartDashboard.putBoolean("Invert Translation", false);
+        /*
+         * SmartDashboard.putBoolean("Invert Rotation", false);
+         * SmartDashboard.putBoolean("Invert Translation", false);
+         */
     }
 
     @Override
