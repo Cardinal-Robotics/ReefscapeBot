@@ -184,6 +184,7 @@ public final class Constants {
         public static final double kAllowedSetpointError = 3;
 
         public static final double kTargetAngleIntake = -6;
+        public static final double kTargetAngleL1Test = 13.49;
         public static final double kTargetAngleStore = 50;
         public static final double kTargetAngleL1 = 26.66; // down
         public static final double kTargetAngleL2_3 = 26.66; // left

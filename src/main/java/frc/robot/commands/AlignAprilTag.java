@@ -68,6 +68,7 @@ public class AlignAprilTag extends Command {
 
         Optional<PhotonTrackedTarget> target = m_visionSubsystem.getClosestTarget();
         if (target.isEmpty()) {
+            System.out.println("no target");
             m_finished = true;
             m_targetId = -1;
             return;
@@ -96,19 +97,22 @@ public class AlignAprilTag extends Command {
         // m_poseOffset = new Transform2d(SmartDashboard.getNumber("customAlignX", 0),
         // SmartDashboard.getNumber("customAlignY", 0), Rotation2d.kZero);
         Optional<Transform2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
-        if (potentialPose.isEmpty()) {
-            try {
-                // The pose of the AprilTag according to a Welded field's specs and give our
-                // odometry is perfect.
-                Pose2d perfectAprilTagPose = VisionSubsystem.getAprilTagPose(m_targetId);
-                Pose2d relativePose = perfectAprilTagPose.relativeTo(m_swerveSubsystem.getPose());
-
-                potentialPose = Optional
-                        .of(new Transform2d(relativePose.getX(), relativePose.getY(),
-                                perfectAprilTagPose.getRotation()));
-            } catch (Exception e) {
-            }
-        }
+        /*
+         * if (potentialPose.isEmpty()) {
+         * try {
+         * // The pose of the AprilTag according to a Welded field's specs and give our
+         * // odometry is perfect.
+         * Pose2d perfectAprilTagPose = VisionSubsystem.getAprilTagPose(m_targetId);
+         * Pose2d relativePose =
+         * perfectAprilTagPose.relativeTo(m_swerveSubsystem.getPose());
+         * 
+         * potentialPose = Optional
+         * .of(new Transform2d(relativePose.getX(), relativePose.getY(),
+         * perfectAprilTagPose.getRotation()));
+         * } catch (Exception e) {
+         * }
+         * }
+         */
 
         // Logger.recordOutput("K", potentialPose.isPresent() ? potentialPose.get() :
         // Transform2d.kZero);

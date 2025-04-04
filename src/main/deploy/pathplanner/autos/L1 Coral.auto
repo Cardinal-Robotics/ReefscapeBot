@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -17,13 +23,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ElevatorCoralL1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CoralTiltL1"
+                  "name": "CoralTiltL1Test"
                 }
               }
             ]
@@ -33,6 +33,31 @@
           "type": "named",
           "data": {
             "name": "CoralRelease"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralRelease"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "move left"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralTiltIntake"
           }
         }
       ]

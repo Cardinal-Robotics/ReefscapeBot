@@ -216,6 +216,8 @@ public class RobotContainer {
         // Coral mechanism
         NamedCommands.registerCommand("CoralTiltIntake",
                 m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleIntake));
+        NamedCommands.registerCommand("CoralTiltL1Test",
+                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL1Test));
         NamedCommands.registerCommand("CoralTiltStore",
                 m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore));
         NamedCommands.registerCommand("CoralTiltL1",
@@ -235,7 +237,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("AlgaeRelease", m_algaeSubsystem.spinIntakeMotorCommand(0.65, 2));
         NamedCommands.registerCommand("AlgaeIntake", m_algaeSubsystem.spinIntakeMotorCommand(-0.65, 1.5));
 
-        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-1, 2));
+        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-0.15, 2));
         NamedCommands.registerCommand("CoralIntake", m_coralSubsystem.setIntakeMotorCommand(0.2, 1));
     }
 
