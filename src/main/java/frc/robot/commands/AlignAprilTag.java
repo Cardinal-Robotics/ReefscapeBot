@@ -36,7 +36,7 @@ public class AlignAprilTag extends Command {
     private Transform2d m_poseOffset = setOffsetPose(0, -0.5);
     private boolean m_finished = false;
     private double m_lastUpdated;
-    private int m_targetId;
+    private int m_targetId = -1;
 
     public AlignAprilTag(VisionSubsystem visionSubsystem, SwerveSubsystem swerveSubsystem,
             ElevatorSubsystem elevatorSubsystem, double offsetX,
@@ -66,15 +66,16 @@ public class AlignAprilTag extends Command {
         m_lastUpdated = Timer.getFPGATimestamp();
         m_finished = false;
 
-        Optional<PhotonTrackedTarget> target = Robot.isSimulation() ? m_visionSubsystem.getClosestTarget()
-                : m_visionSubsystem.getBestTarget();
+        Optional<PhotonTrackedTarget> target = m_visionSubsystem.getClosestTarget();
         if (target.isEmpty()) {
             m_finished = true;
+            m_targetId = -1;
             return;
         }
 
         m_targetId = target.get().getFiducialId();
-
+        xTranslationController.reset();
+        yTranslationController.reset();
     }
 
     /**
@@ -95,6 +96,20 @@ public class AlignAprilTag extends Command {
         // m_poseOffset = new Transform2d(SmartDashboard.getNumber("customAlignX", 0),
         // SmartDashboard.getNumber("customAlignY", 0), Rotation2d.kZero);
         Optional<Transform2d> potentialPose = m_visionSubsystem.getRobotPoseRelativeToAprilTag(m_targetId);
+        if (potentialPose.isEmpty()) {
+            try {
+                // The pose of the AprilTag according to a Welded field's specs and give our
+                // odometry is perfect.
+                Pose2d perfectAprilTagPose = VisionSubsystem.getAprilTagPose(m_targetId);
+                Pose2d relativePose = perfectAprilTagPose.relativeTo(m_swerveSubsystem.getPose());
+
+                potentialPose = Optional
+                        .of(new Transform2d(relativePose.getX(), relativePose.getY(),
+                                perfectAprilTagPose.getRotation()));
+            } catch (Exception e) {
+            }
+        }
+
         // Logger.recordOutput("K", potentialPose.isPresent() ? potentialPose.get() :
         // Transform2d.kZero);
 
@@ -105,13 +120,14 @@ public class AlignAprilTag extends Command {
 
         if (xTranslationController.atSetpoint() && yTranslationController.atSetpoint()) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
+            System.out.println("at target");
             m_finished = true;
             return;
         }
-        System.out.println("at target");
 
         if ((Timer.getFPGATimestamp() - m_lastUpdated) > 1) {
             m_swerveSubsystem.getLibSwerveDrive().drive(new ChassisSpeeds(0, 0, 0));
+            System.out.println("Giving up");
             m_finished = true;
             return;
         }
@@ -156,16 +172,16 @@ public class AlignAprilTag extends Command {
 
         double speedLimiter = Math.max(2 * (1 - (m_elevatorSubsystem.getPosition() / 1.3)), 0.3);
 
-        ChassisSpeeds targetRelativeSpeeds = new ChassisSpeeds(
-                MathUtil.clamp(xAdjustedTranslationSpeed, -speedLimiter, speedLimiter), // Forward velocity
-                MathUtil.clamp(yAdjustedTranslationSpeed, -speedLimiter, speedLimiter), // Sideways velocity
-                omegaRadiansPerSecond // Rotational velocity
-        );
+        ChassisSpeeds targetRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(
+                MathUtil.clamp(xTranslationSpeed, -speedLimiter, speedLimiter), // Forward velocity
+                MathUtil.clamp(yTranslationSpeed, -speedLimiter, speedLimiter), // Sideways velocity
+                omegaRadiansPerSecond,
+                m_swerveSubsystem.getRotation());
 
         Logger.recordOutput("AT Align X Error", xTranslationController.getError());
         Logger.recordOutput("AT Align Y Error", yTranslationController.getError());
 
-        m_swerveSubsystem.getLibSwerveDrive().drive(targetRelativeSpeeds);
+        m_swerveSubsystem.getLibSwerveDrive().driveFieldOriented(targetRelativeSpeeds);
 
         m_lastUpdated = Timer.getFPGATimestamp();
     }

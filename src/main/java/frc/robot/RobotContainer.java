@@ -266,17 +266,19 @@ public class RobotContainer {
         /*
          * m_driveInputStream.driveToPose(() ->
          * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas),
-         * new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(1, 0.5)),
+         * new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(3, 1)),
          * new ProfiledPIDController(0.1, 0, 0,
          * new TrapezoidProfile.Constraints(Units.degreesToRadians(30),
-         * Units.degreesToRadians(10))));
+         * Units.degreesToRadians(30))));
          * 
-         * m_driverController.povDown().whileTrue(Commands.runEnd(() -> {
+         * m_driverController.povDown()
+         * .and(() -> m_elevatorSubsystem.getPosition() <
+         * ElevatorTarget.CoralIntake.getCoralPosition() + 0.1)
+         * .whileTrue(Commands.runEnd(() -> {
          * Pose2d nearestPose =
          * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas);
-         * double distance =
-         * nearestPose.getTranslation().getDistance(m_swerveDrive.getPose().
-         * getTranslation());
+         * double distance = nearestPose.getTranslation()
+         * .getDistance(m_swerveDrive.getPose().getTranslation());
          * if (distance > 2)
          * m_driveInputStream.driveToPoseEnabled(false);
          * else

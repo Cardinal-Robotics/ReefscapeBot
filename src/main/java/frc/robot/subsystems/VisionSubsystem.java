@@ -120,10 +120,10 @@ public class VisionSubsystem extends SubsystemBase {
      *                    itself correctly.
      * @return The target pose of the AprilTag.
      */
-    public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
+    public static Pose2d getAprilTagPose(int aprilTag) {
         Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
         if (aprilTagPose3d.isPresent()) {
-            return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
+            return aprilTagPose3d.get().toPose2d();
         } else {
             throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
         }
@@ -250,18 +250,39 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public Optional<PhotonTrackedTarget> getClosestTarget() {
+        List<Integer> includedTags = new ArrayList<Integer>();
+        includedTags.add(22);
+        includedTags.add(21);
+        includedTags.add(20);
+        includedTags.add(19);
+        includedTags.add(18);
+        includedTags.add(17);
+        includedTags.add(11);
+        includedTags.add(10);
+        includedTags.add(9);
+        includedTags.add(8);
+        includedTags.add(7);
+        includedTags.add(6);
+
+        Optional<PhotonTrackedTarget> closestTarget = Optional.empty();
         for (Cameras camera : Cameras.values()) {
             for (PhotonPipelineResult result : camera.resultsList) {
                 if (!result.hasTargets())
                     continue;
+                List<PhotonTrackedTarget> targets = result.getTargets();
+                for (PhotonTrackedTarget target : targets) {
+                    if (!includedTags.contains(target.getFiducialId()))
+                        continue;
 
-                return result.getTargets().stream().sorted(Comparator.comparing((PhotonTrackedTarget target) -> {
-                    return target.bestCameraToTarget.getTranslation().getDistance(Translation3d.kZero);
-                })).findFirst();
+                    if (closestTarget.isEmpty() || closestTarget.get().altCameraToTarget.getTranslation()
+                            .getDistance(Translation3d.kZero) > target.altCameraToTarget.getTranslation()
+                                    .getDistance(Translation3d.kZero))
+                        closestTarget = Optional.of(target);
+                }
             }
         }
 
-        return Optional.empty();
+        return closestTarget;
     }
 
     private final StructPublisher<Transform3d> m_publisher = NetworkTableInstance.getDefault()
