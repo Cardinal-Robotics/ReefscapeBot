@@ -38,7 +38,7 @@ public class Robot extends LoggedRobot {
         if (Robot.isSimulation())
             Logger.addDataReceiver(new NT4Publisher());
 
-        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs/"));
         Logger.start();
 
         // Instantiate our RobotContainer. This will perform all our button bindings,

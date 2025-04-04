@@ -105,7 +105,7 @@ public final class Constants {
             CoralIntake(Double.NaN, -.02),
             AlgaeScore(0.32, Double.NaN),
             L1(Double.NaN, 0.125),
-            L2(0.88, 0.23),
+            L2(0.92, 0.23),
             L3(1.295, 0.62),
             L4(Double.NaN, 1.275); // coral 1.295
 
