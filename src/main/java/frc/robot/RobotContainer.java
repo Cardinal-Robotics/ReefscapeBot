@@ -33,7 +33,8 @@ import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.SimulatedGame;
-import frc.robot.commands.AlignAprilTag;
+import frc.robot.commands.CoralAndProcessorAlign;
+import frc.robot.commands.ReefAlign;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -128,7 +129,7 @@ public class RobotContainer {
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
 
-    private final AlignAprilTag m_alignAprilTag = new AlignAprilTag(m_visionSubsystem, m_swerveDrive,
+    private final ReefAlign m_alignAprilTag = new ReefAlign(m_visionSubsystem, m_swerveDrive,
             m_elevatorSubsystem);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
@@ -139,11 +140,7 @@ public class RobotContainer {
 
         DriverStation.silenceJoystickConnectionWarning(true);
         m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
-        m_elevatorSubsystem.setScaleDriverInputConsumer((Double scale) -> {
-            m_driveInputStream.scaleTranslation(scale);
-
-            m_swerveDrive.getLibSwerveDrive().swerveController.config.maxAngularVelocity = (4 * Math.PI) * scale;
-        });
+        m_elevatorSubsystem.setDriveSubsystem(m_swerveDrive);
 
         registerNamedCommands();
         configureBindings();
@@ -160,6 +157,10 @@ public class RobotContainer {
                 List<Pose2d> poses = new ArrayList<>();
 
                 for (PathPlannerPath path : trajectory) {
+
+                    if (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Red))
+                        path = path.flipPath();
+
                     poses.addAll(path.getPathPoses());
                 }
 
@@ -182,11 +183,11 @@ public class RobotContainer {
         // AprilTag Alignment
 
         NamedCommands.registerCommand("AprilTagAlignRight",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
+                new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
         NamedCommands.registerCommand("AprilTagAlignLeft",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
+                new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
         NamedCommands.registerCommand("AprilTagAlignCenter",
-                new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
+                new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
 
         // Elevator positions
         NamedCommands.registerCommand("ElevatorCoralIntake",
@@ -260,11 +261,13 @@ public class RobotContainer {
         // m_driverController.povRight().onTrue(Commands.runOnce(() ->
         // m_alignAprilTag.setOffsetPose(-0.5, 0.15)));
         m_driverController.povRight()
-                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
+                .whileTrue(new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
         m_driverController.povLeft()
-                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
+                .whileTrue(new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
         m_driverController.povUp()
-                .whileTrue(new AlignAprilTag(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
+                .whileTrue(new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
+
+        m_driverController.povDown().whileTrue(new CoralAndProcessorAlign(m_swerveDrive, m_elevatorSubsystem));
         /*
          * m_driveInputStream.driveToPose(() ->
          * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas),

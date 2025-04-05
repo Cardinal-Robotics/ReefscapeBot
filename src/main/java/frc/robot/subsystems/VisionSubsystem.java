@@ -15,6 +15,7 @@ import org.photonvision.PhotonUtils;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -89,6 +90,18 @@ public class VisionSubsystem extends SubsystemBase {
         this.m_swerveDrive = swerveDrive;
         this.field2d = swerveDrive.field;
 
+        for (Cameras camera : Cameras.values()) {
+            SmartDashboard.putNumber(camera.name() + "/X", camera.robotToCamTransform.getX());
+            SmartDashboard.putNumber(camera.name() + "/Y", camera.robotToCamTransform.getY());
+            SmartDashboard.putNumber(camera.name() + "/Z", camera.robotToCamTransform.getZ());
+            SmartDashboard.putNumber(camera.name() + "/AngX",
+                    Math.toDegrees(camera.robotToCamTransform.getRotation().getX()));
+            SmartDashboard.putNumber(camera.name() + "/AngY",
+                    Math.toDegrees(camera.robotToCamTransform.getRotation().getY()));
+            SmartDashboard.putNumber(camera.name() + "/AngZ",
+                    Math.toDegrees(camera.robotToCamTransform.getRotation().getZ()));
+        }
+
         if (!Robot.isSimulation())
             return;
 
@@ -97,11 +110,24 @@ public class VisionSubsystem extends SubsystemBase {
 
         for (Cameras camera : Cameras.values()) {
             camera.addToVisionSim(visionSim);
+
         }
+
     }
 
     @Override
     public void periodic() {
+        for (Cameras camera : Cameras.values()) {
+            camera.poseEstimator
+                    .setRobotToCameraTransform(new Transform3d(SmartDashboard.getNumber(camera.name() + "/X", 0),
+                            SmartDashboard.getNumber(camera.name() + "/Y", 0),
+                            SmartDashboard.getNumber(camera.name() + "/Z", 0),
+                            new Rotation3d(
+                                    Math.toRadians(SmartDashboard.getNumber(camera.name() + "/AngX", 0)),
+                                    Math.toRadians(SmartDashboard.getNumber(camera.name() + "/AngY", 0)),
+                                    Math.toRadians(SmartDashboard.getNumber(camera.name() + "/AngZ", 0)))));
+        }
+
         if (poseEstimationEnabled)
             this.updatePoseEstimation();
         else {
@@ -154,6 +180,7 @@ public class VisionSubsystem extends SubsystemBase {
                 continue;
 
             var pose = poseEst.get();
+            Logger.recordOutput("PE-" + camera.name(), pose.estimatedPose.toPose2d());
             m_swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                     pose.timestampSeconds,
                     camera.curStdDevs);

@@ -14,6 +14,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -85,13 +88,19 @@ public final class Constants {
         public static final boolean kFrontRightNotVersH = true;
         public static final boolean kRearRightNotVersH = false;
 
+        public static final PPHolonomicDriveController kPathDriveController = new PPHolonomicDriveController(
+                new PIDConstants(DriveConstants.kPTrans, DriveConstants.kITrans, DriveConstants.kDTrans), // Translation
+                                                                                                          // PID
+                new PIDConstants(DriveConstants.kPAngular, DriveConstants.kIAngular,
+                        DriveConstants.kDAngular));
+
         public static final List<Pose2d> kInteractionAreas = List.of(
                 new Pose2d(11.55, 7.7, Rotation2d.kCCW_90deg),
                 new Pose2d(6, 0.4, Rotation2d.kCW_90deg),
-                new Pose2d(16.4, 0.9, new Rotation2d(130)),
-                new Pose2d(16.4, 7, new Rotation2d(-130)),
-                new Pose2d(1, 7, new Rotation2d(-50)),
-                new Pose2d(1, 0.9, new Rotation2d(50)));
+                new Pose2d(16.4, 0.9, Rotation2d.fromDegrees(130)),
+                new Pose2d(16.4, 7, Rotation2d.fromDegrees(-130)),
+                new Pose2d(1, 7, Rotation2d.fromDegrees(-50)),
+                new Pose2d(1, 0.9, Rotation2d.fromDegrees(50)));
     }
 
     public static final class ElevatorConstants {

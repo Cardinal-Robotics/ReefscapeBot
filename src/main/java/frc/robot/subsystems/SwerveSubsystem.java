@@ -208,11 +208,7 @@ public class SwerveSubsystem extends SubsystemBase {
                                 m_swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
                                 moduleFeedForwards.linearForces());
                     },
-                    new PPHolonomicDriveController(
-                            new PIDConstants(DriveConstants.kPTrans, DriveConstants.kITrans, DriveConstants.kDTrans), // Translation
-                                                                                                                      // PID
-                            new PIDConstants(DriveConstants.kPAngular, DriveConstants.kIAngular,
-                                    DriveConstants.kDAngular)), // Rotation PID
+                    DriveConstants.kPathDriveController, // Rotation PID
                     config,
                     () -> {
                         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);

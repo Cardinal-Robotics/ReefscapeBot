@@ -47,7 +47,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     // DO NOT CHANGE TO FOLLOWER
     private final SparkMax m_slave = new SparkMax(ElevatorConstants.kSlaveMotorId, MotorType.kBrushless);
     private final RelativeEncoder m_encoder = m_master.getEncoder();
-    private Consumer<Double> m_scaleDriverInputConsumer = null;
+    private SwerveSubsystem m_swerveDrive = null;
     private CoralSubsystem m_coralSubsystem = null;
 
     // Feedforward stuff (if needed)
@@ -77,8 +77,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("master motor output %", m_master.getAppliedOutput());
         SmartDashboard.putNumber("ElevatorSubsystem::getPosition", getPosition());
 
-        if (m_scaleDriverInputConsumer != null)
-            m_scaleDriverInputConsumer.accept(0.8 * Math.max((1 - (getPosition() / 1.3)), 0.1));
+        if (m_swerveDrive != null) {
+            m_swerveDrive.getLibSwerveDrive().setMaximumAllowableSpeeds(1.2 * (1 - (getPosition() / 1.3)) + 0.3,
+                    (11 * Math.PI / 6) * (1 - (getPosition() / 1.3)) + (Math.PI / 6));
+        }
 
         double targetPosition = m_setpoint.position;
 
@@ -151,10 +153,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         };
     }
 
-    public ElevatorSubsystem(CoralSubsystem coralSubsystem, Consumer<Double> scaleDriverInputConsumer) {
+    public ElevatorSubsystem(CoralSubsystem coralSubsystem, SwerveSubsystem swerveSubsystem) {
         SmartDashboard.putNumber("ElevatorFF %", 0);
         SmartDashboard.putNumber("ElevatorHeight", 0);
-        m_scaleDriverInputConsumer = scaleDriverInputConsumer;
+        m_swerveDrive = swerveSubsystem;
         SparkMaxConfig masterConfig = new SparkMaxConfig();
         masterConfig.idleMode(IdleMode.kCoast);
         m_coralSubsystem = coralSubsystem;
@@ -202,8 +204,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         this.m_coralSubsystem = coralSubsystem;
     }
 
-    public void setScaleDriverInputConsumer(Consumer<Double> scaleDriverInputConsumer) {
-        this.m_scaleDriverInputConsumer = scaleDriverInputConsumer;
+    public void setDriveSubsystem(SwerveSubsystem swerveDrive) {
+        this.m_swerveDrive = swerveDrive;
     }
 
     public double getPosition() {
