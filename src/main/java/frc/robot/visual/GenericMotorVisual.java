@@ -11,7 +11,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -21,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Util;
 
 public class GenericMotorVisual extends SubsystemBase {
+    private boolean challengeStarted = false;
+    private Timer timer = new Timer();
     private SparkMaxSim m_motorSim;
     private SparkMax m_motor;
     private double m_angle;
@@ -46,6 +50,17 @@ public class GenericMotorVisual extends SubsystemBase {
         initialize();
     }
 
+    public void startChallengeMode() {
+        if (challengeStarted)
+            return;
+        challengeStarted = true;
+        timer.start();
+    }
+
+    public boolean isChallengeModeReady() {
+        return timer.hasElapsed(3);
+    }
+
     public void initialize() {
         root.append(wheel);
         SmartDashboard.putData("Motor Visualization", mech);
@@ -53,20 +68,39 @@ public class GenericMotorVisual extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        double voltage = m_motor.get() * RobotController.getBatteryVoltage();
         double dt = 0.02;
+        double busVoltage = m_motorSim.getBusVoltage();
 
-        // Apply input voltage
-        flywheelSim.setInputVoltage(voltage);
+        // during challenge spin-up, force open-loop control
+        if (challengeStarted && !isChallengeModeReady()) {
+            m_motor.set(-1.0);
+        }
+
+        // 1. Run REVSim first — this updates internal PID output
+        // feed the *current* flywheel speed and voltage estimate
+        double velocityRPM = Units.radiansPerSecondToRotationsPerMinute(flywheelSim.getAngularVelocityRadPerSec());
+        m_motorSim.iterate(velocityRPM, busVoltage, dt);
+
+        // 2. Now read what the PID decided to do
+        double appliedOutput = m_motorSim.getAppliedOutput();
+        double motorVoltage = appliedOutput * busVoltage;
+
+        // 3. Advance the flywheel physics with that voltage
+        flywheelSim.setInputVoltage(motorVoltage);
         flywheelSim.update(dt);
 
-        m_motorSim.iterate(flywheelSim.getAngularVelocityRadPerSec(), voltage, dt);
-
+        // 4. Integrate the position (radians → rotations)
         m_angle += flywheelSim.getAngularVelocityRadPerSec() * dt;
+        m_motor.getEncoder().setPosition(m_angle / (2.0 * Math.PI));
+
+        // 5. Update the mechanism visual
         wheel.setAngle(Math.toDegrees(m_angle));
 
-        // Display info
-        SmartDashboard.putNumber("Flywheel Speed (RPM)", flywheelSim.getAngularVelocityRPM());
-        SmartDashboard.putNumber("Flywheel Angle (deg)", Math.toDegrees(m_angle));
+        // 6. Telemetry
+        SmartDashboard.putNumber("Encoder RPM (reported)", m_motor.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Applied Output (sim)", m_motorSim.getAppliedOutput()); // -1..1
+        SmartDashboard.putNumber("Bus Voltage (V)", m_motorSim.getBusVoltage());
+        SmartDashboard.putNumber("Motor Voltage (V)", m_motorSim.getAppliedOutput() * m_motorSim.getBusVoltage());
+        SmartDashboard.putNumber("FlywheelSim RPM", flywheelSim.getAngularVelocityRPM());
     }
 }

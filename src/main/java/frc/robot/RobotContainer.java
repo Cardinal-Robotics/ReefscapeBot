@@ -13,7 +13,7 @@ import frc.robot.visual.GenericMotorVisual;
 
 public class RobotContainer {
     /* Lessons: */
-    // private final GenericMotor m_genericMotor = new GenericMotor();
+    private final GenericMotor m_genericMotor = new GenericMotor();
 
     /* Challenge: */
     // private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();

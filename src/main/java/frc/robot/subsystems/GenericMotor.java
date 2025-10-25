@@ -4,16 +4,19 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkBase.ResetMode;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.visual.GenericMotorVisual;
 
 public class GenericMotor extends SubsystemBase {
     // private GenericMotorVisual visual = new GenericMotorVisual(motorSim);
 
     public GenericMotor() {
+
     }
 
     @Override
     public void periodic() {
+
     }
 }
