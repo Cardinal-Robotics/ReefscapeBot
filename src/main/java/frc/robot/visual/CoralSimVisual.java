@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.visual;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 import frc.robot.Robot;
+import frc.robot.Util;
 
 public class CoralSimVisual extends SubsystemBase {
     private Optional<SparkMaxSim> m_simulatedPivot;
@@ -40,29 +41,27 @@ public class CoralSimVisual extends SubsystemBase {
 
     public CoralSimVisual(SparkMaxSim simulatedFlywheel, SparkMaxSim simulatedPivot) {
         m_simulatedFlywheel = simulatedFlywheel;
-        m_flywheel = getMotorFromSim(simulatedFlywheel);
+        m_flywheel = Util.getMotorFromSim(simulatedFlywheel);
 
         m_simulatedPivot = Optional.of(simulatedPivot);
-        m_pivot = Optional.of(getMotorFromSim(simulatedPivot));
+        m_pivot = Optional.of(Util.getMotorFromSim(simulatedPivot));
     }
 
-    private SparkMax getMotorFromSim(SparkMaxSim simulatedMotor) {
-        try {
-            Class<?> simulatedSparkClass = SparkMaxSim.class;
-            Field privateField = simulatedSparkClass.getDeclaredField("m_spark");
-            privateField.setAccessible(true);
+    public CoralSimVisual(SparkMaxSim simulatedFlywheel, SparkMax flywheel) {
+        m_simulatedFlywheel = simulatedFlywheel;
+        m_flywheel = flywheel;
+    }
 
-            return (SparkMax) privateField.get(simulatedMotor);
-        } catch (Exception error) {
-            error.printStackTrace();
-            throw new RuntimeException(
-                    "\nFailed to extract motor. Please use 'new CoralSimVisual(simMotor, motor);' instead.");
-        }
+    public CoralSimVisual(SparkMaxSim simulatedFlywheel) {
+        m_simulatedFlywheel = simulatedFlywheel;
+        m_flywheel = Util.getMotorFromSim(simulatedFlywheel);
     }
 
     @Override
     public void simulationPeriodic() {
         double pivotRadianRot = m_pivot.isEmpty() ? 0 : m_pivot.get().getEncoder().getPosition();
+
+        System.out.println(m_flywheel.get());
 
         Logger.recordOutput("ZeroedComponentPoses",
                 new Pose3d[] {
