@@ -1,190 +1,99 @@
 {
-  "hubs": [
-    {
-      "x": -8,
-      "y": -8,
-      "width": 1552,
-      "height": 832,
-      "state": {
-        "sidebar": {
-          "width": 272,
-          "expanded": [
-            "/NT",
-            "/NTConnection",
-            "/PathPlanner",
-            "/SmartDashboard/Swerve Drive/infos",
-            "/SmartDashboard/Swerve Drive/errors",
-            "/SmartDashboard/swerve/wheelLocation",
-            "/SmartDashboard/swerve/modules",
-            "/SmartDashboard/swerve/advantagescope/robotRotation",
-            "/SmartDashboard/swerve/advantagescope",
-            "/SmartDashboard/swerve/modules/backright",
-            "/SmartDashboard/swerve/modules/frontleft",
-            "/SmartDashboard/swerve/modules/frontright",
-            "/SmartDashboard/swerve/modules/backleft",
-            "/SmartDashboard/swerve/imu",
-            "/YAGSL Pose",
-            "/Shuffleboard",
-            "/SmartDashboard",
-            "/PathPlanner/vel",
-            "/limelight",
-            "/limelight/botpose_wpired",
-            "/photonvision",
-            "/photonvision/cameraName",
-            "/photonvision/cameraName/rawBytes",
-            "/photonvision/cameraName/rawBytes/targets",
-            "/photonvision/cameraName/rawBytes/targets/0",
-            "/limelight/botpose_targetspace",
-            "/SmartDashboard/Elevator Simulation",
-            "/SmartDashboard/Elevator Simulation/Elevator Root",
-            "/SmartDashboard/Elevator Simulation/Elevator Root/Elevator",
-            "/SmartDashboard/Elevator Simulation/dims"
-          ]
-        },
-        "tabs": {
-          "selected": 3,
-          "tabs": [
-            {
-              "type": 0,
-              "title": "",
-              "controller": null,
-              "controllerUUID": "ysrqhbyff78cvo6vxxphn11ag6uveijm",
-              "renderer": "#/",
-              "controlsHeight": 0
-            },
-            {
-              "type": 9,
-              "title": "Swerve",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "rotation",
-                    "logKey": "NT:/SmartDashboard/swerve/advantagescope/robotRotation",
-                    "logType": "Rotation2d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "states",
-                    "logKey": "NT:/SmartDashboard/swerve/advantagescope/desiredStates",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#0000ff",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "states",
-                    "logKey": "NT:/SmartDashboard/swerve/advantagescope/currentStates",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff0000",
-                      "arrangement": "0,1,2,3"
-                    }
-                  }
-                ],
-                "maxSpeed": 3.699,
-                "sizeX": 0.65,
-                "sizeY": 0.65,
-                "orientation": 1
+    "hubs": [
+      {
+        "x": 1912,
+        "y": -8,
+        "width": 1936,
+        "height": 1096,
+        "state": {
+          "sidebar": {
+            "width": 300,
+            "expanded": [
+              "/SmartDashboard",
+              "/Shuffleboard/.recording",
+              "/Shuffleboard/.metadata",
+              "/AdvantageKit",
+              "/AdvantageKit/RealOutputs",
+              "/AdvantageKit/RealOutputs/FieldSimulation"
+            ]
+          },
+          "tabs": {
+            "selected": 1,
+            "tabs": [
+              {
+                "type": 0,
+                "title": "",
+                "controller": null,
+                "controllerUUID": "z7bcqbvyierm4k6aorpero48hrx4dlv3",
+                "renderer": "#/",
+                "controlsHeight": 0
               },
-              "controllerUUID": "437w32z816t6pc4zou7kxwpxbh8p9d5c",
-              "renderer": null,
-              "controlsHeight": 200
-            },
-            {
-              "type": 2,
-              "title": "Odometry",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "robot",
-                    "logKey": "NT:YAGSL Pose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:Photon Pose",
-                    "logType": "Transform3d",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00"
+              {
+                "type": 3,
+                "title": "3D Field",
+                "controller": {
+                  "sources": [
+                    {
+                      "type": "robot",
+                      "logKey": "NT:/AdvantageKit/RealOutputs/RobotPosition",
+                      "logType": "Pose3d",
+                      "visible": true,
+                      "options": {
+                        "model": "UFB"
+                      }
+                    },
+                    {
+                      "type": "component",
+                      "logKey": "NT:/AdvantageKit/RealOutputs/ZeroedComponentPoses",
+                      "logType": "Pose3d[]",
+                      "visible": true,
+                      "options": {}
+                    },
+                    {
+                      "type": "gamePiece",
+                      "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/Coral",
+                      "logType": "Pose3d[]",
+                      "visible": true,
+                      "options": {
+                        "variant": "Coral"
+                      }
+                    },
+                    {
+                      "type": "gamePiece",
+                      "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/Algae",
+                      "logType": "Pose3d[]",
+                      "visible": true,
+                      "options": {
+                        "variant": "Algae"
+                      }
                     }
-                  }
-                ],
-                "game": "2025 Field (Welded)",
-                "bumpers": "auto",
-                "origin": "blue",
-                "orientation": 0,
-                "size": 30
-              },
-              "controllerUUID": "0t3oymcsdir8w8707sl02xgg4uoykx63",
-              "renderer": null,
-              "controlsHeight": 200
-            },
-            {
-              "type": 3,
-              "title": "3D Field",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "robot",
-                    "logKey": "NT:YAGSL Pose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "UFB"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:Photon Pose",
-                    "logType": "Transform3d",
-                    "visible": true,
-                    "options": {
-                      "model": "KitBot",
-                      "color": "#00ff00"
-                    }
-                  },
-                  {
-                    "type": "heatmap",
-                    "logKey": "NT:Target aligning position",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "timeRange": "enabled"
-                    }
-                  }
-                ],
-                "game": "Axes",
-                "origin": "blue"
-              },
-              "controllerUUID": "a3xgdl3bc135ic61w8oi3bxexhsgmr7e",
-              "renderer": {
-                "cameraIndex": -2,
-                "orbitFov": 50,
-                "cameraPosition": [
-                  -0.02228001443255076,
-                  1.004196295583137,
-                  -0.5783022708264584
-                ],
-                "cameraTarget": [
-                  0.15209381666900024,
-                  -0.074482689914508,
-                  0.5636371598852082
-                ]
-              },
-              "controlsHeight": 132
-            }
-          ]
+                  ],
+                  "game": "2025 Field (Welded)",
+                  "origin": "blue"
+                },
+                "controllerUUID": "fxg8tl58sf55x79h0rokzvj5rxcf7a3w",
+                "renderer": {
+                  "cameraIndex": -2,
+                  "orbitFov": 50,
+                  "cameraPosition": [
+                    -0.1057838619675453,
+                    1.0185548413429628,
+                    -0.8794926366955111
+                  ],
+                  "cameraTarget": [
+                    -0.8035406578223756,
+                    0.577408832916053,
+                    0.33582426635923945
+                  ]
+                },
+                "controlsHeight": 200
+              }
+            ]
+          }
         }
       }
-    }
-  ],
-  "satellites": [],
-  "version": "4.1.0"
-}
+    ],
+    "satellites": [],
+    "version": "4.1.5"
+  }
+  

@@ -4,14 +4,19 @@
 
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.visual.CoralSimVisual;
 
@@ -22,21 +27,16 @@ public class CoralSubsystem extends SubsystemBase {
     private CoralSimVisual simVisual = new CoralSimVisual(flywheelSim);
 
     public CoralSubsystem() {
+        double pivotAngle = 0;
+        SmartDashboard.putNumber("x", pivotAngle);
+        SmartDashboard.putNumber("y", pivotAngle);
+        SmartDashboard.putNumber("z", pivotAngle);
+        SmartDashboard.putNumber("pivot", pivotAngle);
+
     }
 
     @Override
     public void simulationPeriodic() {
-        // Use in later part.
-        /*
-         * m_armSim.setInput(m_pivotMotorSim.getAppliedOutput() *
-         * RobotController.getBatteryVoltage());
-         * m_pivotMotorSim.iterate(m_armSim.getVelocityRadPerSec(),
-         * RoboRioSim.getVInVoltage(), 0.020);
-         * m_armSim.update(0.020);
-         * 
-         * RoboRioSim.setVInVoltage(
-         * BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()
-         * ));
-         */
+
     }
 }

@@ -32,6 +32,7 @@ public class GenericMotorVisual extends SubsystemBase {
     private final Mechanism2d mech = new Mechanism2d(3, 3);
     private final MechanismRoot2d root = mech.getRoot("Motor", 1.5, 1.5);
     private final MechanismLigament2d wheel = new MechanismLigament2d("Wheel", 1.0, 0);
+    private final MechanismLigament2d opposingWheel = wheel.append(new MechanismLigament2d("Wheel", -1.0, 0));
 
     private final LinearSystem<N1, N1, N1> flywheelPlant = LinearSystemId.createFlywheelSystem(DCMotor.getNEO(1),
             0.00096,

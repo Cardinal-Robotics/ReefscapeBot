@@ -6,17 +6,18 @@ package frc.robot;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.robot.subsystems.ArmMechanism;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.GenericMotor;
 import frc.robot.visual.GenericMotorVisual;
 
 public class RobotContainer {
     /* Lessons: */
-    private final GenericMotor m_genericMotor = new GenericMotor();
+    // private final GenericMotor m_genericMotor = new GenericMotor();
+    // private final ArmMechanism m_armMechanism = new ArmMechanism();
 
     /* Challenge: */
-    // private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
+    private final CoralSubsystem m_coralSubsystem = new CoralSubsystem();
 
     public RobotContainer() {
     }

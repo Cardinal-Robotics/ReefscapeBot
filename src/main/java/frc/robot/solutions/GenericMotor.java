@@ -30,7 +30,7 @@ public class GenericMotor extends SubsystemBase {
         SmartDashboard.putNumber("Rotation Target", -30);
         SparkMaxConfig config = new SparkMaxConfig();
         config.closedLoop.pid(0.5, 0, 0.001);
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
         if (challengeMode)
             visual.startChallengeMode();
