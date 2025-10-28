@@ -81,7 +81,7 @@ public class CoralSimVisual extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        double pivotAngle = 30;
+        double pivotAngle = 30; // m_pivot.isPresent() ? m_pivot.get().getEncoder().getPosition() * 360 : 0
 
         List<GamePiece> coralGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Coral");
         List<Pose3d> coralPoses = new ArrayList<Pose3d>();
@@ -114,7 +114,8 @@ public class CoralSimVisual extends SubsystemBase {
                 0,
                 0.365,
                 new Rotation3d(0,
-                        Math.toRadians(30), 0))
+                        Math.toRadians(30), 0)) // m_pivot.isPresent() ? m_pivot.get().getEncoder().getPosition() * 360
+                                                // : 0
                 .plus(coralOffset);
     }
 
