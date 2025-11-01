@@ -92,7 +92,7 @@ public class RobotContainer {
     // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
     private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem,
-            m_swerveDrive)
+            m_swerveDrive);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
