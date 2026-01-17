@@ -8,7 +8,6 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
-import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -132,6 +131,5 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         CommandScheduler.getInstance().run();
-        SimulatedArena.getInstance().simulationPeriodic();
     }
 }

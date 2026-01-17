@@ -25,16 +25,8 @@ import frc.robot.Constants.ElevatorConstants.ElevatorTarget;
 import frc.robot.Constants.AlgaeMechanismConstants;
 import frc.robot.Constants.CoralMechanismConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.SpinnyheheboiSubsytem;
-import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.AlgaeSubsystem;
-import frc.robot.subsystems.CoralSubsystem;
-import frc.robot.subsystems.SimulatedGame;
-import frc.robot.commands.CoralAndProcessorAlign;
-import frc.robot.commands.ReefAlign;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -64,37 +56,17 @@ public class RobotContainer {
         Coral,
         Algae
     }
-    // ---------------------------------------------------------------------------------------------------------------------------------------
-    //
 
-    //
     // Controllers
     // ---------------------------------------------------------------------------------------------------------------------------------------
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
     private final CommandXboxController m_operatorController = new CommandXboxController(
             OperatorConstants.kOperatorControllerPort);
-    // ---------------------------------------------------------------------------------------------------------------------------------------
-    //
 
-    //
     // Subsystems
-    // ---------------------------------------------------------------------------------------------------------------------------------------
-    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem(null, null);
     private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
-    private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveDrive.getLibSwerveDrive());
-    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem(m_elevatorSubsystem);
-    private final CoralSubsystem m_coralSubsystem = new CoralSubsystem(m_elevatorSubsystem);
-    private final SpinnyheheboiSubsytem m_SpinnyheheboiSubsytem = new SpinnyheheboiSubsytem();
-    // private final LightSubsystem m_lightSubsystem = new
-    // LightSubsystem(m_elevatorSubsystem);
-    // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
-
-    private final SimulatedGame m_gameSim = new SimulatedGame(m_elevatorSubsystem, m_algaeSubsystem, m_coralSubsystem,
-            m_swerveDrive);
-    // ---------------------------------------------------------------------------------------------------------------------------------------
-    //
 
     //
     // YAGSL Swerve input streams
@@ -128,9 +100,6 @@ public class RobotContainer {
     private final Command m_driveFieldOriented = m_swerveDrive
             .driveFieldOriented(m_driveInputStream);
     private final Command m_resetGyro = Commands.runOnce(() -> m_swerveDrive.resetGyro(), m_swerveDrive);
-
-    private final ReefAlign m_alignAprilTag = new ReefAlign(m_visionSubsystem, m_swerveDrive,
-            m_elevatorSubsystem);
     // ---------------------------------------------------------------------------------------------------------------------------------------
     //
 
@@ -139,13 +108,10 @@ public class RobotContainer {
         SmartDashboard.putBoolean("Invert Rotation", false);
 
         DriverStation.silenceJoystickConnectionWarning(true);
-        m_elevatorSubsystem.setCoralSubsystem(m_coralSubsystem);
-        m_elevatorSubsystem.setDriveSubsystem(m_swerveDrive);
-
-        registerNamedCommands();
-        configureBindings();
 
         m_swerveDrive.setDefaultCommand(m_driveFieldOriented);
+
+        m_driverController.y().whileTrue(m_resetGyro);
 
         m_autoChooser = AutoBuilder.buildAutoChooser("Leave");
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
@@ -170,255 +136,8 @@ public class RobotContainer {
             }
         });
 
-        // m_coralsubsystem.setDefaultCommand(m_coralCommand);
-        /*
-         * m_lightSubsystem.setDefaultCommand(
-         * DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
-         * ? m_lightSubsystem.setConstantColor(253, 11, 205)
-         * : m_lightSubsystem.setConstantColor(0, 0, 255));
-         */
+
     }
-
-    private void registerNamedCommands() {
-        // AprilTag Alignment
-
-        NamedCommands.registerCommand("AprilTagAlignRight",
-                new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
-        NamedCommands.registerCommand("AprilTagAlignLeft",
-                new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
-        NamedCommands.registerCommand("AprilTagAlignCenter",
-                new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
-
-        // Elevator positions
-        NamedCommands.registerCommand("ElevatorCoralIntake",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.CoralIntake));
-        NamedCommands.registerCommand("ElevatorCoralL1",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L1, InteractionState.Coral));
-        NamedCommands.registerCommand("ElevatorCoralL2",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L2, InteractionState.Coral));
-        NamedCommands.registerCommand("ElevatorCoralL3",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L3, InteractionState.Coral));
-        NamedCommands.registerCommand("ElevatorCoralL4",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L4, InteractionState.Coral));
-        NamedCommands.registerCommand("ElevatorAlgaeL1",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L1, InteractionState.Algae));
-        NamedCommands.registerCommand("ElevatorAlgaeL2",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L2, InteractionState.Algae));
-        NamedCommands.registerCommand("ElevatorAlgaeL3",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L3, InteractionState.Algae));
-        NamedCommands.registerCommand("ElevatorAlgaeL4",
-                m_elevatorSubsystem.setElevatorGoalCommand(ElevatorTarget.L4, InteractionState.Algae));
-
-        NamedCommands.registerCommand("InteractionAlgae",
-                Commands.runOnce(() -> interactionState = InteractionState.Algae));
-        NamedCommands.registerCommand("InteractionCoral",
-                Commands.runOnce(() -> interactionState = InteractionState.Coral));
-
-        // Coral mechanism
-        NamedCommands.registerCommand("CoralTiltIntake",
-                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleIntake));
-        NamedCommands.registerCommand("CoralTiltL1Test",
-                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL1Test));
-        NamedCommands.registerCommand("CoralTiltStore",
-                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleStore));
-        NamedCommands.registerCommand("CoralTiltL1",
-                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL1));
-        NamedCommands.registerCommand("CoralTiltL2-L3",
-                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL2_3));
-        NamedCommands.registerCommand("CoralTiltL4",
-                m_coralSubsystem.setTargetCommand(CoralMechanismConstants.kTargetAngleL4));
-
-        NamedCommands.registerCommand("AlgaeTiltStore",
-                m_algaeSubsystem.setTiltTargetCommand(AlgaeMechanismConstants.kTargetDisabledAngle));
-        NamedCommands.registerCommand("AlgaeTiltL2",
-                m_algaeSubsystem.setTiltTargetCommand(AlgaeMechanismConstants.kTargetIntakeAngleL2));
-        NamedCommands.registerCommand("AlgaeTiltL3",
-                m_algaeSubsystem.setTiltTargetCommand(AlgaeMechanismConstants.kTargetIntakeAngleL3));
-
-        NamedCommands.registerCommand("AlgaeRelease", m_algaeSubsystem.spinIntakeMotorCommand(0.65, 2));
-        NamedCommands.registerCommand("AlgaeIntake", m_algaeSubsystem.spinIntakeMotorCommand(-0.65, 1.5));
-
-        NamedCommands.registerCommand("CoralRelease", m_coralSubsystem.setIntakeMotorCommand(-0.15, 2));
-        NamedCommands.registerCommand("CoralIntake", m_coralSubsystem.setIntakeMotorCommand(0.2, 1));
-    }
-
-    private void configureBindings() {
-        // Driver controls
-        m_driverController.y().onTrue(m_resetGyro);
-        m_driverController.rightBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, -0.35)));
-        m_driverController.leftBumper().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0, 0.35)));
-        m_driverController.rightTrigger().whileTrue(m_swerveDrive.driveRelative(new Translation2d(0.35, 0)));
-        m_driverController.leftTrigger().whileTrue(m_swerveDrive.driveRelative(new Translation2d(-0.35, 0)));
-
-        m_driverController.a().whileTrue(m_alignAprilTag);
-        /*
-         * m_driverController.b().and(
-         * () -> 0 < 1)
-         * .whileTrue(m_swerveDrive.driveToPose(new Pose2d(11.55, 7.5,
-         * Rotation2d.kCCW_90deg)));
-         */
-
-        // m_driverController.povRight().onTrue(Commands.runOnce(() ->
-        // m_alignAprilTag.setOffsetPose(-0.5, 0.15)));
-        m_driverController.povRight()
-                .whileTrue(new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0.15));
-        m_driverController.povLeft()
-                .whileTrue(new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, -0.15));
-        m_driverController.povUp()
-                .whileTrue(new ReefAlign(m_visionSubsystem, m_swerveDrive, m_elevatorSubsystem, 0.5, 0));
-
-        m_driverController.povDown().whileTrue(new CoralAndProcessorAlign(m_swerveDrive, m_elevatorSubsystem));
-        /*
-         * m_driveInputStream.driveToPose(() ->
-         * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas),
-         * new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(3, 1)),
-         * new ProfiledPIDController(0.1, 0, 0,
-         * new TrapezoidProfile.Constraints(Units.degreesToRadians(30),
-         * Units.degreesToRadians(30))));
-         * 
-         * m_driverController.povDown()
-         * .and(() -> m_elevatorSubsystem.getPosition() <
-         * ElevatorTarget.CoralIntake.getCoralPosition() + 0.1)
-         * .whileTrue(Commands.runEnd(() -> {
-         * Pose2d nearestPose =
-         * m_swerveDrive.getPose().nearest(DriveConstants.kInteractionAreas);
-         * double distance = nearestPose.getTranslation()
-         * .getDistance(m_swerveDrive.getPose().getTranslation());
-         * if (distance > 2)
-         * m_driveInputStream.driveToPoseEnabled(false);
-         * else
-         * m_driveInputStream.driveToPoseEnabled(true);
-         * }, () -> {
-         * m_driveInputStream.driveToPoseEnabled(false);
-         * }));
-         */
-
-        /*
-         * m_driverController.x()
-         * .toggleOnTrue(Commands.runOnce(() ->
-         * m_swerveDrive.setDefaultCommand(m_driveFieldOriented)));
-         */
-
-        // Climber controls
-        /*
-         * m_driverController.leftStick()
-         * .onTrue(Commands.runOnce(() ->
-         * m_climberSubsystem.setGoal(ClimberConstants.kCrushingFrame),
-         * m_climberSubsystem));
-         * m_driverController.rightStick()
-         * .onTrue(Commands.runOnce(() ->
-         * m_climberSubsystem.setGoal(ClimberConstants.kCrushingCage),
-         * m_climberSubsystem));
-         */
-
-        /*
-         * m_driverController.b()
-         * .onTrue(m_swerveDrive.driveToPose(DriverStation.getAlliance().get() ==
-         * Alliance.Red
-         * ? Constants.DriveConstants.kInitialRedRobotPose
-         * : Constants.DriveConstants.kInitialBlueRobotPose));
-         */
-
-        // Operator controls
-
-        // State Controls
-        m_operatorController.rightStick()
-                .onTrue(Commands.runOnce(() -> {
-                    interactionState = InteractionState.Algae;
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleStore);
-                }));
-
-        m_operatorController.leftStick()
-                .onTrue(Commands.runOnce(() -> {
-                    interactionState = InteractionState.Coral;
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetDisabledAngle);
-                }));
-
-        // Coral Controls
-        m_operatorController.leftBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(0.5))
-                .onFalse(m_coralSubsystem.setIntakeMotorCommand(0));
-        m_operatorController.rightBumper()
-                .onTrue(m_coralSubsystem.setIntakeMotorCommand(() -> ElevatorSubsystem.coralReleaseSpeed))
-                .onFalse(m_coralSubsystem.setIntakeMotorCommand(0))
-                .onFalse(Commands.runOnce(() -> {
-                    Optional<PhotonTrackedTarget> target = Robot.isSimulation() ? m_visionSubsystem.getClosestTarget()
-                            : m_visionSubsystem.getBestTarget();
-                    if (target.isEmpty())
-                        return;
-
-                    Optional<Transform2d> potentialPose = m_visionSubsystem
-                            .getRobotPoseRelativeToAprilTag(target.get().fiducialId);
-
-                    if (potentialPose.isEmpty())
-                        return;
-
-                    Logger.recordOutput("Offset", potentialPose.get());
-                }));
-
-        // Algae Controls
-        m_operatorController.leftTrigger()
-                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(-1))
-                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(-0.1));
-
-        m_operatorController.rightTrigger()
-                .onTrue(m_algaeSubsystem.spinIntakeMotorCommand(1))
-                .onFalse(m_algaeSubsystem.spinIntakeMotorCommand(0))
-                .onFalse(Commands.runOnce(() -> {
-                    Optional<PhotonTrackedTarget> target = Robot.isSimulation() ? m_visionSubsystem.getClosestTarget()
-                            : m_visionSubsystem.getBestTarget();
-                    if (target.isEmpty())
-                        return;
-
-                    Optional<Transform2d> potentialPose = m_visionSubsystem
-                            .getRobotPoseRelativeToAprilTag(target.get().fiducialId);
-
-                    if (potentialPose.isEmpty())
-                        return;
-
-                    Logger.recordOutput("Offset", potentialPose.get());
-                }));
-
-        // Elevator Positions
-        m_operatorController.button(7)
-                .onTrue(Commands.runOnce(() -> {
-                    // m_lightSubsystem.elevatorPattern();
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.CoralIntake);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleIntake);
-                }));
-
-        m_operatorController.button(8).and(() -> m_elevatorSubsystem.getPosition() < 0.1)
-                .onTrue(Commands.runOnce(() -> m_elevatorSubsystem.resetEncoder()));
-
-        m_operatorController.a()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L1, ElevatorTarget.AlgaeScore);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL1);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetGroundIntakeAngle);
-                }));
-
-        m_operatorController.x()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L2);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngleL2);
-                }));
-
-        m_operatorController.b()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L3);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL2_3);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetIntakeAngleL3);
-                }));
-
-        m_operatorController.y()
-                .onTrue(Commands.runOnce(() -> {
-                    m_elevatorSubsystem.setElevatorGoal(ElevatorTarget.L4, ElevatorTarget.AlgaeScore);
-                    m_coralSubsystem.setTarget(CoralMechanismConstants.kTargetAngleL4);
-                    m_algaeSubsystem.setTiltTarget(AlgaeMechanismConstants.kTargetScoreAngle);
-                }));
-    }
-
     public Command getAutonomousCommand() {
         return m_autoChooser.getSelected();
     }
